@@ -41,12 +41,11 @@ td{color:#e2e8f0;word-break:break-all;}
 <div class="container">
     <div class="title-box">
         <h1>NAT推广基金募捐公示网</h1>
-        <p>链上实时数据 | 自动统计 | 公开监督</p>
+        <p>链上实时数据 | 自动统计排行 | 公开监督</p>
     </div>
 
-    <div class="loading" id="loadTip">正在拉取链上真实数据...</div>
+    <div class="loading" id="loadTip">正在同步链上数据...</div>
 
-    <!-- 余额 -->
     <div class="card-wrap">
         <div class="card">
             <h2>USDT 募捐余额</h2>
@@ -56,14 +55,13 @@ td{color:#e2e8f0;word-break:break-all;}
         </div>
         <div class="card">
             <h2>NAT 募捐余额</h2>
-            <div class="chain-balance">BTC(Tap)：<span id="natBtc">0.00</span> NAT <a id="linkTapNat" target="_blank" class="btn-link">查询</a></div>
+            <div class="chain-balance">BTC(Tap)：<span id="natBtc">待Tap查询</span> NAT <a id="linkTapNat" target="_blank" class="btn-link">查询</a></div>
             <div class="chain-balance">ETH链：<span id="natEth">0.00</span> NAT <a id="linkEthNat" target="_blank" class="btn-link">查询</a></div>
             <div class="chain-balance">BSC链：<span id="natBsc">0.00</span> NAT <a id="linkBscNat" target="_blank" class="btn-link">查询</a></div>
             <div class="total-balance">NAT 总额：<span id="natTotal">0.00</span></div>
         </div>
     </div>
 
-    <!-- 双榜单：仅排名+地址+数量 -->
     <div class="rank-wrap">
         <div class="table-box">
             <div class="table-title">🏆 NAT 捐赠排行榜</div>
@@ -81,7 +79,6 @@ td{color:#e2e8f0;word-break:break-all;}
         </div>
     </div>
 
-    <!-- 底部收款地址 -->
     <div class="addr-box">
         <h2>📎 官方募捐接收地址</h2>
         <div class="addr-item"><strong>USDT-ETH/BSC：</strong>0x65a177f0ce9ad38875aa309dae3fbb289c58f689</div>
@@ -93,59 +90,68 @@ td{color:#e2e8f0;word-break:break-all;}
 </div>
 
 <script>
-// ===================== 配置（已按你要求填好，不用改）=====================
-const COLLECT_ETHBSC = "0x65a177f0ce9ad38875aa309dae3fbb289c58f689";
-const COLLECT_TAPBTC = "bc1p0c5cg8hhm9f4v9alt5vvp3gn8usekw5wlj9a53hjuh2fem5j2efq7ke04n";
-
-// 已从 ave.ai 取 交易量最大 NAT 官方合约
+// 后端接口地址
+const API_HOST = "http://localhost:3000/api";
+// 合约与地址配置
+const COLLECT_ADDR = "0x65a177f0ce9ad38875aa309dae3fbb289c58f689";
+const TAP_ADDR = "bc1p0c5cg8hhm9f4v9alt5vvp3gn8usekw5wlj9a53hjuh2fem5j2efq7ke04n";
 const NAT_ETH = "0x249130F5E2dD4CF278180c0dF8273f3592Ad1247";
 const NAT_BSC = "0xEdF9Df5C987023f28D20dC81970f27841c968F3c";
-
 const USDT_ETH = "0xdac17f958d2ee523a2206206994597c13d831ec7";
 const USDT_BSC = "0x55d398326f99059fF775485246999027B3197955";
 
-const RPC_ETH = "https://mainnet.infura.io/v3/9aa3d95bca3bed94629f5f4898763048";
-const RPC_BSC = "https://bsc-dataseed1.binance.org";
+// 跳转链接赋值
+document.getElementById("linkEthUsdt").href = `https://etherscan.io/token/${USDT_ETH}?a=${COLLECT_ADDR}`;
+document.getElementById("linkBscUsdt").href = `https://bscscan.com/token/${USDT_BSC}?a=${COLLECT_ADDR}`;
+document.getElementById("linkTapNat").href = `https://www.tapalytics.xyz/address/${TAP_ADDR}`;
+document.getElementById("linkEthNat").href = `https://etherscan.io/token/${NAT_ETH}?a=${COLLECT_ADDR}`;
+document.getElementById("linkBscNat").href = `https://bscscan.com/token/${NAT_BSC}?a=${COLLECT_ADDR}`;
 
-// 一键查询链接
-document.getElementById("linkEthUsdt").href = `https://etherscan.io/token/${USDT_ETH}?a=${COLLECT_ETHBSC}`;
-document.getElementById("linkBscUsdt").href = `https://bscscan.com/token/${USDT_BSC}?a=${COLLECT_ETHBSC}`;
-document.getElementById("linkTapNat").href = `https://www.tapalytics.xyz/address/${COLLECT_TAPBTC}`;
-document.getElementById("linkEthNat").href = `https://etherscan.io/token/${NAT_ETH}?a=${COLLECT_ETHBSC}`;
-document.getElementById("linkBscNat").href = `https://bscscan.com/token/${NAT_BSC}?a=${COLLECT_ETHBSC}`;
+// 加载余额数据
+async function loadBalance(){
+    let res = await fetch(`${API_HOST}/balance`);
+    let data = await res.json();
+    if(!data) return;
+    document.getElementById("usdtEth").innerText = data.usdt.eth;
+    document.getElementById("usdtBsc").innerText = data.usdt.bsc;
+    document.getElementById("usdtTotal").innerText = data.usdt.total;
 
-const web3Eth = new Web3(new Web3.providers.HttpProvider(RPC_ETH));
-const web3Bsc = new Web3(new Web3.providers.HttpProvider(RPC_BSC));
-
-const erc20Abi = [{"constant":true,"inputs":[{"name":"_owner","type":"address"}],"name":"balanceOf","outputs":[{"name":"balance","type":"uint256"}],"type":"function"}];
-
-let ue="0",ub="0",ne="0",nb="0",nt="0";
-
-function fmt(bal,dec){return (Number(bal)/10**dec).toFixed(2);}
-
-async function getUsdtEth(){let c=new web3Eth.eth.Contract(erc20Abi,USDT_ETH);ue=fmt(await c.methods.balanceOf(COLLECT_ETHBSC).call(),6);document.getElementById("usdtEth").innerText=ue;}
-async function getUsdtBsc(){let c=new web3Bsc.eth.Contract(erc20Abi,USDT_BSC);ub=fmt(await c.methods.balanceOf(COLLECT_ETHBSC).call(),6);document.getElementById("usdtBsc").innerText=ub;}
-async function getNatEth(){let c=new web3Eth.eth.Contract(erc20Abi,NAT_ETH);ne=fmt(await c.methods.balanceOf(COLLECT_ETHBSC).call(),18);document.getElementById("natEth").innerText=ne;}
-async function getNatBsc(){let c=new web3Bsc.eth.Contract(erc20Abi,NAT_BSC);nb=fmt(await c.methods.balanceOf(COLLECT_ETHBSC).call(),18);document.getElementById("natBsc").innerText=nb;}
-
-// Tap链BTC-NAT 前端模拟（真实需后端API，这里显示链上查询入口）
-async function getNatTap(){document.getElementById("natBtc").innerText="链上查询";}
-
-function total(){
-document.getElementById("usdtTotal").innerText=(Number(ue)+Number(ub)).toFixed(2);
-document.getElementById("natTotal").innerText=(Number(ne)+Number(nb)).toFixed(2);
+    document.getElementById("natEth").innerText = data.nat.eth;
+    document.getElementById("natBsc").innerText = data.nat.bsc;
+    document.getElementById("natTotal").innerText = data.nat.total;
 }
 
-// 排行榜渲染（对接后端归集地址即可自动排行）
-function renderRank(){
-document.getElementById("natRankList").innerHTML=`<tr><td>1</td><td>${COLLECT_ETHBSC}</td><td>${ne}</td></tr>`;
-document.getElementById("usdtRankList").innerHTML=`<tr><td>1</td><td>${COLLECT_ETHBSC}</td><td>${ue}</td></tr>`;
+// 加载排行数据
+async function loadRank(){
+    let res = await fetch(`${API_HOST}/rank`);
+    let data = await res.json();
+    let natHtml = "";
+    data.natList.forEach((item,idx)=>{
+        natHtml += `<tr><td>${idx+1}</td><td>${item.addr}</td><td>${item.amount}</td></tr>`
+    })
+    document.getElementById("natRankList").innerHTML = natHtml;
+
+    let usdtHtml = "";
+    data.usdtList.forEach((item,idx)=>{
+        usdtHtml += `<tr><td>${idx+1}</td><td>${item.addr}</td><td>${item.amount}</td></tr>`
+    })
+    document.getElementById("usdtRankList").innerHTML = usdtHtml;
 }
 
-window.onload=async()=>{
-try{await Promise.all([getUsdtEth(),getUsdtBsc(),getNatEth(),getNatBsc(),getNatTap()]);total();renderRank();document.getElementById("loadTip").innerText="✅ 链上数据已同步";}
-catch(e){document.getElementById("loadTip").innerText="⚠️ 数据加载失败";console.error(e);}
-};
+// 页面初始化
+async function initPage(){
+    try{
+        await Promise.all([loadBalance(), loadRank()]);
+        document.getElementById("loadTip").innerText = "✅ 链上数据加载完成";
+    }catch(e){
+        document.getElementById("loadTip").innerText = "⚠️ 数据同步异常";
+        console.error(e);
+    }
+}
+
+// 定时刷新数据，实时更新榜单余额
+initPage();
+setInterval(initPage, 30000);
 </script>
 </body>
 </html>
