@@ -23,7 +23,7 @@ body{background:#070a13;color:#e2e8f0;font-family:system-ui,-apple-system,Segoe 
 </style>
 </head>
 <body class="max-w-6xl mx-auto p-4 py-6">
-<h1 class="text-xl font-bold mb-6 text-center"> NAT市场推广基金募捐统计表</h1>
+<h1 class="text-xl font-bold mb-6 text-center"> USDT & DMT-NAT 多链转入监控｜时间筛选</h1>
 
 <!-- 时间筛选 -->
 <div class="card mb-4">
@@ -80,15 +80,15 @@ const CONTRACT = {
   ETH_USDT:  '0xdac17f958d2ee523a2206206994597c13d831ec7',
   BSC_USDT:  '0x55d398326f99059fF775485246999027B3197955',
   SOL_USDT:  'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB',
-  ETH_NAT:   '0x249130f5e2dd4cf278180c0df8273f3592ad1247',
-  BSC_NAT:   '0x600e3b55d5368c32a94f9372563318adb6a3f882',
-  SOL_NAT:   'FbKRaqBzupLry3V7QujpNghwrHgxutB4MY11M8aeyVa1',
+  ETH_NAT:   null,
+  BSC_NAT:   null,
+  SOL_NAT:   null,
   BTC_NAT:   null
 };
 
-// ====================== 【粘贴你的密钥 只改这里！】======================
-const ETH_API_KEY = "【B7Z4F2I35HC41MC1AEZU9YTJXAGCKWM4RA】";
-const BSC_API_KEY = "【B7Z4F2I35HC41MC1AEZU9YTJXAGCKWM4RA】";
+// ====================== 已填入你提供的统一API密钥 ======================
+const ETH_API_KEY = "B7Z4F2I35HC41MC1AEZU9YTJXAGCKWM4RA";
+const BSC_API_KEY = "B7Z4F2I35HC41MC1AEZU9YTJXAGCKWM4RA";
 // =====================================================================
 
 const proxy = url => `https://corsproxy.io/?${encodeURIComponent(url)}`;
@@ -124,11 +124,11 @@ async function fetchInTxs(item) {
         if (t.to.toLowerCase() !== addr.toLowerCase()) return;
         const c = t.contractAddress.toLowerCase();
         if (coin === 'USDT' && c !== CONTRACT.ETH_USDT) return;
-        if (coin === 'NAT' && c !== CONTRACT.ETH_NAT) return;
         const val = Number(t.value) / 1e6;
         txs.push({ chain, coin, addr, value: val, time: Number(t.timeStamp)*1000 });
       });
     }
+
     if (chain === 'BSC') {
       const api = proxy(`https://api.bscscan.com/api?module=account&action=tokentx&address=${addr}&sort=desc&apikey=${BSC_API_KEY}`);
       const res = await fetch(api);
@@ -138,11 +138,11 @@ async function fetchInTxs(item) {
         if (t.to.toLowerCase() !== addr.toLowerCase()) return;
         const c = t.contractAddress.toLowerCase();
         if (coin === 'USDT' && c !== CONTRACT.BSC_USDT) return;
-        if (coin === 'NAT' && c !== CONTRACT.BSC_NAT) return;
         const val = Number(t.value) / 1e6;
         txs.push({ chain, coin, addr, value: val, time: Number(t.timeStamp)*1000 });
       });
     }
+
     if (chain === 'SOL') {
       const api = proxy(`https://api.solscan.io/account/transactions?address=${addr}&limit=50`);
       const res = await fetch(api);
@@ -158,18 +158,21 @@ async function fetchInTxs(item) {
         });
       });
     }
-    if (chain === 'BTC') {
-      const api = proxy(`https://blockchain.info/rawaddr/${addr}`);
+
+    // ========== BTC-NAT：改用 Tapalytics Tap协议浏览器 ==========
+    if (chain === 'BTC' && coin === 'NAT') {
+      const api = proxy(`https://api.tapalytics.xyz/v1/address/${addr}/transfers`);
       const res = await fetch(api);
       const data = await res.json();
-      data.txs.forEach(t => {
-        t.out.forEach(o => {
-          if (o.addr !== addr) return;
-          const val = o.value / 1e8;
-          txs.push({ chain:'BTC', coin:'NAT', addr, value: val, time: t.time*1000 });
-        });
+      if (!data || !data.transfers) return [];
+      data.transfers.forEach(t => {
+        if (t.to !== addr) return;
+        const val = Number(t.amount);
+        const ts = t.timestamp ? Number(t.timestamp)*1000 : Date.now();
+        txs.push({ chain:'BTC', coin:'NAT', addr, value: val, time: ts });
       });
     }
+
   } catch(e){ console.error(chain, e); }
   return txs;
 }
