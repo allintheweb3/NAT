@@ -50,18 +50,18 @@
         <div class="card-wrap">
             <div class="card">
                 <h2>USDT 募捐余额</h2>
-                <div class="chain-balance">ETH链余额：<span id="usdtEth">0.00</span> USDT <a href="https://etherscan.io" target="_blank" class="btn-link">一键查询</a></div>
-                <div class="chain-balance">BSC链余额：<span id="usdtBsc">0.00</span> USDT <a href="https://bscscan.com" target="_blank" class="btn-link">一键查询</a></div>
-                <div class="chain-balance">SOL链余额：<span id="usdtSol">0.00</span> USDT <a href="https://solscan.io" target="_blank" class="btn-link">一键查询</a></div>
+                <div class="chain-balance">ETH链余额：<span id="usdtEth">0.00</span> USDT <a id="linkEthUsdt" href="" target="_blank" class="btn-link">一键查询</a></div>
+                <div class="chain-balance">BSC链余额：<span id="usdtBsc">0.00</span> USDT <a id="linkBscUsdt" href="" target="_blank" class="btn-link">一键查询</a></div>
+                <div class="chain-balance">SOL链余额：<span id="usdtSol">0.00</span> USDT <a id="linkSolUsdt" href="" target="_blank" class="btn-link">一键查询</a></div>
                 <div class="total-balance">USDT 合计总额：<span id="usdtTotal">0.00</span> USDT</div>
             </div>
 
             <div class="card">
                 <h2>NAT 募捐余额</h2>
-                <div class="chain-balance">BTC链(Tap)余额：<span id="natBtc">0.00</span> NAT <a href="https://tapscan.io" target="_blank" class="btn-link">一键查询</a></div>
-                <div class="chain-balance">ETH链余额：<span id="natEth">0.00</span> NAT <a href="https://etherscan.io" target="_blank" class="btn-link">一键查询</a></div>
-                <div class="chain-balance">BSC链余额：<span id="natBsc">0.00</span> NAT <a href="https://bscscan.com" target="_blank" class="btn-link">一键查询</a></div>
-                <div class="chain-balance">SOL链余额：<span id="natSol">0.00</span> NAT <a href="https://solscan.io" target="_blank" class="btn-link">一键查询</a></div>
+                <div class="chain-balance">BTC链(Tap)余额：<span id="natBtc">0.00</span> NAT <a id="linkTapNat" href="" target="_blank" class="btn-link">一键查询</a></div>
+                <div class="chain-balance">ETH链余额：<span id="natEth">0.00</span> NAT <a id="linkEthNat" href="" target="_blank" class="btn-link">一键查询</a></div>
+                <div class="chain-balance">BSC链余额：<span id="natBsc">0.00</span> NAT <a id="linkBscNat" href="" target="_blank" class="btn-link">一键查询</a></div>
+                <div class="chain-balance">SOL链余额：<span id="natSol">0.00</span> NAT <a id="linkSolNat" href="" target="_blank" class="btn-link">一键查询</a></div>
                 <div class="total-balance">NAT 合计总额：<span id="natTotal">0.00</span> NAT</div>
             </div>
         </div>
@@ -144,10 +144,26 @@
     </div>
 
     <script>
-        // 链上余额数据
+        // 收款地址常量
+        const addrEthBsc = "0x65a177f0ce9ad38875aa309dae3fbb289c58f689";
+        const addrSol = "J16N4uAQKXF7Y3fDgkowhVVBniFbW2fW4f7uKygau1y6";
+        const addrTapBtc = "bc1p0c5cg8hhm9f4v9alt5vvp3gn8usekw5wlj9a53hjuh2fem5j2efq7ke04n";
+
+        // ========== 在这里修改余额数值 ==========
         const balanceData = {
-            usdt:{eth:"0.00",bsc:"0.00",sol:"0.00",total:"0.00"},
-            nat:{btc:"0.00",eth:"0.00",bsc:"0.00",sol:"0.00",total:"0.00"}
+            usdt:{
+                eth:"1256.88",
+                bsc:"892.35",
+                sol:"368.70",
+                total:"2517.93"
+            },
+            nat:{
+                btc:"5200.66",
+                eth:"3100.22",
+                bsc:"1890.50",
+                sol:"960.80",
+                total:"11152.18"
+            }
         };
 
         // 赋值页面余额
@@ -162,33 +178,67 @@
         document.getElementById("natSol").innerText=balanceData.nat.sol;
         document.getElementById("natTotal").innerText=balanceData.nat.total;
 
-        // NAT捐赠榜单数据
+        // 修复一键查询链接，直接跳转地址详情页
+        document.getElementById("linkEthUsdt").href = `https://etherscan.io/address/${addrEthBsc}`;
+        document.getElementById("linkBscUsdt").href = `https://bscscan.com/address/${addrEthBsc}`;
+        document.getElementById("linkSolUsdt").href = `https://solscan.io/address/${addrSol}`;
+
+        document.getElementById("linkTapNat").href = `https://tapscan.io/address/${addrTapBtc}`;
+        document.getElementById("linkEthNat").href = `https://etherscan.io/address/${addrEthBsc}`;
+        document.getElementById("linkBscNat").href = `https://bscscan.com/address/${addrEthBsc}`;
+        document.getElementById("linkSolNat").href = `https://solscan.io/address/${addrSol}`;
+
+        // ========== 在这里填写NAT捐赠排行榜数据 ==========
         let natRankData = [
-            {nick:"",num:"",time:"",chain:""}
+            {nick:"用户甲",num:"2600.30",time:"2026-05-10",chain:"BTC(Tap)链"},
+            {nick:"用户乙",num:"2100.50",time:"2026-05-12",chain:"ETH链"},
+            {nick:"用户丙",num:"1800.20",time:"2026-05-15",chain:"BSC链"}
         ];
         let natHtml = "";
         natRankData.forEach((item,idx)=>{
-            natHtml += `<tr><td>${idx+1}</td><td>${item.nick}</td><td>${item.num}</td><td>${item.time}</td><td>${item.chain}</td></tr>`;
+            natHtml += `<tr>
+                <td>${idx+1}</td>
+                <td>${item.nick}</td>
+                <td>${item.num}</td>
+                <td>${item.time}</td>
+                <td>${item.chain}</td>
+            </tr>`;
         });
         document.getElementById("natRankList").innerHTML=natHtml;
 
-        // USDT捐赠榜单数据
+        // ========== 在这里填写USDT捐赠排行榜数据 ==========
         let usdtRankData = [
-            {nick:"",num:"",time:"",chain:""}
+            {nick:"伙伴A",num:"950.60",time:"2026-05-08",chain:"ETH链"},
+            {nick:"伙伴B",num:"720.25",time:"2026-05-11",chain:"BSC链"},
+            {nick:"伙伴C",num:"368.70",time:"2026-05-13",chain:"SOL链"}
         ];
         let usdtHtml = "";
         usdtRankData.forEach((item,idx)=>{
-            usdtHtml += `<tr><td>${idx+1}</td><td>${item.nick}</td><td>${item.num}</td><td>${item.time}</td><td>${item.chain}</td></tr>`;
+            usdtHtml += `<tr>
+                <td>${idx+1}</td>
+                <td>${item.nick}</td>
+                <td>${item.num}</td>
+                <td>${item.time}</td>
+                <td>${item.chain}</td>
+            </tr>`;
         });
         document.getElementById("usdtRankList").innerHTML=usdtHtml;
 
-        // 捐赠流水数据
+        // ========== 在这里填写捐赠流水数据 ==========
         let flowData = [
-            {time:"",nick:"",coin:"",num:"",chain:"",hash:""}
+            {time:"2026-05-18 10:20",nick:"用户甲",coin:"NAT",num:"1200.00",chain:"BTC(Tap)链",hash:"0xabc123xxxx"},
+            {time:"2026-05-17 15:30",nick:"伙伴A",coin:"USDT",num:"500.00",chain:"ETH链",hash:"0xdef456xxxx"}
         ];
         let flowHtml = "";
         flowData.forEach(item=>{
-            flowHtml += `<tr><td>${item.time}</td><td>${item.nick}</td><td>${item.coin}</td><td>${item.num}</td><td>${item.chain}</td><td>${item.hash}</td></tr>`;
+            flowHtml += `<tr>
+                <td>${item.time}</td>
+                <td>${item.nick}</td>
+                <td>${item.coin}</td>
+                <td>${item.num}</td>
+                <td>${item.chain}</td>
+                <td>${item.hash}</td>
+            </tr>`;
         });
         document.getElementById("logList").innerHTML=flowHtml;
     </script>
