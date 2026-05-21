@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>USDT & DMT-NAT 多链转入监控｜时间筛选版</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+*{box-sizing:border-box}
+body{background:#070a13;color:#e2e8f0;font-family:system-ui,-apple-system,Segoe UI}
+.card{background:#101526;border:1px solid #1f2940;border-radius:14px;padding:16px;margin-bottom:12px}
+.chain-badge{padding:2px 7px;border-radius:6px;font-size:11px;margin-right:6px}
+.btc{background:#f7931a22;color:#f7931a}
+.eth{background:#627eea22;color:#627eea}
+.bsc{background:#f3ba2f22;color:#f3ba2f}
+.sol{background:#00ffa322;color:#00ffa3}
+.usdt{color:#2dd4bf;font-weight:500}
+.nat{color:#f472b6;font-weight:500}
+.rank-1{border-left:4px solid #facc15}
+.rank-2{border-left:4px solid #9ca3af}
+.rank-3{border-left:4px solid #b45309}
+.select{background:#1a2138;border:1px solid #334155;color:#fff;padding:8px 12px;border-radius:8px}
+</style>
+</head>
+<body class="max-w-6xl mx-auto p-4 py-6">
+<h1 class="text-xl font-bold mb-6 text-center"> NAT市场推广基金募捐统计表</h1>
+
+<!-- 时间筛选 -->
+<div class="card mb-4">
+<div class="flex items-center gap-3">
+<span>筛选时间：</span>
+<select id="timeFilter" class="select">
+<option value="all">全部</option>
+<option value="1d">近24小时</option>
+<option value="7d">近7天</option>
+<option value="30d">近30天</option>
+</select>
+</div>
+</div>
+
+<div class="card">
+<h2 class="text-base font-semibold mb-3">已监控地址</h2>
+<div id="addrList" class="space-y-2 text-sm"></div>
+</div>
+
+<div class="grid md:grid-cols-4 gap-4 mb-6">
+<div class="card text-center">USDT总转入<br><span id="usdtIn" class="usdt font-bold text-lg">0</span></div>
+<div class="card text-center">NAT总转入<br><span id="natIn" class="nat font-bold text-lg">0</span></div>
+<div class="card text-center">更新状态<br><span id="status" class="text-yellow-400">读取链中</span></div>
+<div class="card text-center">最近更新<br><span id="updateTime" class="text-gray-400">-</span></div>
+</div>
+
+<div class="grid md:grid-cols-2 gap-6 mb-6">
+<div class="card">
+<h2 class="text-base font-semibold mb-3"> USDT转入排名（累积×时间权重）</h2>
+<div id="rankUSDT"></div>
+</div>
+<div class="card">
+<h2 class="text-base font-semibold mb-3"> DMT-NAT转入排名（累积×时间权重）</h2>
+<div id="rankNAT"></div>
+</div>
+</div>
+
+<div class="card">
+<h2 class="text-base font-semibold mb-3"> 转入流水（仅目标合约）</h2>
+<div id="txList" class="space-y-2 text-sm"></div>
+</div>
+
+<script>
+// 你的监控地址
+const watchList = [
+  { chain:'BTC', coin:'NAT', addr:'bc1p0c5cg8hhm9f4v9alt5vvp3gn8usekw5wlj9a53hjuh2fem5j2efq7ke04n' },
+  { chain:'ETH', coin:'USDT', addr:'0x65a177f0ce9ad38875aa309dae3fbb289c58f689' },
+  { chain:'BSC', coin:'USDT', addr:'0x65a177f0ce9ad38875aa309dae3fbb289c58f689' },
+  { chain:'SOL', coin:'USDT', addr:'J16N4uAQKXF7Y3fDgkowhVVBniFbW2fW4f7uKygau1y6' }
+];
+
+// 各链合约地址
+const CONTRACT = {
+  ETH_USDT:  '0xdac17f958d2ee523a2206206994597c13d831ec7',
+  BSC_USDT:  '0x55d398326f99059fF775485246999027B3197955',
+  SOL_USDT:  'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB',
+  ETH_NAT:   '0x0000000000000000000000000000000000000000',
+  BSC_NAT:   '0x0000000000000000000000000000000000000000',
+  SOL_NAT:   '0x0000000000000000000000000000000000000000',
+  BTC_NAT:   null
+};
+
+// ====================== 【粘贴你的密钥 只改这里！】======================
+const ETH_API_KEY = "【B7Z4F2I35HC41MC1AEZU9YTJXAGCKWM4RA】";
+const BSC_API_KEY = "【B7Z4F2I35HC41MC1AEZU9YTJXAGCKWM4RA】";
+// =====================================================================
+
+const proxy = url => `https://corsproxy.io/?${encodeURIComponent(url)}`;
+let allRawTxs = [];
+
+// 时间筛选计算时间戳
+function getTimeCut(type){
+  const now = Date.now();
+  switch(type){
+    case '1d': return now - 86400*1000;
+    case '7d': return now - 86400*7*1000;
+    case '30d':return now - 86400*30*1000;
+    default: return 0;
+  }
+}
+
+// 筛选交易
+function filterTxs(txs, type){
+  const cut = getTimeCut(type);
+  return txs.filter(t => t.time >= cut);
+}
+
+async function fetchInTxs(item) {
+  const {chain,coin,addr} = item;
+  let txs = [];
+  try {
+    if (chain === 'ETH') {
+      const api = proxy(`https://api.etherscan.io/api?module=account&action=tokentx&address=${addr}&sort=desc&apikey=${ETH_API_KEY}`);
+      const res = await fetch(api);
+      const data = await res.json();
+      if (!data.result) return [];
+      data.result.forEach(t => {
+        if (t.to.toLowerCase() !== addr.toLowerCase()) return;
+        const c = t.contractAddress.toLowerCase();
+        if (coin === 'USDT' && c !== CONTRACT.ETH_USDT) return;
+        if (coin === 'NAT' && c !== CONTRACT.ETH_NAT) return;
+        const val = Number(t.value) / 1e6;
+        txs.push({ chain, coin, addr, value: val, time: Number(t.timeStamp)*1000 });
+      });
+    }
+    if (chain === 'BSC') {
+      const api = proxy(`https://api.bscscan.com/api?module=account&action=tokentx&address=${addr}&sort=desc&apikey=${BSC_API_KEY}`);
+      const res = await fetch(api);
+      const data = await res.json();
+      if (!data.result) return [];
+      data.result.forEach(t => {
+        if (t.to.toLowerCase() !== addr.toLowerCase()) return;
+        const c = t.contractAddress.toLowerCase();
+        if (coin === 'USDT' && c !== CONTRACT.BSC_USDT) return;
+        if (coin === 'NAT' && c !== CONTRACT.BSC_NAT) return;
+        const val = Number(t.value) / 1e6;
+        txs.push({ chain, coin, addr, value: val, time: Number(t.timeStamp)*1000 });
+      });
+    }
+    if (chain === 'SOL') {
+      const api = proxy(`https://api.solscan.io/account/transactions?address=${addr}&limit=50`);
+      const res = await fetch(api);
+      const data = await res.json();
+      if (!data.data) return [];
+      data.data.forEach(t => {
+        if (!t.tokenTransfers) return;
+        t.tokenTransfers.forEach(tr => {
+          if (tr.toOwner !== addr) return;
+          if (tr.mint !== CONTRACT.SOL_USDT) return;
+          const val = Number(tr.amount) / 1e6;
+          txs.push({ chain:'SOL', coin:'USDT', addr, value: val, time: t.blockTime*1000 });
+        });
+      });
+    }
+    if (chain === 'BTC') {
+      const api = proxy(`https://blockchain.info/rawaddr/${addr}`);
+      const res = await fetch(api);
+      const data = await res.json();
+      data.txs.forEach(t => {
+        t.out.forEach(o => {
+          if (o.addr !== addr) return;
+          const val = o.value / 1e8;
+          txs.push({ chain:'BTC', coin:'NAT', addr, value: val, time: t.time*1000 });
+        });
+      });
+    }
+  } catch(e){ console.error(chain, e); }
+  return txs;
+}
+
+// 渲染主界面
+function render(filterType){
+  const txs = filterTxs(allRawTxs, filterType);
+  let usdtTotal=0, natTotal=0;
+  txs.forEach(t=>{
+    if(t.coin==='USDT') usdtTotal+=t.value;
+    if(t.coin==='NAT') natTotal+=t.value;
+  });
+
+  document.getElementById('usdtIn').innerText = usdtTotal.toFixed(2);
+  document.getElementById('natIn').innerText = natTotal.toFixed(2);
+
+  // 地址列表
+  document.getElementById('addrList').innerHTML = watchList.map(x=>`
+    <div class="flex items-center gap-2">
+      <span class="chain-badge ${x.chain.toLowerCase()}">${x.chain}</span>
+      <span class="${x.coin==='USDT'?'usdt':'nat'}">${x.coin}</span>
+      <span>${x.addr.slice(0,16)}...</span>
+    </div>`).join('');
+
+  // 排名：累积转入 × 最新交易时间权重
+  const getRank = (coin) => watchList
+    .filter(i=>i.coin===coin)
+    .map(item=>{
+      const list = txs.filter(t=>t.addr===item.addr && t.coin===coin);
+      const totalIn = list.reduce((s,t)=>s+t.value,0);
+      const latest = list.length ? Math.max(...list.map(t=>t.time)) : Date.now();
+      const weight = totalIn * (latest/1e12);
+      return {...item,totalIn,weight};
+    }).sort((a,b)=>b.weight-a.weight);
+
+  document.getElementById('rankUSDT').innerHTML = getRank('USDT').map((item,i)=>`
+    <div class="card ${i<3?'rank-'+(i+1):''} py-2">
+      <div class="flex justify-between items-center">
+        <div><span class="chain-badge ${item.chain.toLowerCase()}">${item.chain}</span>${item.addr.slice(0,12)}...</div>
+        <div class="usdt font-bold">${item.totalIn.toFixed(2)}</div>
+      </div>
+    </div>`).join('');
+
+  document.getElementById('rankNAT').innerHTML = getRank('NAT').map((item,i)=>`
+    <div class="card ${i<3?'rank-'+(i+1):''} py-2">
+      <div class="flex justify-between items-center">
+        <div><span class="chain-badge ${item.chain.toLowerCase()}">${item.chain}</span>${item.addr.slice(0,12)}...</div>
+        <div class="nat font-bold">${item.totalIn.toFixed(2)}</div>
+      </div>
+    </div>`).join('');
+
+  // 流水
+  document.getElementById('txList').innerHTML = txs
+    .sort((a,b)=>b.time-a.time).slice(0,30)
+    .map(t=>`
+    <div class="flex justify-between border-b border-slate-700 py-2">
+      <div><span class="chain-badge ${t.chain.toLowerCase()}">${t.chain}</span><span class="${t.coin==='USDT'?'usdt':'nat'}">${t.coin}</span>${t.addr.slice(0,14)}...</div>
+      <div class="text-green-400">+${t.value.toFixed(2)}</div>
+    </div>`).join('');
+}
+
+// 加载链上数据
+async function loadData(){
+  document.getElementById('status').innerText = '读取链上数据...';
+  allRawTxs = [];
+  for (const item of watchList) {
+    const txs = await fetchInTxs(item);
+    allRawTxs.push(...txs);
+  }
+  document.getElementById('status').innerText = '✅ 已更新';
+  document.getElementById('updateTime').innerText = new Date().toLocaleString();
+  render(document.getElementById('timeFilter').value);
+}
+
+// 切换筛选
+document.getElementById('timeFilter').addEventListener('change', e=>{
+  render(e.target.value);
+});
+
+// 启动
+loadData();
+setInterval(loadData, 60000);
+</script>
+</body>
+</html>
