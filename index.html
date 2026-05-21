@@ -24,8 +24,7 @@
         table{width:100%;border-collapse:collapse;min-width:500px;}
         th,td{border:1px solid #334155;padding:10px;text-align:center;font-size:14px;}
         th{background:#334155;color:#38bdf8;}
-        td{color:#e2e8f0;}
-        .log-box{background:#1e293b;border-radius:12px;padding:20px;margin-bottom:30px;overflow-x:auto;}
+        td{color:#e2e8f0;word-break:break-all;}
         .addr-box{background:#1e293b;border-radius:12px;padding:25px;margin-bottom:30px;word-break:break-all;}
         .addr-box h2{font-size:20px;color:#38bdf8;margin-bottom:15px;}
         .addr-item{margin:10px 0;font-size:14px;line-height:1.8;}
@@ -66,56 +65,34 @@
             </div>
         </div>
 
-        <!-- 双独立排行榜 -->
+        <!-- 双独立排行榜，仅保留排名、地址、累计数量 -->
         <div class="rank-wrap">
             <div class="table-box">
-                <div class="table-title">🏆 NAT捐赠排行榜（金额优先→时间排序）</div>
+                <div class="table-title">🏆 NAT捐赠排行榜</div>
                 <table>
                     <thead>
                         <tr>
                             <th>排名</th>
-                            <th>QQ昵称</th>
-                            <th>累计捐赠NAT</th>
-                            <th>首次捐赠时间</th>
-                            <th>捐赠公链</th>
+                            <th>捐赠地址</th>
+                            <th>累计捐赠数量</th>
                         </tr>
                     </thead>
                     <tbody id="natRankList"></tbody>
                 </table>
             </div>
             <div class="table-box">
-                <div class="table-title">🏆 USDT捐赠排行榜（金额优先→时间排序）</div>
+                <div class="table-title">🏆 USDT捐赠排行榜</div>
                 <table>
                     <thead>
                         <tr>
                             <th>排名</th>
-                            <th>QQ昵称</th>
-                            <th>累计捐赠USDT</th>
-                            <th>首次捐赠时间</th>
-                            <th>捐赠公链</th>
+                            <th>捐赠地址</th>
+                            <th>累计捐赠数量</th>
                         </tr>
                     </thead>
                     <tbody id="usdtRankList"></tbody>
                 </table>
             </div>
-        </div>
-
-        <!-- 全部捐赠流水 -->
-        <div class="log-box">
-            <div class="table-title">📋 全部捐赠流水记录（时间倒序）</div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>捐赠时间</th>
-                        <th>QQ昵称</th>
-                        <th>捐赠币种</th>
-                        <th>捐赠金额</th>
-                        <th>转账公链</th>
-                        <th>区块交易哈希</th>
-                    </tr>
-                </thead>
-                <tbody id="logList"></tbody>
-            </table>
         </div>
 
         <!-- 底部统一放置所有收款地址 -->
@@ -134,7 +111,7 @@
             <p>1、本次推广基金捐赠全程自愿参与，无任何强制捐赠要求，公开透明公示。</p>
             <p>2、USDT三链余额直接复制接收地址，进入对应区块浏览器搜索即可核对真实余额。</p>
             <p>3、NAT查询方式：BTC链进入Tap区块浏览器查询地址余额；ETH/BSC/SOL链使用DMT-NAT全网交易量最大官方合约地址核验余额。</p>
-            <p>4、榜单统一排序规则：累计捐赠数额从高至低排序，数额相同按照最早捐赠时间先后排序。</p>
+            <p>4、榜单统一排序规则：累计捐赠数额从高至低排序。</p>
             <p>5、所有社区共识成员均可创建观察钱包，全程监督基金所有款项流向与使用用途。</p>
         </div>
 
@@ -149,24 +126,24 @@
         const addrSol = "J16N4uAQKXF7Y3fDgkowhVVBniFbW2fW4f7uKygau1y6";
         const addrTapBtc = "bc1p0c5cg8hhm9f4v9alt5vvp3gn8usekw5wlj9a53hjuh2fem5j2efq7ke04n";
 
-        // ========== 在这里修改余额数值 ==========
+        // 余额数据，自行填写真实数值
         const balanceData = {
             usdt:{
-                eth:"1256.88",
-                bsc:"892.35",
-                sol:"368.70",
-                total:"2517.93"
+                eth:"0.00",
+                bsc:"0.00",
+                sol:"0.00",
+                total:"0.00"
             },
             nat:{
-                btc:"5200.66",
-                eth:"3100.22",
-                bsc:"1890.50",
-                sol:"960.80",
-                total:"11152.18"
+                btc:"0.00",
+                eth:"0.00",
+                bsc:"0.00",
+                sol:"0.00",
+                total:"0.00"
             }
         };
 
-        // 赋值页面余额
+        // 页面余额赋值
         document.getElementById("usdtEth").innerText=balanceData.usdt.eth;
         document.getElementById("usdtBsc").innerText=balanceData.usdt.bsc;
         document.getElementById("usdtSol").innerText=balanceData.usdt.sol;
@@ -178,7 +155,7 @@
         document.getElementById("natSol").innerText=balanceData.nat.sol;
         document.getElementById("natTotal").innerText=balanceData.nat.total;
 
-        // 修复一键查询链接，直接跳转地址详情页
+        // 一键查询跳转地址详情页
         document.getElementById("linkEthUsdt").href = `https://etherscan.io/address/${addrEthBsc}`;
         document.getElementById("linkBscUsdt").href = `https://bscscan.com/address/${addrEthBsc}`;
         document.getElementById("linkSolUsdt").href = `https://solscan.io/address/${addrSol}`;
@@ -188,59 +165,33 @@
         document.getElementById("linkBscNat").href = `https://bscscan.com/address/${addrEthBsc}`;
         document.getElementById("linkSolNat").href = `https://solscan.io/address/${addrSol}`;
 
-        // ========== 在这里填写NAT捐赠排行榜数据 ==========
+        // NAT排行榜数据 格式：地址+累计数量
         let natRankData = [
-            {nick:"用户甲",num:"2600.30",time:"2026-05-10",chain:"BTC(Tap)链"},
-            {nick:"用户乙",num:"2100.50",time:"2026-05-12",chain:"ETH链"},
-            {nick:"用户丙",num:"1800.20",time:"2026-05-15",chain:"BSC链"}
+            // 示例 {addr:"钱包地址",amount:"捐赠数值"}
         ];
         let natHtml = "";
         natRankData.forEach((item,idx)=>{
             natHtml += `<tr>
                 <td>${idx+1}</td>
-                <td>${item.nick}</td>
-                <td>${item.num}</td>
-                <td>${item.time}</td>
-                <td>${item.chain}</td>
+                <td>${item.addr}</td>
+                <td>${item.amount}</td>
             </tr>`;
         });
         document.getElementById("natRankList").innerHTML=natHtml;
 
-        // ========== 在这里填写USDT捐赠排行榜数据 ==========
+        // USDT排行榜数据 格式：地址+累计数量
         let usdtRankData = [
-            {nick:"伙伴A",num:"950.60",time:"2026-05-08",chain:"ETH链"},
-            {nick:"伙伴B",num:"720.25",time:"2026-05-11",chain:"BSC链"},
-            {nick:"伙伴C",num:"368.70",time:"2026-05-13",chain:"SOL链"}
+            // 示例 {addr:"钱包地址",amount:"捐赠数值"}
         ];
         let usdtHtml = "";
         usdtRankData.forEach((item,idx)=>{
             usdtHtml += `<tr>
                 <td>${idx+1}</td>
-                <td>${item.nick}</td>
-                <td>${item.num}</td>
-                <td>${item.time}</td>
-                <td>${item.chain}</td>
+                <td>${item.addr}</td>
+                <td>${item.amount}</td>
             </tr>`;
         });
         document.getElementById("usdtRankList").innerHTML=usdtHtml;
-
-        // ========== 在这里填写捐赠流水数据 ==========
-        let flowData = [
-            {time:"2026-05-18 10:20",nick:"用户甲",coin:"NAT",num:"1200.00",chain:"BTC(Tap)链",hash:"0xabc123xxxx"},
-            {time:"2026-05-17 15:30",nick:"伙伴A",coin:"USDT",num:"500.00",chain:"ETH链",hash:"0xdef456xxxx"}
-        ];
-        let flowHtml = "";
-        flowData.forEach(item=>{
-            flowHtml += `<tr>
-                <td>${item.time}</td>
-                <td>${item.nick}</td>
-                <td>${item.coin}</td>
-                <td>${item.num}</td>
-                <td>${item.chain}</td>
-                <td>${item.hash}</td>
-            </tr>`;
-        });
-        document.getElementById("logList").innerHTML=flowHtml;
     </script>
 </body>
 </html>
