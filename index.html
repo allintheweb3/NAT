@@ -44,7 +44,7 @@ td{color:#e2e8f0;word-break:break-all;}
         <p>链上实时数据 | 自动统计排行 | 公开监督</p>
     </div>
 
-    <div class="loading" id="loadTip">正在同步链上数据...</div>
+    <div class="loading" id="loadTip">正在初始化 Web3 并连接区块链节点...</div>
 
     <div class="card-wrap">
         <div class="card">
@@ -55,7 +55,7 @@ td{color:#e2e8f0;word-break:break-all;}
         </div>
         <div class="card">
             <h2>NAT 募捐余额</h2>
-            <div class="chain-balance">BTC(Tap)：<span id="natBtc">待Tap查询</span> NAT <a id="linkTapNat" target="_blank" class="btn-link">查询</a></div>
+            <div class="chain-balance">BTC(Tap)：<span id="natBtc">0.00</span> NAT <a id="linkTapNat" target="_blank" class="btn-link">查询</a></div>
             <div class="chain-balance">ETH链：<span id="natEth">0.00</span> NAT <a id="linkEthNat" target="_blank" class="btn-link">查询</a></div>
             <div class="chain-balance">BSC链：<span id="natBsc">0.00</span> NAT <a id="linkBscNat" target="_blank" class="btn-link">查询</a></div>
             <div class="total-balance">NAT 总额：<span id="natTotal">0.00</span></div>
@@ -64,17 +64,17 @@ td{color:#e2e8f0;word-break:break-all;}
 
     <div class="rank-wrap">
         <div class="table-box">
-            <div class="table-title">🏆 NAT 捐赠排行榜</div>
+            <div class="table-title">🏆 NAT 捐赠排行榜 (近5000区块)</div>
             <table>
                 <thead><tr><th>排名</th><th>捐赠地址</th><th>累计数量</th></tr></thead>
-                <tbody id="natRankList"></tbody>
+                <tbody id="natRankList"><tr><td colspan="3">正在扫描链上转账记录...</td></tr></tbody>
             </table>
         </div>
         <div class="table-box">
-            <div class="table-title">🏆 USDT 捐赠排行榜</div>
+            <div class="table-title">🏆 USDT 捐赠排行榜 (近5000区块)</div>
             <table>
                 <thead><tr><th>排名</th><th>捐赠地址</th><th>累计数量</th></tr></thead>
-                <tbody id="usdtRankList"></tbody>
+                <tbody id="usdtRankList"><tr><td colspan="3">正在扫描链上转账记录...</td></tr></tbody>
             </table>
         </div>
     </div>
@@ -90,68 +90,180 @@ td{color:#e2e8f0;word-break:break-all;}
 </div>
 
 <script>
-// 后端接口地址
-const API_HOST = "http://localhost:3000/api";
-// 合约与地址配置
+// 1. 基础配置
 const COLLECT_ADDR = "0x65a177f0ce9ad38875aa309dae3fbb289c58f689";
 const TAP_ADDR = "bc1p0c5cg8hhm9f4v9alt5vvp3gn8usekw5wlj9a53hjuh2fem5j2efq7ke04n";
+
 const NAT_ETH = "0x249130F5E2dD4CF278180c0dF8273f3592Ad1247";
 const NAT_BSC = "0xEdF9Df5C987023f28D20dC81970f27841c968F3c";
 const USDT_ETH = "0xdac17f958d2ee523a2206206994597c13d831ec7";
 const USDT_BSC = "0x55d398326f99059fF775485246999027B3197955";
 
-// 跳转链接赋值
+// 2. 公共 RPC 节点配置（如失效可更换为 Cloudflare 或 Ankr 等提供商）
+const RPC_ETH = "https://cloudflare-eth.com"; 
+const RPC_BSC = "https://bsc-dataseed.binance.org";
+
+// 初始化多链 Web3 实例
+const web3Eth = new Web3(new Web3.providers.HttpProvider(RPC_ETH));
+const web3Bsc = new Web3(new Web3.providers.HttpProvider(RPC_BSC));
+
+// 最小 ERC20 ABI 用于查询余额和过滤转账事件
+const MIN_ERC20_ABI = [
+    {
+        "constant": true,
+        "inputs": [{"name": "_owner", "type": "address"}],
+        "name": "balanceOf",
+        "outputs": [{"name": "balance", "type": "uint256"}],
+        "type": "function"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {"indexed": true, "name": "from", "type": "address"},
+            {"indexed": true, "name": "to", "type": "address"},
+            {"indexed": false, "name": "value", "type": "uint256"}
+        ],
+        "name": "Transfer",
+        "type": "event"
+    }
+];
+
+// 绑定跳转
 document.getElementById("linkEthUsdt").href = `https://etherscan.io/token/${USDT_ETH}?a=${COLLECT_ADDR}`;
 document.getElementById("linkBscUsdt").href = `https://bscscan.com/token/${USDT_BSC}?a=${COLLECT_ADDR}`;
-document.getElementById("linkTapNat").href = `https://www.tapalytics.xyz/address/${TAP_ADDR}`;
+document.getElementById("linkTapNat").href = `https://mempool.space/address/${TAP_ADDR}`; // 换成更通用的BTC浏览器
 document.getElementById("linkEthNat").href = `https://etherscan.io/token/${NAT_ETH}?a=${COLLECT_ADDR}`;
 document.getElementById("linkBscNat").href = `https://bscscan.com/token/${NAT_BSC}?a=${COLLECT_ADDR}`;
 
-// 加载余额数据
-async function loadBalance(){
-    let res = await fetch(`${API_HOST}/balance`);
-    let data = await res.json();
-    if(!data) return;
-    document.getElementById("usdtEth").innerText = data.usdt.eth;
-    document.getElementById("usdtBsc").innerText = data.usdt.bsc;
-    document.getElementById("usdtTotal").innerText = data.usdt.total;
-
-    document.getElementById("natEth").innerText = data.nat.eth;
-    document.getElementById("natBsc").innerText = data.nat.bsc;
-    document.getElementById("natTotal").innerText = data.nat.total;
+// 格式化输出，保留2位小数
+function formatNum(num) {
+    return parseFloat(num).toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 4 });
 }
 
-// 加载排行数据
-async function loadRank(){
-    let res = await fetch(`${API_HOST}/rank`);
-    let data = await res.json();
-    let natHtml = "";
-    data.natList.forEach((item,idx)=>{
-        natHtml += `<tr><td>${idx+1}</td><td>${item.addr}</td><td>${item.amount}</td></tr>`
-    })
-    document.getElementById("natRankList").innerHTML = natHtml;
+// 3. 异步获取链上余额
+async function loadBalance() {
+    // 实例化合约
+    const contractUsdtEth = new web3Eth.eth.Contract(MIN_ERC20_ABI, USDT_ETH);
+    const contractNatEth = new web3Eth.eth.Contract(MIN_ERC20_ABI, NAT_ETH);
+    const contractUsdtBsc = new web3Bsc.eth.Contract(MIN_ERC20_ABI, USDT_BSC);
+    const contractNatBsc = new web3Bsc.eth.Contract(MIN_ERC20_ABI, NAT_BSC);
 
-    let usdtHtml = "";
-    data.usdtList.forEach((item,idx)=>{
-        usdtHtml += `<tr><td>${idx+1}</td><td>${item.addr}</td><td>${item.amount}</td></tr>`
-    })
-    document.getElementById("usdtRankList").innerHTML = usdtHtml;
+    // 异步并发读取
+    const [rawUsdtEth, rawNatEth, rawUsdtBsc, rawNatBsc, rawNatBtc] = await Promise.all([
+        contractUsdtEth.methods.balanceOf(COLLECT_ADDR).call(),
+        contractNatEth.methods.balanceOf(COLLECT_ADDR).call(),
+        contractUsdtBsc.methods.balanceOf(COLLECT_ADDR).call(),
+        contractNatBsc.methods.balanceOf(COLLECT_ADDR).call(),
+        fetchBtcTapBalance(TAP_ADDR) // 专门处理BTC Tap
+    ]);
+
+    // 单位转换 (USDT一般为6位小数，NAT和常规以太坊代币为18位小数)
+    const usdtEth = parseFloat(rawUsdtEth) / 1e6;
+    const usdtBsc = parseFloat(rawUsdtBsc) / 1e18; // BSC上的USDT(BEP20)有些是18位，有些是6位，根据实际标准调整。主流BSC-USDT为18位。
+    const natEth = parseFloat(rawNatEth) / 1e18;
+    const natBsc = parseFloat(rawNatBsc) / 1e18;
+    const natBtc = parseFloat(rawNatBtc);
+
+    const usdtTotal = usdtEth + usdtBsc;
+    const natTotal = natEth + natBsc + natBtc;
+
+    // 渲染到UI
+    document.getElementById("usdtEth").innerText = formatNum(usdtEth);
+    document.getElementById("usdtBsc").innerText = formatNum(usdtBsc);
+    document.getElementById("usdtTotal").innerText = formatNum(usdtTotal);
+
+    document.getElementById("natBtc").innerText = formatNum(natBtc);
+    document.getElementById("natEth").innerText = formatNum(natEth);
+    document.getElementById("natBsc").innerText = formatNum(natBsc);
+    document.getElementById("natTotal").innerText = formatNum(natTotal);
 }
 
-// 页面初始化
-async function initPage(){
-    try{
-        await Promise.all([loadBalance(), loadRank()]);
-        document.getElementById("loadTip").innerText = "✅ 链上数据加载完成";
-    }catch(e){
-        document.getElementById("loadTip").innerText = "⚠️ 数据同步异常";
-        console.error(e);
+// 专门从BTC开放接口获取Tap/BTC余额
+async function fetchBtcTapBalance(address) {
+    try {
+        // 使用 mempool.space 的开放免费API获取聪(sats)余额，再转换
+        let res = await fetch(`https://mempool.space/api/address/${address}`);
+        let data = await res.json();
+        if(data && data.chain_stats) {
+            const sats = data.chain_stats.funded_txo_sum - data.chain_stats.spent_txo_sum;
+            return sats / 1e8; // 转换为BTC/NAT对应基础数量
+        }
+        return 0;
+    } catch (e) {
+        console.error("读取BTC链失败，转为0:", e);
+        return 0;
     }
 }
 
-// 定时刷新数据，实时更新榜单余额
+// 4. 自动通过历史事件(Events)计算捐赠排行榜
+async function loadRank() {
+    const SCAN_BLOCKS = 5000; // 扫描最近 5000 个区块的记录（防节点超时）
+
+    const contractUsdtEth = new web3Eth.eth.Contract(MIN_ERC20_ABI, USDT_ETH);
+    const contractNatEth = new web3Eth.eth.Contract(MIN_ERC20_ABI, NAT_ETH);
+
+    const latestBlock = await web3Eth.eth.getBlockNumber();
+    const fromBlock = latestBlock - SCAN_BLOCKS;
+
+    // 并发获取ETH链上近期的 Transfer 事件
+    const [usdtEvents, natEvents] = await Promise.all([
+        contractUsdtEth.getPastEvents('Transfer', { filter: { to: COLLECT_ADDR }, fromBlock, toBlock: 'latest' }),
+        contractNatEth.getPastEvents('Transfer', { filter: { to: COLLECT_ADDR }, fromBlock, toBlock: 'latest' })
+    ]);
+
+    // 处理并对地址进行聚合分类
+    const usdtRank = processEvents(usdtEvents, 1e6);
+    const natRank = processEvents(natEvents, 1e18);
+
+    // 渲染排行榜 UI
+    renderTable("usdtRankList", usdtRank);
+    renderTable("natRankList", natRank);
+}
+
+// 解析事件数据并排序
+function processEvents(events, decimals) {
+    const map = {};
+    events.forEach(e => {
+        const donor = e.returnValues.from;
+        const val = parseFloat(e.returnValues.value) / decimals;
+        if(donor.toLowerCase() !== COLLECT_ADDR.toLowerCase()) { // 排除归集动作
+            map[donor] = (map[donor] || 0) + val;
+        }
+    });
+
+    return Object.keys(map).map(addr => ({
+        addr: addr.substring(0,6) + "..." + addr.substring(addr.length - 4), // 隐藏中间地址防拉踩
+        amount: map[addr]
+    })).sort((a, b) => b.amount - a.amount).slice(0, 10); // 取前10名
+}
+
+function renderTable(elementId, list) {
+    let html = "";
+    if(list.length === 0) {
+        html = `<tr><td colspan="3">近期暂无捐赠记录</td></tr>`;
+    } else {
+        list.forEach((item, idx) => {
+            html += `<tr><td>${idx + 1}</td><td>${item.addr}</td><td>${formatNum(item.amount)}</td></tr>`;
+        });
+    }
+    document.getElementById(elementId).innerHTML = html;
+}
+
+// 5. 页面统一初始化
+async function initPage(){
+    try{
+        document.getElementById("loadTip").innerText = "⏳ 正在直接从以太坊/BSC链上读取实时数据...";
+        await Promise.all([loadBalance(), loadRank()]);
+        document.getElementById("loadTip").innerText = "✅ 链上原生数据同步完成 (实时更新)";
+    }catch(e){
+        document.getElementById("loadTip").innerText = "⚠️ 节点响应延迟，正在尝试重新连接...";
+        console.error("Web3 Error:", e);
+    }
+}
+
+// 执行初始化与轮询
 initPage();
-setInterval(initPage, 30000);
+setInterval(initPage, 30000); // 每30秒自动请求RPC节点刷新
 </script>
 </body>
 </html>
