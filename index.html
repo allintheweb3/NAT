@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>多链多钱包自定义代币看板 (精度自定义版)</title>
+<title>多链多钱包智能资产看板 (纯前端免服务器版)</title>
 <script src="https://cdn.jsdelivr.net/npm/web3@1.8.2/dist/web3.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@solana/web3.js@1.73.0/lib/index.iife.min.js"></script>
 
@@ -159,10 +159,10 @@ td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; 
 </div>
 
 <script>
-// ==================== 1. 公共去中心化 RPC 节点 ====================
-const RPC_ETH = "https://cloudflare-eth.com";
+// ==================== 1. 公共高可用 RPC 节点配置 ====================
+const RPC_ETH = "https://rpc.ankr.com/eth"; 
 const RPC_BSC = "https://bsc-dataseed.binance.org";
-const RPC_SOL = "https://api.mainnet-beta.solana.com";
+const RPC_SOL = "https://rpc.ankr.com/solana"; 
 
 const web3Eth = new Web3(new Web3.providers.HttpProvider(RPC_ETH));
 const web3Bsc = new Web3(new Web3.providers.HttpProvider(RPC_BSC));
@@ -170,7 +170,7 @@ const solanaConn = new solanaWeb3.Connection(RPC_SOL, 'confirmed');
 
 const MIN_ERC20_ABI = [{ "constant": true, "inputs": [{ "name": "_owner", "type": "address" }], "name": "balanceOf", "outputs": [{ "name": "balance", "type": "uint256" }], "type": "function" }];
 
-// ==================== 2. 初始化本地缓存与基础默认数据 ====================
+// ==================== 2. 初始化本地缓存与初始默认数据 ====================
 const INITIAL_TOKENS = [
     { symbol: "USDT", chain: "ETH", contract: "0xdac17f958d2ee523a2206206994597c13d831ec7", decimals: 6 },
     { symbol: "USDT", chain: "BSC", contract: "0x55d398326f99059fF775485246999027B3197955", decimals: 18 },
@@ -188,15 +188,19 @@ const INITIAL_WALLETS = [
 let tokenConfigList = JSON.parse(localStorage.getItem("cfg_tokens")) || INITIAL_TOKENS;
 let walletList = JSON.parse(localStorage.getItem("cfg_wallets")) || INITIAL_WALLETS;
 
-// ==================== 3. 核心链上原生调用逻辑 ====================
+// ==================== 3. 核心安全链上调用层 ====================
 async function queryEvmBalance(chain, walletAddr, tokenAddr, decimals) {
     try {
         const web3 = (chain === "ETH") ? web3Eth : web3Bsc;
         const contract = new web3.eth.Contract(MIN_ERC20_ABI, tokenAddr);
-        const raw = await contract.methods.balanceOf(walletAddr).call();
-        // 允许 decimals 为 0，Math.pow(10, 0) 等于 1
+        
+        const raw = await Promise.race([
+            contract.methods.balanceOf(walletAddr).call(),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 6000))
+        ]);
         return parseFloat(raw) / Math.pow(10, decimals);
     } catch (e) {
+        console.warn(`[EVM] 读取失败 ${chain}: ${walletAddr}`, e.message);
         return 0;
     }
 }
@@ -207,24 +211,30 @@ async function querySolanaBalance(walletAddr, tokenMint) {
         const tokenAccounts = await solanaConn.getParsedTokenAccountsByOwner(pubkey, {
             programId: new solanaWeb3.PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA")
         });
+        
         let bal = 0;
-        tokenAccounts.value.forEach(acc => {
-            const info = acc.account.data.parsed.info;
-            if (info.mint === tokenMint) bal = info.tokenAmount.uiAmount || 0;
-        });
+        if (tokenAccounts && tokenAccounts.value) {
+            tokenAccounts.value.forEach(acc => {
+                const info = acc.account.data.parsed.info;
+                if (info.mint === tokenMint) bal = info.tokenAmount.uiAmount || 0;
+            });
+        }
         return bal;
     } catch (e) {
+        console.warn(`[Solana] 读取失败: ${walletAddr}`, e.message);
         return 0;
     }
 }
 
 async function updateAllBalances() {
     const btn = document.getElementById("refreshBtn");
-    btn.innerText = "⏳ 节点读取中...";
-    btn.disabled = true;
+    if(btn) {
+        btn.innerText = "⏳ 节点读取中...";
+        btn.disabled = true;
+    }
 
     const tasks = walletList.map(async (wallet) => {
-        wallet.balances = {};
+        if (!wallet.balances) wallet.balances = {};
         const matchTokens = tokenConfigList.filter(t => t.chain === wallet.chain);
         
         for (let token of matchTokens) {
@@ -242,27 +252,25 @@ async function updateAllBalances() {
     localStorage.setItem("cfg_wallets", JSON.stringify(walletList));
     renderUI();
 
-    btn.innerText = "🔄 一键拉取实时链上余额";
-    btn.disabled = false;
+    if(btn) {
+        btn.innerText = "🔄 一键拉取实时链上余额";
+        btn.disabled = false;
+    }
 }
 
-// ==================== 4. 动态渲染与交互 ====================
+// ==================== 4. 前端动态渲染与交互 ====================
 function addCustomToken() {
     const symbol = document.getElementById("newTokenSymbol").value.trim().toUpperCase();
     const chain = document.getElementById("newTokenChain").value;
     const contract = document.getElementById("newTokenContract").value.trim();
-    
-    // 用 parseInt 解析，只要大于等于 0 均视为有效输入
-    const decimalsInput = document.getElementById("newTokenDecimals").value;
-    const decimals = parseInt(decimalsInput);
+    const decimals = parseInt(document.getElementById("newTokenDecimals").value);
 
     if (!symbol || !contract) {
         alert("代币简称与合约地址不能为空！");
         return;
     }
-
     if (isNaN(decimals) || decimals < 0) {
-        alert("请输入有效的精度位（大于或等于 0 的整数）！");
+        alert("请输入有效的精度位（支持0）！");
         return;
     }
 
@@ -281,7 +289,7 @@ function addCustomToken() {
 }
 
 function deleteCustomToken(idx) {
-    if(confirm("移除该代币会导致对应监控汇总停止，确认移除吗？")) {
+    if(confirm("移除该代币会导致对应监控汇总停止，确认删除吗？")) {
         tokenConfigList.splice(idx, 1);
         localStorage.setItem("cfg_tokens", JSON.stringify(tokenConfigList));
         rebuildTokenDropdown();
@@ -338,7 +346,6 @@ function renderUI() {
     const currentToken = document.getElementById("selectDisplayToken").value || "USDT";
     document.getElementById("dynamicTableHeader").innerText = `${currentToken} 余额`;
 
-    // 渲染右侧代币
     const tokenSlot = document.getElementById("customTokenListSlot");
     tokenSlot.innerHTML = "";
     tokenConfigList.forEach((t, i) => {
@@ -353,13 +360,12 @@ function renderUI() {
         `;
     });
 
-    // 渲染左侧钱包与总数
     const tbody = document.getElementById("walletTableBody");
     tbody.innerHTML = "";
     let totalAccumulator = 0;
 
     walletList.forEach((w, idx) => {
-        let bal = parseFloat(w.balances[currentToken] || 0);
+        let bal = parseFloat((w.balances && w.balances[currentToken]) || 0);
         totalAccumulator += bal;
 
         tbody.innerHTML += `
@@ -376,7 +382,7 @@ function renderUI() {
     document.getElementById("summary_wallet_count").innerText = walletList.length;
 }
 
-// ==================== 5. 初始化 ====================
+// ==================== 5. 自动启动 ====================
 rebuildTokenDropdown();
 renderUI();
 updateAllBalances();
