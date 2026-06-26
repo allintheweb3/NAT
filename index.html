@@ -3,25 +3,28 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>多链多钱包智能资产看板 (直连修复 & 折叠优化版)</title>
+<title>多链多钱包智能资产看板 (全端全居中直连修复版)</title>
 
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: "PingFang SC", "Microsoft YaHei", sans-serif; }
 body { background: #0f172a; color: #f1f5f9; padding: 30px 15px; }
 .container { max-width: 1200px; margin: 0 auto; }
-.header { text-align: center; margin-bottom: 25px; }
-.header h1 { color: #38bdf8; font-size: 26px; margin-bottom: 8px; }
-.header p { color: #64748b; font-size: 14px; }
 
-/* 顶栏资产汇总栏 */
-.summary-banner { background: linear-gradient(135deg, #1e1b4b, #2e1065); border: 1px solid #4c1d95; padding: 25px; border-radius: 12px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; gap: 20px; }
-.summary-left h3 { font-size: 14px; color: #a78bfa; margin-bottom: 5px; }
-.summary-left .total-val { font-size: 36px; font-weight: 800; color: #10b981; font-family: monospace; word-break: break-all; }
-.summary-right { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; flex-shrink: 0; }
-.select-token-ui { padding: 10px 20px; font-size: 16px; font-weight: bold; color: #38bdf8; border: 2px solid #38bdf8; background: #0f172a; border-radius: 8px; cursor: pointer; width: 100%; max-width: 250px; }
-.wallet-count-badge { font-size: 12px; color: #94a3b8; background: rgba(255,255,255,0.05); padding: 4px 10px; border-radius: 20px; border: 1px solid #334155; }
+/* 头部主副标题：全端绝对居中 */
+.header { text-align: center; margin-bottom: 25px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.header h1 { color: #38bdf8; font-size: 26px; margin-bottom: 8px; text-align: center; }
+.header p { color: #64748b; font-size: 14px; text-align: center; }
 
-/* 左右布局（适配移动端） */
+/* 顶栏资产汇总栏：全端全自适应全居中 */
+.summary-banner { background: linear-gradient(135deg, #1e1b4b, #2e1065); border: 1px solid #4c1d95; padding: 25px; border-radius: 12px; margin-bottom: 25px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 15px; }
+.summary-left { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; }
+.summary-left h3 { font-size: 14px; color: #a78bfa; margin-bottom: 8px; text-align: center; }
+.summary-left .total-val { font-size: 38px; font-weight: 800; color: #10b981; font-family: monospace; word-break: break-all; text-align: center; line-height: 1.2; }
+.summary-right { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; width: 100%; }
+.select-token-ui { padding: 10px 20px; font-size: 16px; font-weight: bold; color: #38bdf8; border: 2px solid #38bdf8; background: #0f172a; border-radius: 8px; cursor: pointer; width: 100%; max-width: 280px; text-align: center; text-align-last: center; }
+.wallet-count-badge { font-size: 12px; color: #94a3b8; background: rgba(255,255,255,0.05); padding: 4px 15px; border-radius: 20px; border: 1px solid #334155; display: inline-block; }
+
+/* 左右布局（宽屏下应用） */
 .main-layout { display: grid; grid-template-columns: 2fr 1fr; gap: 25px; }
 
 /* 卡片容器 */
@@ -65,9 +68,11 @@ td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; 
 .token-item-info h4 { font-size: 14px; color: #fff; }
 .token-item-info p { font-size: 11px; color: #64748b; font-family: monospace; word-break: break-all; margin-top: 2px; }
 
+/* 移动端断点适配 */
 @media (max-width: 768px) {
-    .summary-banner { flex-direction: column; align-items: flex-start; padding: 20px; }
-    .summary-right { align-items: flex-start; width: 100%; }
+    body { padding: 15px 10px; }
+    .header h1 { font-size: 22px; }
+    .summary-left .total-val { font-size: 30px; }
     .select-token-ui { max-width: 100%; }
     .main-layout { grid-template-columns: 1fr; }
     .form-row-inline { grid-template-columns: 1fr; gap: 8px; }
@@ -77,12 +82,13 @@ td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; 
 <body>
 
 <div class="container">
+    <!-- 头部主副标题（全端自动居中） -->
     <div class="header">
         <h1>多链多钱包智能资产看板</h1>
-        <p>动态添加代币 | 多钱包合并计算 | 高兼容去中心化 RPC 直连网络</p>
+        <p>动态添加代币 | 多钱包合并计算 | 跨域容错高兼容链上通信架构</p>
     </div>
 
-    <!-- 资产汇总栏 -->
+    <!-- 资产汇总栏（全端自动居中） -->
     <div class="summary-banner">
         <div class="summary-left">
             <h3>当前所选代币全网监控总额</h3>
@@ -142,7 +148,7 @@ td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; 
             </div>
         </div>
 
-        <!-- 右侧：代币资产配置（改用折叠样式，默认为收起） -->
+        <!-- 右侧：代币资产配置（折叠样式，默认为收起） -->
         <div>
             <!-- 添加自定义代币 (默认收起) -->
             <div class="card-box">
@@ -198,10 +204,10 @@ td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; 
 </div>
 
 <script>
-// ==================== 1. 全球开放型高兼容 RPC 节点配置 ====================
-// 更换为了抗前端CORS跨域拦截的高兼容性公共公共端点
-const RPC_ETH = "https://cloudflare-eth.com"; 
-const RPC_BSC = "https://bsc-dataseed1.binance.org";
+// ==================== 1. RPC 节点配置 ====================
+// 【已修复】：更换 ETH 节点为高开放、高频无拦截的 MEV-Blocker 防阻断端点。BSC 节点保持原封不动。
+const RPC_ETH = "https://rpc.mevblocker.io"; 
+const RPC_BSC = "https://bsc-dataseed1.binance.org"; // 严格未动
 const RPC_SOL = "https://api.mainnet-beta.solana.com"; 
 
 // ==================== 2. 初始化缓存与示例数据 ====================
@@ -216,7 +222,7 @@ const INITIAL_TOKENS = [
 const INITIAL_WALLETS = [
     { chain: "ETH", remark: "V神钱包示例", address: "0xAb5801a7D398351b8bE11C439e05C5B3259aec9B", balances: {} },
     { chain: "BSC", remark: "币安热钱包示例", address: "0xF977814e90dA44bFA03b6295A0616a897441aceC", balances: {} },
-    { chain: "SOL", remark: "SOL巨鲸示例", address: "6ZRCB7v8gscuA2N6773FwYms48D6f4YfV2LnyfC8e96X", balances: {} }
+    { chain: "SOL", remark: "SOL监控示例", address: "6ZRCB7v8gscuA2N6773FwYms48D6f4YfV2LnyfC8e96X", balances: {} }
 ];
 
 let tokenConfigList = JSON.parse(localStorage.getItem("cfg_tokens")) || INITIAL_TOKENS;
@@ -240,7 +246,6 @@ async function queryEvmBalance(chain, walletAddr, tokenAddr, decimals) {
     try {
         const rpcUrl = (chain === "ETH") ? RPC_ETH : RPC_BSC;
         const cleanAddress = walletAddr.toLowerCase().replace("0x", "");
-        // 拼接标准合约ERC20 balanceOf 的 Data 载荷
         const dataParam = "0x70a08231" + cleanAddress.padStart(64, "0");
 
         const response = await fetch(rpcUrl, {
@@ -265,9 +270,9 @@ async function queryEvmBalance(chain, walletAddr, tokenAddr, decimals) {
     }
 }
 
-async function querySolanaBalance(walletAddr, tokenMint) {
+async function querySolanaBalance(walletAddr, tokenMint, decimals) {
     try {
-        // 严格遵循 Solana RPC 要求的格式过滤器，防止被公共节点认定为无效请求而拦截
+        // 【已修复】：针对特定 SPL 节点返回，同时提取 uiAmount 变体和原始 amount，彻底排除冷门代币解析空值引发的不显示故障
         const response = await fetch(RPC_SOL, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -285,9 +290,14 @@ async function querySolanaBalance(walletAddr, tokenMint) {
         const json = await response.json();
         let bal = 0;
         if (json.result && json.result.value && json.result.value.length > 0) {
-            // 解析定位到 Token 账户内部返回的格式化资产
-            const amountInfo = json.result.value[0].account.data.parsed.info.tokenAmount;
-            bal = parseFloat(amountInfo.uiAmountString || amountInfo.uiAmount || 0);
+            const parsedInfo = json.result.value[0].account.data.parsed.info.tokenAmount;
+            
+            if (parsedInfo.uiAmount !== null && parsedInfo.uiAmount !== undefined) {
+                bal = parseFloat(parsedInfo.uiAmountString || parsedInfo.uiAmount);
+            } else if (parsedInfo.amount) {
+                // 回退保障：若无格式化数额，采用原始颗粒度除以精度位强行换算
+                bal = Number(parsedInfo.amount) / Math.pow(10, decimals || 6);
+            }
         }
         return bal;
     } catch (e) {
@@ -309,10 +319,13 @@ async function updateAllBalances() {
         
         for (let token of matchTokens) {
             let balance = 0;
-            if (wallet.chain === "ETH" || wallet.chain === "BSC") {
+            if (wallet.chain === "BSC") {
+                // 严格保证原始 BSC 代码及路由路径未做任何变动
+                balance = await queryEvmBalance(wallet.chain, wallet.address, token.contract, token.decimals);
+            } else if (wallet.chain === "ETH") {
                 balance = await queryEvmBalance(wallet.chain, wallet.address, token.contract, token.decimals);
             } else if (wallet.chain === "SOL") {
-                balance = await querySolanaBalance(wallet.address, token.contract);
+                balance = await querySolanaBalance(wallet.address, token.contract, token.decimals);
             }
             wallet.balances[token.symbol] = balance;
         }
@@ -433,7 +446,7 @@ function renderUI() {
         `;
     });
 
-    // 渲染左侧钱包清单明细（支持自动编号）
+    // 渲染左侧钱包清单明细
     const tbody = document.getElementById("walletTableBody");
     tbody.innerHTML = "";
     let totalAccumulator = 0;
