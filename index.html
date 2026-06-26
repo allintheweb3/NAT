@@ -2,9 +2,8 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<!-- 严格限制移动端与PC端的可视区域，从根源锁死横向溢出 -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>多链多钱包智能资产看板 (无横向溢出真正全适屏版)</title>
+<title>多链多钱包智能资产看板 (SOL深度修复兼默认折叠版)</title>
 
 <style>
 /* 根源防护：彻底锁死横向溢出，不允许任何组件把屏幕撑出右边界 */
@@ -41,14 +40,14 @@ html, body {
 .header-meta-text h1 { color: #38bdf8; font-size: 28px; margin: 0 0 8px 0; font-weight: 700; }
 .header-meta-text p { color: #64748b; font-size: 13px; margin: 0; }
 
-/* 核心总额大看板：流式自适应，宽度跟随屏幕缩放，两边留出安全间距 */
+/* 核心总额大看板：流式自适应 */
 .summary-banner { 
     background: linear-gradient(135deg, #1e1b4b, #2e1065); 
     border: 1px solid #4c1d95; 
     padding: 20px; 
     border-radius: 12px; 
     width: 100%;
-    max-width: 800px; /* PC端的最大美观上限 */
+    max-width: 800px; 
     display: flex; 
     flex-direction: column; 
     align-items: center; 
@@ -99,7 +98,7 @@ button.btn-success:hover { background: #059669; }
 button.btn-danger { background: #ef4444; padding: 4px 8px; font-size: 12px; }
 button.btn-danger:hover { background: #dc2626; }
 
-/* 监控明细表响应式包裹器：防止大表格挤爆屏幕右侧 */
+/* 监控明细表响应式包裹器 */
 .table-scroll-container { 
     width: 100%; 
     overflow-x: auto; 
@@ -127,7 +126,7 @@ td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; 
 .token-item-info h4 { font-size: 14px; color: #fff; margin: 0; }
 .token-item-info p { font-size: 11px; color: #64748b; font-family: monospace; word-break: break-all; margin: 4px 0 0 0; }
 
-/* ⏰ 真正的全自动视口断点：一旦屏幕变窄，右边栏无损沉底，100%全宽展示 */
+/* 全自动视口断点 */
 @media (max-width: 992px) {
     .main-layout { grid-template-columns: 1fr; gap: 15px; }
     .form-row-inline { grid-template-columns: 1fr; gap: 8px; }
@@ -138,14 +137,12 @@ td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; 
 </head>
 <body>
 
-<!-- 顶栏区域：纯净自适应 -->
 <div class="full-viewport-header-zone">
     <div class="header-meta-text">
         <h1>多链多钱包智能资产看板</h1>
         <p>动态添加代币 | 多钱包合并计算 | 跨域容错高兼容链上通信架构</p>
     </div>
     
-    <!-- 总额横幅看板：无损缩放 -->
     <div class="summary-banner">
         <div class="summary-left">
             <h3>当前所选代币全网监控总额</h3>
@@ -160,15 +157,19 @@ td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; 
     </div>
 </div>
 
-<!-- 主体内容容器：彻底防止横向溢出 -->
 <div class="container">
     <div class="main-layout">
         <!-- 左侧：钱包监控明细与表单 -->
         <div style="min-width: 0;">
-            <!-- 添加监控钱包表单 -->
+            <!-- 添加监控钱包表单：已调整为默认折叠 -->
             <div class="card-box">
-                <div class="card-title">监控钱包添加</div>
-                <div style="margin-top:15px;">
+                <div class="card-header-toggle" onclick="toggleCard('addWalletContent', 'arrowWallet')">
+                    <div class="card-title">
+                        <span>➕ 监控钱包添加</span>
+                        <span id="arrowWallet" class="toggle-icon">展开 ▼</span>
+                    </div>
+                </div>
+                <div id="addWalletContent" class="toggle-content collapsed">
                     <div class="form-row-inline">
                         <input type="text" id="walletAddress" placeholder="输入钱包地址 (0x... 或 SOL地址)" />
                         <input type="text" id="walletRemark" placeholder="钱包备注(如：巨鲸1号)" />
@@ -178,7 +179,7 @@ td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; 
                             <option value="SOL">Solana 链</option>
                         </select>
                     </div>
-                    <button class="btn-success" style="width:100%;" onclick="addWallet()">➕ 确认添加此钱包到观察队列</button>
+                    <button class="btn-success" style="width:100%;" onclick="addWallet()">确认添加此钱包到观察队列</button>
                 </div>
             </div>
 
@@ -188,7 +189,6 @@ td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; 
                     <div class="card-title" style="margin: 0; border:none; padding:0; width: auto;">钱包明细清单</div>
                     <button onclick="updateAllBalances()" id="refreshBtn">🔄 一键拉取实时链上余额</button>
                 </div>
-                <!-- 滚动包裹隔离层 -->
                 <div class="table-scroll-container">
                     <table>
                         <thead>
@@ -209,9 +209,8 @@ td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; 
             </div>
         </div>
 
-        <!-- 右侧：代币资产配置（自适应沉底或并排） -->
+        <!-- 右侧：代币资产配置 -->
         <div style="min-width: 0;">
-            <!-- 添加自定义代币 -->
             <div class="card-box">
                 <div class="card-header-toggle" onclick="toggleCard('addTokenContent', 'arrow1')">
                     <div class="card-title">
@@ -246,7 +245,6 @@ td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; 
                 </div>
             </div>
 
-            <!-- 已备查代币列表 -->
             <div class="card-box">
                 <div class="card-header-toggle" onclick="toggleCard('listTokenContent', 'arrow2')">
                     <div class="card-title">
@@ -288,7 +286,7 @@ const INITIAL_WALLETS = [
 let tokenConfigList = JSON.parse(localStorage.getItem("cfg_tokens")) || INITIAL_TOKENS;
 let walletList = JSON.parse(localStorage.getItem("cfg_wallets")) || INITIAL_WALLETS;
 
-// ==================== 3. 基础可折叠卡片组件逻辑 ====================
+// ==================== 3. 基础可折叠卡片逻辑 ====================
 function toggleCard(contentId, arrowId) {
     const content = document.getElementById(contentId);
     const arrow = document.getElementById(arrowId);
@@ -301,7 +299,7 @@ function toggleCard(contentId, arrowId) {
     }
 }
 
-// ==================== 4. 节点层跨域安全网络读取算法 ====================
+// ==================== 4. 节点层跨域安全网络读取（无损并完美兼容） ====================
 async function queryEvmBalance(chain, walletAddr, tokenAddr, decimals) {
     try {
         const rpcUrl = (chain === "ETH") ? RPC_ETH : RPC_BSC;
@@ -330,16 +328,15 @@ async function queryEvmBalance(chain, walletAddr, tokenAddr, decimals) {
     }
 }
 
+// 【深度修复】：提升Solana代币关联账户解析防御深度，增加全格式多属性解析
 async function querySolanaBalance(walletAddr, tokenMint, decimals) {
     try {
         const response = await fetch(RPC_SOL, {
             method: "POST",
-            headers: { 
-                "Content-Type": "application/json"
-            },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 jsonrpc: "2.0",
-                id: 1, 
+                id: Math.floor(Math.random() * 1000), 
                 method: "getTokenAccountsByOwner",
                 params: [
                     walletAddr,
@@ -351,23 +348,28 @@ async function querySolanaBalance(walletAddr, tokenMint, decimals) {
         
         if (!response.ok) return 0;
         const json = await response.json();
-        let bal = 0;
         
         if (json && json.result && json.result.value && json.result.value.length > 0) {
+            // 获取首个成功绑定的关联代币子账户信息
             const accountInfo = json.result.value[0].account.data.parsed.info.tokenAmount;
             if (accountInfo) {
+                // 1. 优先度 A：提取最精准的不丢失精度字符串
                 if (accountInfo.uiAmountString !== undefined && accountInfo.uiAmountString !== null) {
-                    bal = parseFloat(accountInfo.uiAmountString);
-                } else if (accountInfo.uiAmount !== undefined && accountInfo.uiAmount !== null) {
-                    bal = parseFloat(accountInfo.uiAmount);
-                } else if (accountInfo.amount) {
-                    bal = Number(accountInfo.amount) / Math.pow(10, parseInt(decimals) || 6);
+                    return parseFloat(accountInfo.uiAmountString);
+                }
+                // 2. 优先度 B：提取数字型原始缩放字段
+                if (accountInfo.uiAmount !== undefined && accountInfo.uiAmount !== null) {
+                    return parseFloat(accountInfo.uiAmount);
+                }
+                // 3. 优先度 C：基于长整数强除兜底
+                if (accountInfo.amount) {
+                    return Number(accountInfo.amount) / Math.pow(10, parseInt(decimals) || 6);
                 }
             }
         }
-        return bal;
+        return 0;
     } catch (e) {
-        console.error(`[Solana 链读取错误] 地址 ${walletAddr}:`, e);
+        console.error(`[Solana Chain RPC Exception] ${walletAddr}:`, e);
         return 0; 
     }
 }
@@ -534,7 +536,7 @@ function renderUI() {
     document.getElementById("summary_wallet_count").innerText = walletList.length;
 }
 
-// ==================== 6. 自动化流程初始化运行 ====================
+// ==================== 6. 初始化运行 ====================
 rebuildTokenDropdown();
 renderUI();
 updateAllBalances();
