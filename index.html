@@ -2,131 +2,150 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>多链多钱包智能资产看板 (无损满屏修复版)</title>
+<!-- 严格限制移动端与PC端的可视区域，从根源锁死横向溢出 -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>多链多钱包智能资产看板 (无横向溢出真正全适屏版)</title>
 
 <style>
-/* 保持底层干净的全局样式，不破坏下方组件 */
-html, body { margin: 0; padding: 0; background: #0f172a; color: #f1f5f9; width: 100%; overflow-x: hidden; }
+/* 根源防护：彻底锁死横向溢出，不允许任何组件把屏幕撑出右边界 */
+html, body { 
+    margin: 0; 
+    padding: 0; 
+    background: #0f172a; 
+    color: #f1f5f9; 
+    width: 100%; 
+    max-width: 100%;
+    overflow-x: hidden; 
+    -webkit-text-size-adjust: 100%;
+}
 * { box-sizing: border-box; font-family: "PingFang SC", "Microsoft YaHei", sans-serif; }
 
-/* ==================== 顶栏无损视口级满屏与轴心居中核心（全新重构） ==================== */
+/* ==================== 顶栏：自适应 100% 宽度，绝不超出边界 ==================== */
 .full-viewport-header-zone {
-    /* 核心黑科技：利用视口单位强行占满屏幕物理宽度，不受任何外部容器影响 */
-    width: 100vw;
-    position: relative;
-    left: 50%;
-    right: 50%;
-    margin-left: -50vw;
-    margin-right: -50vw;
-    
+    width: 100%;
+    max-width: 100%;
     background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
-    padding: 40px 20px;
+    padding: 30px 15px;
     border-bottom: 1px solid #334155;
-    
-    /* 严格的中央垂直弹性容器 */
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    box-sizing: border-box;
 }
 
 .header-meta-text {
     text-align: center;
-    margin-bottom: 25px;
+    margin-bottom: 20px;
+    width: 100%;
 }
-.header-meta-text h1 { color: #38bdf8; font-size: 32px; margin: 0 0 8px 0; }
-.header-meta-text p { color: #64748b; font-size: 14px; margin: 0; }
+.header-meta-text h1 { color: #38bdf8; font-size: 28px; margin: 0 0 8px 0; font-weight: 700; }
+.header-meta-text p { color: #64748b; font-size: 13px; margin: 0; }
 
-/* 核心总额大看板：在顶栏内部实现完美的中轴线绝对居中与适屏 */
+/* 核心总额大看板：流式自适应，宽度跟随屏幕缩放，两边留出安全间距 */
 .summary-banner { 
     background: linear-gradient(135deg, #1e1b4b, #2e1065); 
     border: 1px solid #4c1d95; 
-    padding: 25px; 
-    border-radius: 16px; 
+    padding: 20px; 
+    border-radius: 12px; 
     width: 100%;
-    max-width: 800px; /* 控制大屏下优雅的黄金视觉宽度 */
+    max-width: 800px; /* PC端的最大美观上限 */
     display: flex; 
     flex-direction: column; 
     align-items: center; 
     justify-content: center; 
     text-align: center; 
     gap: 15px;
-    box-shadow: 0 12px 30px -5px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
 }
 .summary-left { text-align: center; width: 100%; }
-.summary-left h3 { font-size: 14px; color: #a78bfa; margin: 0 0 8px 0; letter-spacing: 1px; }
-.summary-left .total-val { font-size: 44px; font-weight: 800; color: #10b981; font-family: monospace; word-break: break-all; margin: 0; line-height: 1.2; }
-.summary-right { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; width: 100%; }
-.select-token-ui { padding: 10px 20px; font-size: 15px; font-weight: bold; color: #38bdf8; border: 2px solid #38bdf8; background: #0f172a; border-radius: 8px; cursor: pointer; width: 100%; max-width: 300px; text-align: center; text-align-last: center; }
-.wallet-count-badge { font-size: 12px; color: #94a3b8; background: rgba(255,255,255,0.05); padding: 5px 15px; border-radius: 20px; border: 1px solid #334155; }
+.summary-left h3 { font-size: 13px; color: #a78bfa; margin: 0 0 6px 0; letter-spacing: 1px; }
+.summary-left .total-val { font-size: 38px; font-weight: 800; color: #10b981; font-family: monospace; word-break: break-all; margin: 0; line-height: 1.2; }
+.summary-right { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; width: 100%; }
+.select-token-ui { padding: 10px 16px; font-size: 14px; font-weight: bold; color: #38bdf8; border: 2px solid #38bdf8; background: #0f172a; border-radius: 8px; cursor: pointer; width: 100%; max-width: 280px; text-align: center; text-align-last: center; }
+.wallet-count-badge { font-size: 12px; color: #94a3b8; background: rgba(255,255,255,0.05); padding: 4px 12px; border-radius: 20px; border: 1px solid #334155; }
 
-/* ==================== 下方完全保留的原生内容容器与网格 ==================== */
-.container { max-width: 1200px; margin: 30px auto; padding: 0 15px; width: 100%; }
-.main-layout { display: grid; grid-template-columns: 2fr 1fr; gap: 25px; }
+/* ==================== 下方内容区：完全自适应弹性网格 ==================== */
+.container { 
+    max-width: 1200px; 
+    margin: 20px auto; 
+    padding: 0 15px; 
+    width: 100%; 
+    max-width: 100%;
+}
+.main-layout { 
+    display: grid; 
+    grid-template-columns: 2fr 1fr; 
+    gap: 20px; 
+    width: 100%;
+}
 
 /* 卡片容器 */
-.card-box { background: #1e293b; padding: 20px; border-radius: 12px; border: 1px solid #334155; margin-bottom: 25px; }
+.card-box { background: #1e293b; padding: 20px; border-radius: 12px; border: 1px solid #334155; margin-bottom: 20px; width: 100%; }
 .card-header-toggle { display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; }
-.card-title { font-size: 16px; color: #38bdf8; font-weight: bold; border-left: 4px solid #38bdf8; padding-left: 10px; display: flex; align-items: center; justify-content: space-between; width: 100%; }
-.toggle-icon { font-size: 12px; color: #64748b; transition: transform 0.2s; }
+.card-title { font-size: 15px; color: #38bdf8; font-weight: bold; border-left: 4px solid #38bdf8; padding-left: 10px; display: flex; align-items: center; justify-content: space-between; width: 100%; }
+.toggle-icon { font-size: 12px; color: #64748b; }
 .toggle-content { margin-top: 15px; }
 .toggle-content.collapsed { display: none; }
 
 /* 表单与输入框 */
 .form-grid { display: flex; flex-direction: column; gap: 12px; }
-.form-row-inline { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 10px; margin-bottom: 10px; }
-input, select, button { padding: 10px 12px; border-radius: 8px; border: 1px solid #475569; background: #0f172a; color: #fff; font-size: 14px; outline: none; }
+.form-row-inline { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 10px; margin-bottom: 10px; width: 100%; }
+input, select, button { padding: 10px 12px; border-radius: 8px; border: 1px solid #475569; background: #0f172a; color: #fff; font-size: 14px; outline: none; max-width: 100%; }
 input:focus, select:focus { border-color: #38bdf8; }
-button { background: #2563eb; cursor: pointer; border: none; font-weight: bold; transition: background 0.2s; }
+button { background: #2563eb; cursor: pointer; border: none; font-weight: bold; transition: background 0.2s; white-space: nowrap; }
 button:hover { background: #3b82f6; }
 button.btn-success { background: #10b981; }
 button.btn-success:hover { background: #059669; }
 button.btn-danger { background: #ef4444; padding: 4px 8px; font-size: 12px; }
 button.btn-danger:hover { background: #dc2626; }
 
-/* 监控明细表 */
-.table-container { overflow-x: auto; background: #1e293b; border-radius: 12px; border: 1px solid #334155; }
-table { width: 100%; border-collapse: collapse; text-align: left; }
+/* 监控明细表响应式包裹器：防止大表格挤爆屏幕右侧 */
+.table-scroll-container { 
+    width: 100%; 
+    overflow-x: auto; 
+    -webkit-overflow-scrolling: touch; 
+    background: #1e293b;
+    border-radius: 0 0 12px 12px;
+}
+table { width: 100%; border-collapse: collapse; text-align: left; min-width: 550px; }
 th, td { padding: 12px 14px; font-size: 13px; border-bottom: 1px solid #334155; }
 th { background: #334155; color: #38bdf8; font-weight: 600; }
 tr:hover td { background: rgba(51, 65, 85, 0.3); }
-td.index-cell { font-family: monospace; color: #64748b; font-weight: bold; text-align: center; width: 50px; }
-td.address-cell { font-family: monospace; color: #cbd5e1; word-break: break-all; }
+td.index-cell { font-family: monospace; color: #64748b; font-weight: bold; text-align: center; width: 45px; }
+td.address-cell { font-family: monospace; color: #cbd5e1; word-break: break-all; font-size: 12px; }
 td.remark-cell { color: #e2e8f0; font-weight: 500; }
-td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; }
+td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; color: #fff; }
 
 .chain-badge { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; }
 .badge-ETH { background: rgba(99, 102, 241, 0.2); color: #818cf8; border: 1px solid #6366f1; }
 .badge-BSC { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid #f59e0b; }
 .badge-SOL { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid #10b981; }
 
-/* 代币列表管理样式 */
-.token-item { display: flex; justify-content: space-between; align-items: center; background: #0f172a; padding: 10px; border-radius: 8px; margin-bottom: 8px; border: 1px solid #334155; }
-.token-item-info h4 { font-size: 14px; color: #fff; }
-.token-item-info p { font-size: 11px; color: #64748b; font-family: monospace; word-break: break-all; margin-top: 2px; }
+/* 代币配置单项 */
+.token-item { display: flex; justify-content: space-between; align-items: center; background: #0f172a; padding: 10px; border-radius: 8px; margin-bottom: 8px; border: 1px solid #334155; gap: 10px; }
+.token-item-info { flex: 1; min-width: 0; }
+.token-item-info h4 { font-size: 14px; color: #fff; margin: 0; }
+.token-item-info p { font-size: 11px; color: #64748b; font-family: monospace; word-break: break-all; margin: 4px 0 0 0; }
 
-/* 移动端断点适配（仅调整文字和比例，绝不拉伸下方卡片） */
-@media (max-width: 768px) {
-    .full-viewport-header-zone { padding: 30px 15px; }
+/* ⏰ 真正的全自动视口断点：一旦屏幕变窄，右边栏无损沉底，100%全宽展示 */
+@media (max-width: 992px) {
+    .main-layout { grid-template-columns: 1fr; gap: 15px; }
+    .form-row-inline { grid-template-columns: 1fr; gap: 8px; }
     .header-meta-text h1 { font-size: 24px; }
     .summary-left .total-val { font-size: 32px; }
-    .main-layout { grid-template-columns: 1fr; }
-    .form-row-inline { grid-template-columns: 1fr; gap: 8px; }
 }
 </style>
 </head>
 <body>
 
-<!-- 独立视口级顶栏：通过视口物理宽度计算实现完美满屏居中，不污染外界结构 -->
+<!-- 顶栏区域：纯净自适应 -->
 <div class="full-viewport-header-zone">
     <div class="header-meta-text">
         <h1>多链多钱包智能资产看板</h1>
         <p>动态添加代币 | 多钱包合并计算 | 跨域容错高兼容链上通信架构</p>
     </div>
     
-    <!-- 总额横幅看板：在中轴线上物理适屏伸缩 -->
+    <!-- 总额横幅看板：无损缩放 -->
     <div class="summary-banner">
         <div class="summary-left">
             <h3>当前所选代币全网监控总额</h3>
@@ -141,10 +160,11 @@ td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; 
     </div>
 </div>
 
+<!-- 主体内容容器：彻底防止横向溢出 -->
 <div class="container">
     <div class="main-layout">
         <!-- 左侧：钱包监控明细与表单 -->
-        <div>
+        <div style="min-width: 0;">
             <!-- 添加监控钱包表单 -->
             <div class="card-box">
                 <div class="card-title">监控钱包添加</div>
@@ -165,19 +185,20 @@ td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; 
             <!-- 钱包资产明细表 -->
             <div class="card-box" style="padding: 0; overflow: hidden;">
                 <div style="padding: 15px 20px 5px 20px; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap;">
-                    <div class="card-title" style="margin: 0; border:none; padding:0;">钱包明细清单</div>
+                    <div class="card-title" style="margin: 0; border:none; padding:0; width: auto;">钱包明细清单</div>
                     <button onclick="updateAllBalances()" id="refreshBtn">🔄 一键拉取实时链上余额</button>
                 </div>
-                <div style="overflow-x: auto; width: 100%;">
-                    <table style="margin-top: 10px; min-width: 600px;">
+                <!-- 滚动包裹隔离层 -->
+                <div class="table-scroll-container">
+                    <table>
                         <thead>
                             <tr>
                                 <th style="text-align: center; width: 50px;">序号</th>
                                 <th style="width: 80px;">网络</th>
-                                <th style="width: 120px;">钱包备注</th>
+                                <th style="width: 110px;">钱包备注</th>
                                 <th>监控钱包地址</th>
-                                <th style="text-align: right; width: 150px;" id="dynamicTableHeader">代币余额</th>
-                                <th style="text-align: center; width: 80px;">操作</th>
+                                <th style="text-align: right; width: 140px;" id="dynamicTableHeader">代币余额</th>
+                                <th style="text-align: center; width: 70px;">操作</th>
                             </tr>
                         </thead>
                         <tbody id="walletTableBody">
@@ -188,9 +209,9 @@ td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; 
             </div>
         </div>
 
-        <!-- 右侧：代币资产配置（折叠样式，默认为收起） -->
-        <div>
-            <!-- 添加自定义代币 (默认收起) -->
+        <!-- 右侧：代币资产配置（自适应沉底或并排） -->
+        <div style="min-width: 0;">
+            <!-- 添加自定义代币 -->
             <div class="card-box">
                 <div class="card-header-toggle" onclick="toggleCard('addTokenContent', 'arrow1')">
                     <div class="card-title">
@@ -220,12 +241,12 @@ td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; 
                             <label style="font-size:12px; color:#94a3b8;">代币精度位 (Decimals)</label>
                             <input type="number" id="newTokenDecimals" value="18" min="0" max="18" style="width:100%; margin-top:4px;" />
                         </div>
-                        <button onclick="addCustomToken()" style="margin-top:5px;">💾 录入并备查此代币</button>
+                        <button onclick="addCustomToken()" style="width:100%; margin-top:5px;">💾 录入并备查此代币</button>
                     </div>
                 </div>
             </div>
 
-            <!-- 已备查代币列表 (默认收起) -->
+            <!-- 已备查代币列表 -->
             <div class="card-box">
                 <div class="card-header-toggle" onclick="toggleCard('listTokenContent', 'arrow2')">
                     <div class="card-title">
@@ -247,7 +268,6 @@ td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; 
 // ==================== 1. RPC 节点配置 ====================
 const RPC_ETH = "https://rpc.mevblocker.io"; 
 const RPC_BSC = "https://bsc-dataseed1.binance.org"; 
-// 选用极其稳定、容错率极高的官方生产环境主网通用 RPC
 const RPC_SOL = "https://api.mainnet-beta.solana.com"; 
 
 // ==================== 2. 初始化缓存与示例数据 ====================
@@ -312,7 +332,6 @@ async function queryEvmBalance(chain, walletAddr, tokenAddr, decimals) {
 
 async function querySolanaBalance(walletAddr, tokenMint, decimals) {
     try {
-        // 【已彻底修复 Solana 读取】：严格补全标准的 POST 报文和完整的 JSON-RPC 2.0 规范通信规约
         const response = await fetch(RPC_SOL, {
             method: "POST",
             headers: { 
@@ -330,14 +349,10 @@ async function querySolanaBalance(walletAddr, tokenMint, decimals) {
             })
         });
         
-        if (!response.ok) {
-            throw new Error(`网络响应异常: ${response.status}`);
-        }
-        
+        if (!response.ok) return 0;
         const json = await response.json();
         let bal = 0;
         
-        // 健壮的多层防护解析器
         if (json && json.result && json.result.value && json.result.value.length > 0) {
             const accountInfo = json.result.value[0].account.data.parsed.info.tokenAmount;
             if (accountInfo) {
@@ -352,8 +367,7 @@ async function querySolanaBalance(walletAddr, tokenMint, decimals) {
         }
         return bal;
     } catch (e) {
-        // 捕获节点所有的连接报错并输出控制台，但返回 0 确保看板主干线程绝不挂起
-        console.error(`[Solana 链读取阻断排查] 地址 ${walletAddr} 出错:`, e);
+        console.error(`[Solana 链读取错误] 地址 ${walletAddr}:`, e);
         return 0; 
     }
 }
@@ -361,7 +375,7 @@ async function querySolanaBalance(walletAddr, tokenMint, decimals) {
 async function updateAllBalances() {
     const btn = document.getElementById("refreshBtn");
     if(btn) {
-        btn.innerText = "⏳ 链上节点同步中...";
+        btn.innerText = "⏳ 同步中...";
         btn.disabled = true;
     }
 
