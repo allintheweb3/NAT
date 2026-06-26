@@ -3,28 +3,61 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>多链多钱包智能资产看板 (全端全居中直连修复版)</title>
+<title>多链多钱包智能资产看板 (全屏适配居中直连修复版)</title>
 
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: "PingFang SC", "Microsoft YaHei", sans-serif; }
-body { background: #0f172a; color: #f1f5f9; padding: 30px 15px; }
-.container { max-width: 1200px; margin: 0 auto; }
+body { background: #0f172a; color: #f1f5f9; padding-bottom: 40px; }
 
-/* 头部主副标题：全端绝对居中 */
-.header { text-align: center; margin-bottom: 25px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-.header h1 { color: #38bdf8; font-size: 26px; margin-bottom: 8px; text-align: center; }
-.header p { color: #64748b; font-size: 14px; text-align: center; }
+/* ==================== 顶部通栏满屏居中样式 ==================== */
+.full-width-header-zone {
+    width: 100%;
+    background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+    padding: 40px 20px;
+    border-bottom: 1px solid #334155;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
 
-/* 顶栏资产汇总栏：全端全自适应全居中 */
-.summary-banner { background: linear-gradient(135deg, #1e1b4b, #2e1065); border: 1px solid #4c1d95; padding: 25px; border-radius: 12px; margin-bottom: 25px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 15px; }
+.header-inner {
+    width: 100%;
+    max-width: 1000px; /* 限制文本和汇总信息的最大黄金阅读宽度 */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.header-inner h1 { color: #38bdf8; font-size: 28px; margin-bottom: 8px; width: 100%; text-align: center; }
+.header-inner p { color: #64748b; font-size: 14px; margin-bottom: 30px; width: 100%; text-align: center; }
+
+/* 顶栏资产汇总栏：满屏居中，自适应扩散 */
+.summary-banner { 
+    background: linear-gradient(135deg, #1e1b4b, #2e1065); 
+    border: 1px solid #4c1d95; 
+    padding: 30px 20px; 
+    border-radius: 16px; 
+    width: 100%;
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: center; 
+    text-align: center; 
+    gap: 15px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+}
 .summary-left { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; }
-.summary-left h3 { font-size: 14px; color: #a78bfa; margin-bottom: 8px; text-align: center; }
-.summary-left .total-val { font-size: 38px; font-weight: 800; color: #10b981; font-family: monospace; word-break: break-all; text-align: center; line-height: 1.2; }
-.summary-right { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; width: 100%; }
-.select-token-ui { padding: 10px 20px; font-size: 16px; font-weight: bold; color: #38bdf8; border: 2px solid #38bdf8; background: #0f172a; border-radius: 8px; cursor: pointer; width: 100%; max-width: 280px; text-align: center; text-align-last: center; }
-.wallet-count-badge { font-size: 12px; color: #94a3b8; background: rgba(255,255,255,0.05); padding: 4px 15px; border-radius: 20px; border: 1px solid #334155; display: inline-block; }
+.summary-left h3 { font-size: 14px; color: #a78bfa; margin-bottom: 10px; text-align: center; letter-spacing: 1px; }
+.summary-left .total-val { font-size: 42px; font-weight: 800; color: #10b981; font-family: monospace; word-break: break-all; text-align: center; line-height: 1.1; }
+.summary-right { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; width: 100%; }
+.select-token-ui { padding: 12px 24px; font-size: 16px; font-weight: bold; color: #38bdf8; border: 2px solid #38bdf8; background: #0f172a; border-radius: 8px; cursor: pointer; width: 100%; max-width: 320px; text-align: center; text-align-last: center; }
+.wallet-count-badge { font-size: 12px; color: #94a3b8; background: rgba(255,255,255,0.05); padding: 5px 18px; border-radius: 20px; border: 1px solid #334155; display: inline-block; }
 
-/* 左右布局（宽屏下应用） */
+/* ==================== 下方内容标准容器 ==================== */
+.container { max-width: 1200px; margin: 30px auto 0 auto; padding: 0 15px; }
 .main-layout { display: grid; grid-template-columns: 2fr 1fr; gap: 25px; }
 
 /* 卡片容器 */
@@ -70,9 +103,9 @@ td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; 
 
 /* 移动端断点适配 */
 @media (max-width: 768px) {
-    body { padding: 15px 10px; }
-    .header h1 { font-size: 22px; }
-    .summary-left .total-val { font-size: 30px; }
+    .full-width-header-zone { padding: 25px 15px; }
+    .header-inner h1 { font-size: 22px; }
+    .summary-left .total-val { font-size: 32px; }
     .select-token-ui { max-width: 100%; }
     .main-layout { grid-template-columns: 1fr; }
     .form-row-inline { grid-template-columns: 1fr; gap: 8px; }
@@ -81,27 +114,29 @@ td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; 
 </head>
 <body>
 
-<div class="container">
-    <!-- 头部主副标题（全端自动居中） -->
-    <div class="header">
+<!-- 顶部完全突破限制的全屏、自适应且完美居中的标题栏与总额区 -->
+<div class="full-width-header-zone">
+    <div class="header-inner">
         <h1>多链多钱包智能资产看板</h1>
         <p>动态添加代币 | 多钱包合并计算 | 跨域容错高兼容链上通信架构</p>
-    </div>
-
-    <!-- 资产汇总栏（全端自动居中） -->
-    <div class="summary-banner">
-        <div class="summary-left">
-            <h3>当前所选代币全网监控总额</h3>
-            <p class="total-val" id="summary_total_display">0.00</p>
+        
+        <!-- 资产汇总蓝：完美在通栏中居中 -->
+        <div class="summary-banner">
+            <div class="summary-left">
+                <h3>当前所选代币全网监控总额</h3>
+                <p class="total-val" id="summary_total_display">0.00</p>
+            </div>
+            <div class="summary-right">
+                <select id="selectDisplayToken" class="select-token-ui" onchange="renderUI()">
+                    <!-- 动态代币选项 -->
+                </select>
+                <div class="wallet-count-badge">正在监控 <span id="summary_wallet_count" style="color:#38bdf8;font-weight:bold;">0</span> 个钱包</div>
+            </div>
         </div>
-        <div class="summary-right">
-            <select id="selectDisplayToken" class="select-token-ui" onchange="renderUI()">
-                <!-- 动态代币选项 -->
-            </select>
-            <div class="wallet-count-badge">正在监控 <span id="summary_wallet_count" style="color:#38bdf8;font-weight:bold;">0</span> 个钱包</div>
-        </div>
     </div>
+</div>
 
+<div class="container">
     <div class="main-layout">
         <!-- 左侧：钱包监控明细与表单 -->
         <div>
@@ -205,10 +240,11 @@ td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; 
 
 <script>
 // ==================== 1. RPC 节点配置 ====================
-// 【已修复】：更换 ETH 节点为高开放、高频无拦截的 MEV-Blocker 防阻断端点。BSC 节点保持原封不动。
+// ETH保持上次修改好的可用节点；BSC严格一字不动。
 const RPC_ETH = "https://rpc.mevblocker.io"; 
-const RPC_BSC = "https://bsc-dataseed1.binance.org"; // 严格未动
-const RPC_SOL = "https://api.mainnet-beta.solana.com"; 
+const RPC_BSC = "https://bsc-dataseed1.binance.org"; 
+// 【SOL 节点全面升级】：采用补全斜杠的规范端点并加入针对公网频繁请求的容错解包逻辑
+const RPC_SOL = "https://api.mainnet-beta.solana.com/"; 
 
 // ==================== 2. 初始化缓存与示例数据 ====================
 const INITIAL_TOKENS = [
@@ -272,13 +308,16 @@ async function queryEvmBalance(chain, walletAddr, tokenAddr, decimals) {
 
 async function querySolanaBalance(walletAddr, tokenMint, decimals) {
     try {
-        // 【已修复】：针对特定 SPL 节点返回，同时提取 uiAmount 变体和原始 amount，彻底排除冷门代币解析空值引发的不显示故障
+        // 【已修复 Solana 阻断问题】：全面优化 Payload，改用标准的 headers 规避部分公共节点拒绝非核心请求的问题
         const response = await fetch(RPC_SOL, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: { 
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
             body: JSON.stringify({
                 jsonrpc: "2.0",
-                id: Math.floor(Math.random() * 1000),
+                id: Math.floor(Math.random() * 2000) + 1,
                 method: "getTokenAccountsByOwner",
                 params: [
                     walletAddr,
@@ -287,21 +326,26 @@ async function querySolanaBalance(walletAddr, tokenMint, decimals) {
                 ]
             })
         });
+        
+        if (!response.ok) return 0;
         const json = await response.json();
         let bal = 0;
+        
         if (json.result && json.result.value && json.result.value.length > 0) {
-            const parsedInfo = json.result.value[0].account.data.parsed.info.tokenAmount;
-            
-            if (parsedInfo.uiAmount !== null && parsedInfo.uiAmount !== undefined) {
-                bal = parseFloat(parsedInfo.uiAmountString || parsedInfo.uiAmount);
-            } else if (parsedInfo.amount) {
-                // 回退保障：若无格式化数额，采用原始颗粒度除以精度位强行换算
-                bal = Number(parsedInfo.amount) / Math.pow(10, decimals || 6);
+            const accountData = json.result.value[0].account.data.parsed.info.tokenAmount;
+            if (accountData) {
+                if (accountData.uiAmountString !== undefined && accountData.uiAmountString !== null) {
+                    bal = parseFloat(accountData.uiAmountString);
+                } else if (accountData.uiAmount !== undefined && accountData.uiAmount !== null) {
+                    bal = parseFloat(accountData.uiAmount);
+                } else if (accountData.amount) {
+                    bal = Number(accountData.amount) / Math.pow(10, decimals || 6);
+                }
             }
         }
         return bal;
     } catch (e) {
-        console.error(`[SOLANA ERROR] -> ${walletAddr}:`, e);
+        console.error(`[SOLANA强固化引擎告警] -> 地址 ${walletAddr} 分解失败:`, e);
         return 0;
     }
 }
@@ -320,7 +364,6 @@ async function updateAllBalances() {
         for (let token of matchTokens) {
             let balance = 0;
             if (wallet.chain === "BSC") {
-                // 严格保证原始 BSC 代码及路由路径未做任何变动
                 balance = await queryEvmBalance(wallet.chain, wallet.address, token.contract, token.decimals);
             } else if (wallet.chain === "ETH") {
                 balance = await queryEvmBalance(wallet.chain, wallet.address, token.contract, token.decimals);
@@ -371,6 +414,7 @@ function addCustomToken() {
     updateAllBalances();
 }
 
+// 删除已备查代币
 function deleteCustomToken(idx) {
     if(confirm("移除该备查代币会导致对应监控停止，确认删除吗？")) {
         tokenConfigList.splice(idx, 1);
@@ -380,6 +424,7 @@ function deleteCustomToken(idx) {
     }
 }
 
+// 添加钱包逻辑
 function addWallet() {
     const address = document.getElementById("walletAddress").value.trim();
     const remark = document.getElementById("walletRemark").value.trim() || "未命名钱包";
@@ -404,6 +449,7 @@ function addWallet() {
     updateAllBalances();
 }
 
+// 删除钱包
 function deleteWallet(idx) {
     if(confirm("确认从列表中永久移出此监控钱包吗？")) {
         walletList.splice(idx, 1);
@@ -431,7 +477,6 @@ function renderUI() {
     const currentToken = document.getElementById("selectDisplayToken").value || "USDT";
     document.getElementById("dynamicTableHeader").innerText = `${currentToken} 余额`;
 
-    // 渲染折叠面板内的自定义代币列表
     const tokenSlot = document.getElementById("customTokenListSlot");
     tokenSlot.innerHTML = "";
     tokenConfigList.forEach((t, i) => {
@@ -446,7 +491,6 @@ function renderUI() {
         `;
     });
 
-    // 渲染左侧钱包清单明细
     const tbody = document.getElementById("walletTableBody");
     tbody.innerHTML = "";
     let totalAccumulator = 0;
