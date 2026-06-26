@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>多链多钱包自定义代币资产智能看板 </title>
+<title>多链多钱包自定义代币看板 (精度自定义版)</title>
 <script src="https://cdn.jsdelivr.net/npm/web3@1.8.2/dist/web3.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@solana/web3.js@1.73.0/lib/index.iife.min.js"></script>
 
@@ -70,7 +70,7 @@ td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; 
 
 <div class="container">
     <div class="header">
-        <h1>多链多钱包资产智能看板</h1>
+        <h1>多链多钱包智能资产看板</h1>
         <p>动态添加代币 | 多钱包合并计算 | 纯前端免服务器直连区块链</p>
     </div>
 
@@ -142,8 +142,8 @@ td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; 
                         <input type="text" id="newTokenContract" placeholder="EVM的0x地址 或 SOL的Mint公钥" style="width:100%; margin-top:4px;" />
                     </div>
                     <div>
-                        <label style="font-size:12px; color:#94a3b8;">代币精度位 (Decimals)</label>
-                        <input type="number" id="newTokenDecimals" value="18" placeholder="通常为 18 或 6" style="width:100%; margin-top:4px;" />
+                        <label style="font-size:12px; color:#94a3b8;">代币精度位 (Decimals，支持设置为 0)</label>
+                        <input type="number" id="newTokenDecimals" value="18" min="0" max="18" placeholder="支持输入 0 - 18 之间的整数" style="width:100%; margin-top:4px;" />
                     </div>
                     <button onclick="addCustomToken()" style="margin-top:5px;">💾 录入并备查此代币</button>
                 </div>
@@ -171,7 +171,6 @@ const solanaConn = new solanaWeb3.Connection(RPC_SOL, 'confirmed');
 const MIN_ERC20_ABI = [{ "constant": true, "inputs": [{ "name": "_owner", "type": "address" }], "name": "balanceOf", "outputs": [{ "name": "balance", "type": "uint256" }], "type": "function" }];
 
 // ==================== 2. 初始化本地缓存与基础默认数据 ====================
-// 默认内置的常用备查代币
 const INITIAL_TOKENS = [
     { symbol: "USDT", chain: "ETH", contract: "0xdac17f958d2ee523a2206206994597c13d831ec7", decimals: 6 },
     { symbol: "USDT", chain: "BSC", contract: "0x55d398326f99059fF775485246999027B3197955", decimals: 18 },
@@ -180,7 +179,6 @@ const INITIAL_TOKENS = [
     { symbol: "USDT", chain: "SOL", contract: "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB", decimals: 6 }
 ];
 
-// 默认内置初始化观察钱包地址
 const INITIAL_WALLETS = [
     { chain: "ETH", address: "0x65a177f0ce9ad38875aa309dae3fbb289c58f689", balances: {} },
     { chain: "BSC", address: "0x65a177f0ce9ad38875aa309dae3fbb289c58f689", balances: {} },
@@ -190,21 +188,19 @@ const INITIAL_WALLETS = [
 let tokenConfigList = JSON.parse(localStorage.getItem("cfg_tokens")) || INITIAL_TOKENS;
 let walletList = JSON.parse(localStorage.getItem("cfg_wallets")) || INITIAL_WALLETS;
 
-// ==================== 3. 核心全自研多链直接调用层 ====================
-
-// 读取 EVM 链代币余额
+// ==================== 3. 核心链上原生调用逻辑 ====================
 async function queryEvmBalance(chain, walletAddr, tokenAddr, decimals) {
     try {
         const web3 = (chain === "ETH") ? web3Eth : web3Bsc;
         const contract = new web3.eth.Contract(MIN_ERC20_ABI, tokenAddr);
         const raw = await contract.methods.balanceOf(walletAddr).call();
+        // 允许 decimals 为 0，Math.pow(10, 0) 等于 1
         return parseFloat(raw) / Math.pow(10, decimals);
     } catch (e) {
         return 0;
     }
 }
 
-// 读取 Solana 链代币余额
 async function querySolanaBalance(walletAddr, tokenMint) {
     try {
         const pubkey = new solanaWeb3.PublicKey(walletAddr);
@@ -222,18 +218,13 @@ async function querySolanaBalance(walletAddr, tokenMint) {
     }
 }
 
-// 遍历所有的钱包及代币，直连 RPC 节点刷新
 async function updateAllBalances() {
     const btn = document.getElementById("refreshBtn");
     btn.innerText = "⏳ 节点读取中...";
     btn.disabled = true;
 
-    // 多线程高并发异步流
     const tasks = walletList.map(async (wallet) => {
-        // 清理原有旧余额
         wallet.balances = {};
-        
-        // 找到与当前钱包同属一条链的所有备查代币进行余额核查
         const matchTokens = tokenConfigList.filter(t => t.chain === wallet.chain);
         
         for (let token of matchTokens) {
@@ -243,7 +234,6 @@ async function updateAllBalances() {
             } else if (wallet.chain === "SOL") {
                 balance = await querySolanaBalance(wallet.address, token.contract);
             }
-            // 缓存记录当前钱包下该代币符号的对应额度
             wallet.balances[token.symbol] = balance;
         }
     });
@@ -256,21 +246,26 @@ async function updateAllBalances() {
     btn.disabled = false;
 }
 
-// ==================== 4. 动态渲染与前端交互机制 ====================
-
-// 4.1 添加自定义代币逻辑
+// ==================== 4. 动态渲染与交互 ====================
 function addCustomToken() {
     const symbol = document.getElementById("newTokenSymbol").value.trim().toUpperCase();
     const chain = document.getElementById("newTokenChain").value;
     const contract = document.getElementById("newTokenContract").value.trim();
-    const decimals = parseInt(document.getElementById("newTokenDecimals").value) || 18;
+    
+    // 用 parseInt 解析，只要大于等于 0 均视为有效输入
+    const decimalsInput = document.getElementById("newTokenDecimals").value;
+    const decimals = parseInt(decimalsInput);
 
     if (!symbol || !contract) {
         alert("代币简称与合约地址不能为空！");
         return;
     }
 
-    // 查重规则
+    if (isNaN(decimals) || decimals < 0) {
+        alert("请输入有效的精度位（大于或等于 0 的整数）！");
+        return;
+    }
+
     const exist = tokenConfigList.some(t => t.symbol === symbol && t.chain === chain && t.contract.toLowerCase() === contract.toLowerCase());
     if(exist) {
         alert("相同的代币资产已经在备查池中！");
@@ -280,13 +275,11 @@ function addCustomToken() {
     tokenConfigList.push({ symbol, chain, contract, decimals });
     localStorage.setItem("cfg_tokens", JSON.stringify(tokenConfigList));
     
-    // 重筑下拉框与代币面板
     rebuildTokenDropdown();
     renderUI();
-    updateAllBalances(); // 自动去查询刚刚配置的这个代币的所有钱包数额
+    updateAllBalances();
 }
 
-// 4.2 删除自定义代币
 function deleteCustomToken(idx) {
     if(confirm("移除该代币会导致对应监控汇总停止，确认移除吗？")) {
         tokenConfigList.splice(idx, 1);
@@ -296,7 +289,6 @@ function deleteCustomToken(idx) {
     }
 }
 
-// 4.3 添加钱包逻辑
 function addWallet() {
     const address = document.getElementById("walletAddress").value.trim();
     const chain = document.getElementById("walletChain").value;
@@ -319,21 +311,17 @@ function addWallet() {
     updateAllBalances();
 }
 
-// 4.4 删除钱包逻辑
 function deleteWallet(idx) {
-    if(confirm("确认移出对此钱包的资产同步监视吗？")) {
+    if(confirm("确认从列表中删除此钱包吗？")) {
         walletList.splice(idx, 1);
         localStorage.setItem("cfg_wallets", JSON.stringify(walletList));
         renderUI();
     }
 }
 
-// 4.5 重筑顶部下拉菜单组件结构
 function rebuildTokenDropdown() {
     const select = document.getElementById("selectDisplayToken");
-    // 获取当前不重复的所有代币Symbol集合
     const uniqueSymbols = [...new Set(tokenConfigList.map(t => t.symbol))];
-    
     const previousSelection = select.value;
     select.innerHTML = "";
     
@@ -341,18 +329,16 @@ function rebuildTokenDropdown() {
         select.innerHTML += `<option value="${sym}">🔍 观察/查看 ${sym} 资产</option>`;
     });
 
-    // 尽可能保留用户刚才选定的币种高亮
     if(uniqueSymbols.includes(previousSelection)) {
         select.value = previousSelection;
     }
 }
 
-// 4.6 界面重绘总引擎
 function renderUI() {
     const currentToken = document.getElementById("selectDisplayToken").value || "USDT";
     document.getElementById("dynamicTableHeader").innerText = `${currentToken} 余额`;
 
-    // 渲染右侧代币卡片
+    // 渲染右侧代币
     const tokenSlot = document.getElementById("customTokenListSlot");
     tokenSlot.innerHTML = "";
     tokenConfigList.forEach((t, i) => {
@@ -362,19 +348,17 @@ function renderUI() {
                     <h4>${t.symbol} <span class="chain-badge badge-${t.chain}">${t.chain}</span></h4>
                     <p>合约:${t.contract.substring(0,6)}...${t.contract.substring(t.contract.length-6)} (精度:${t.decimals})</p>
                 </div>
-                <button class="btn-danger" onclick="deleteCustomToken(${i})">移除</button>
+                <button class="btn-danger" onclick="deleteCustomToken(${i})">删除</button>
             </div>
         `;
     });
 
-    // 渲染左侧钱包数据，并累加当前选定代币的全局总余额
+    // 渲染左侧钱包与总数
     const tbody = document.getElementById("walletTableBody");
     tbody.innerHTML = "";
-    
     let totalAccumulator = 0;
 
     walletList.forEach((w, idx) => {
-        // 从钱包缓存的资产集里提取当前在顶栏下拉菜单中选中的代币数
         let bal = parseFloat(w.balances[currentToken] || 0);
         totalAccumulator += bal;
 
@@ -382,23 +366,20 @@ function renderUI() {
             <tr>
                 <td><span class="chain-badge badge-${w.chain}">${w.chain}</span></td>
                 <td class="address-cell">${w.address}</td>
-                <td class="balance-cell">${bal.toLocaleString('zh-CN', {minimumFractionDigits: 2, maximumFractionDigits: 4})}</td>
-                <td style="text-align: center;"><button class="btn-danger" onclick="deleteWallet(${idx})">注销</button></td>
+                <td class="balance-cell">${bal.toLocaleString('zh-CN', {minimumFractionDigits: 0, maximumFractionDigits: 4})}</td>
+                <td style="text-align: center;"><button class="btn-danger" onclick="deleteWallet(${idx})">删除</button></td>
             </tr>
         `;
     });
 
-    // 更新汇总卡片的数值呈现
-    document.getElementById("summary_total_display").innerText = totalAccumulator.toLocaleString('zh-CN', {minimumFractionDigits: 2, maximumFractionDigits: 4});
+    document.getElementById("summary_total_display").innerText = totalAccumulator.toLocaleString('zh-CN', {minimumFractionDigits: 0, maximumFractionDigits: 4});
     document.getElementById("summary_wallet_count").innerText = walletList.length;
 }
 
-// ==================== 5. 网页生命运行入口 ====================
+// ==================== 5. 初始化 ====================
 rebuildTokenDropdown();
 renderUI();
-// 页面加载时自动调取一次最新账目数
 updateAllBalances();
 </script>
-
 </body>
 </html>
