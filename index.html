@@ -72,9 +72,26 @@ html, body {
 }
 .summary-left { text-align: center; width: 100%; }
 .summary-left h3 { font-size: 13px; color: #a78bfa; margin: 0 0 6px 0; letter-spacing: 1px; }
-.summary-left .total-val { font-size: 38px; font-weight: 800; color: #10b981; font-family: monospace; word-break: break-all; margin: 0; line-height: 1.2; }
-/* 简写小括号单位样式 */
-.summary-left .total-short-val { font-size: 18px; color: #34d399; font-weight: normal; margin-left: 6px; vertical-align: middle; }
+
+/* 总额数字样式 */
+.summary-left .total-val { 
+    display: block; /* 设为块级，独占一行 */
+    font-size: 38px; 
+    font-weight: 800; 
+    color: #10b981; 
+    font-family: monospace; 
+    word-break: break-all; 
+    margin: 0; 
+    line-height: 1.2; 
+}
+/* 简写小括号单位样式：使其完美排在数字正下方 */
+.summary-left .total-short-val { 
+    display: block; /* 设为块级，另起一行排在下面 */
+    font-size: 16px; 
+    color: #34d399; 
+    font-weight: 500; 
+    margin-top: 6px; /* 与上方数字保持呼吸间距 */
+}
 
 .summary-right { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; width: 100%; }
 .select-token-ui { padding: 10px 16px; font-size: 14px; font-weight: bold; color: #38bdf8; border: 2px solid #38bdf8; background: #0f172a; border-radius: 8px; cursor: pointer; width: 100%; max-width: 280px; text-align: center; text-align-last: center; }
@@ -198,8 +215,8 @@ td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; 
             <div class="summary-banner">
                 <div class="summary-left">
                     <h3>当前所选代币全网监控总额</h3>
-                    <!-- 调整结构：支持主数据和小括号简写单位并列展示 -->
-                    <div style="display: inline-block; text-align: center;">
+                    <!-- 调整上下级结构：使小括号简写单位完美呆在数字正下方 -->
+                    <div style="width: 100%; text-align: center;">
                         <span class="total-val" id="summary_total_display">0.00</span>
                         <span class="total-short-val" id="summary_short_display"></span>
                     </div>
@@ -523,14 +540,14 @@ function deleteCustomToken(idx) {
     }
 }
 
-/* 🚀 简写大数字量级转换算法 */
+/* 简写大数字量级转换算法 */
 function formatShortVolume(val) {
-    if (val < 10000) return ""; // 较小数值不需要画蛇添足加括号简写
+    if (val < 10000) return ""; 
     const units = [
-        { value: 1e12, symbol: "T" }, // 万亿
-        { value: 1e9,  symbol: "B" }, // 十亿
-        { value: 1e6,  symbol: "M" }, // 百万
-        { value: 1e3,  symbol: "K" }  // 千
+        { value: 1e12, symbol: "T" }, 
+        { value: 1e9,  symbol: "B" }, 
+        { value: 1e6,  symbol: "M" }, 
+        { value: 1e3,  symbol: "K" }  
     ];
     for (let i = 0; i < units.length; i++) {
         if (val >= units[i].value) {
@@ -627,7 +644,7 @@ function renderUI() {
     });
 
     document.getElementById("summary_total_display").innerText = totalAccumulator.toLocaleString('zh-CN', {minimumFractionDigits: 0, maximumFractionDigits: 4});
-    // 渲染简写单位
+    // 渲染简写单位 (自动在CSS控制下排列在正下方)
     document.getElementById("summary_short_display").innerText = formatShortVolume(totalAccumulator);
     document.getElementById("summary_wallet_count").innerText = walletList.length;
 }
