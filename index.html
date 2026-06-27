@@ -6,7 +6,7 @@
 <title>多链多钱包智能资产看板 (无横向溢出真正全适屏版)</title>
 
 <style>
-/* ==================== 1. 根源防护与全新自适应吸底布局 ==================== */
+/* ==================== 1. 根源防护与自适应吸底布局 ==================== */
 html, body { 
     margin: 0; 
     padding: 0; 
@@ -73,6 +73,9 @@ html, body {
 .summary-left { text-align: center; width: 100%; }
 .summary-left h3 { font-size: 13px; color: #a78bfa; margin: 0 0 6px 0; letter-spacing: 1px; }
 .summary-left .total-val { font-size: 38px; font-weight: 800; color: #10b981; font-family: monospace; word-break: break-all; margin: 0; line-height: 1.2; }
+/* 简写小括号单位样式 */
+.summary-left .total-short-val { font-size: 18px; color: #34d399; font-weight: normal; margin-left: 6px; vertical-align: middle; }
+
 .summary-right { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; width: 100%; }
 .select-token-ui { padding: 10px 16px; font-size: 14px; font-weight: bold; color: #38bdf8; border: 2px solid #38bdf8; background: #0f172a; border-radius: 8px; cursor: pointer; width: 100%; max-width: 280px; text-align: center; text-align-last: center; }
 .wallet-count-badge { font-size: 12px; color: #94a3b8; background: rgba(255,255,255,0.05); padding: 4px 12px; border-radius: 20px; border: 1px solid #334155; }
@@ -140,7 +143,7 @@ td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; 
 .token-item-info h4 { font-size: 14px; color: #fff; margin: 0; }
 .token-item-info p { font-size: 11px; color: #64748b; font-family: monospace; word-break: break-all; margin: 4px 0 0 0; }
 
-/* ==================== 4. 底部版权与解释权样式（深度适配全平台） ==================== */
+/* ==================== 4. 底部版权与解释权样式 ==================== */
 .footer-zone {
     width: 100%;
     padding: 24px 15px;
@@ -176,17 +179,15 @@ td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; 
     .summary-left .total-val { font-size: 32px; }
     .footer-zone {
         font-size: 12px;
-        padding-bottom: calc(24px + env(safe-area-inset-bottom)); /* 智能兼容手机小黑条和流体刘海 */
+        padding-bottom: calc(24px + env(safe-area-inset-bottom)); /* 智能兼容全面屏小黑条 */
     }
 }
 </style>
 </head>
 <body>
 
-<!-- 【外层吸底骨架包裹】 -->
 <div class="page-container">
     
-    <!-- 【原有核心内容业务区】 -->
     <div class="content-wrap">
         <div class="full-viewport-header-zone">
             <div class="header-meta-text">
@@ -197,7 +198,11 @@ td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; 
             <div class="summary-banner">
                 <div class="summary-left">
                     <h3>当前所选代币全网监控总额</h3>
-                    <p class="total-val" id="summary_total_display">0.00</p>
+                    <!-- 调整结构：支持主数据和小括号简写单位并列展示 -->
+                    <div style="display: inline-block; text-align: center;">
+                        <span class="total-val" id="summary_total_display">0.00</span>
+                        <span class="total-short-val" id="summary_short_display"></span>
+                    </div>
                 </div>
                 <div class="summary-right">
                     <select id="selectDisplayToken" class="select-token-ui" onchange="renderUI()">
@@ -212,7 +217,6 @@ td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; 
             <div class="main-layout">
                 <!-- 左侧：钱包监控明细与表单 -->
                 <div style="min-width: 0;">
-                    <!-- 添加监控钱包表单：已调整为默认折叠 -->
                     <div class="card-box">
                         <div class="card-header-toggle" onclick="toggleCard('addWalletContent', 'arrowWallet')">
                             <div class="card-title">
@@ -234,7 +238,6 @@ td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; 
                         </div>
                     </div>
 
-                    <!-- 钱包资产明细表 -->
                     <div class="card-box" style="padding: 0; overflow: hidden;">
                         <div style="padding: 15px 20px 5px 20px; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap;">
                             <div class="card-title" style="margin: 0; border:none; padding:0; width: auto;">钱包明细清单</div>
@@ -314,7 +317,6 @@ td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; 
         </div>
     </div>
 
-    <!-- 【5. 底部：绝对自适应弹性吸底的版权与统计区】 -->
     <div class="footer-zone">
         <div>版权和解释权属于藤蔓协议云南商学院</div>
         <div class="footer-counter">📊 系统累计使用人数：<span class="counter-num" id="user_counter_slot">1</span> 人次</div>
@@ -332,7 +334,7 @@ const RPC_SOL = "https://api.mainnet-beta.solana.com";
 const INITIAL_TOKENS = [
     { symbol: "USDT", chain: "ETH", contract: "0xdac17f958d2ee523a2206206994597c13d831ec7", decimals: 6 },
     { symbol: "USDT", chain: "BSC", contract: "0x55d398326f99059ff775485246999027b3197955", decimals: 18 },
-    { symbol: "SOL",  chain: "SOL", contract: "11111111111111111111111111111111", decimals: 9 }, // 默认预设原生SOL
+    { symbol: "SOL",  chain: "SOL", contract: "11111111111111111111111111111111", decimals: 9 }, 
     { symbol: "NAT",  chain: "ETH", contract: "0x249130f5e2dd4cf278180c0df8273f3592ad1247", decimals: 18 },
     { symbol: "USDT", chain: "SOL", contract: "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB", decimals: 6 }
 ];
@@ -388,10 +390,8 @@ async function queryEvmBalance(chain, walletAddr, tokenAddr, decimals) {
     }
 }
 
-/* 🚀 核心优化分支：定向无改动拦截修复 Solana 原生币显示问题 */
 async function querySolanaBalance(walletAddr, tokenMint, decimals) {
     try {
-        // 定向优化拦截器：如果合约/Mint是32个1，说明查询的是Solana原生主网代币SOL
         if (tokenMint === "11111111111111111111111111111111" || tokenMint.trim() === "") {
             const response = await fetch(RPC_SOL, {
                 method: "POST",
@@ -399,22 +399,18 @@ async function querySolanaBalance(walletAddr, tokenMint, decimals) {
                 body: JSON.stringify({
                     jsonrpc: "2.0",
                     id: Math.floor(Math.random() * 1000),
-                    method: "getBalance", // 直接调用原生底层查主账户余额方法
+                    method: "getBalance", 
                     params: [walletAddr]
                 })
             });
             if (!response.ok) return 0;
             const json = await response.json();
             if (json && json.result && json.result.value !== undefined) {
-                // 原生SOL的单位是 Lamports，需要缩减9个0
                 return Number(json.result.value) / Math.pow(10, 9);
             }
             return 0;
         }
 
-        // ----------------------------------------------------------------------
-        // 以下100%保持原有无瑕疵的普通 SPL 代币账户树读取代码，不做任何改动
-        // ----------------------------------------------------------------------
         const response = await fetch(RPC_SOL, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -527,6 +523,24 @@ function deleteCustomToken(idx) {
     }
 }
 
+/* 🚀 简写大数字量级转换算法 */
+function formatShortVolume(val) {
+    if (val < 10000) return ""; // 较小数值不需要画蛇添足加括号简写
+    const units = [
+        { value: 1e12, symbol: "T" }, // 万亿
+        { value: 1e9,  symbol: "B" }, // 十亿
+        { value: 1e6,  symbol: "M" }, // 百万
+        { value: 1e3,  symbol: "K" }  // 千
+    ];
+    for (let i = 0; i < units.length; i++) {
+        if (val >= units[i].value) {
+            const shortNum = (val / units[i].value).toFixed(2);
+            return `(${shortNum}${units[i].symbol})`;
+        }
+    }
+    return "";
+}
+
 function addWallet() {
     const address = document.getElementById("walletAddress").value.trim();
     const remark = document.getElementById("walletRemark").value.trim() || "未命名钱包";
@@ -613,10 +627,12 @@ function renderUI() {
     });
 
     document.getElementById("summary_total_display").innerText = totalAccumulator.toLocaleString('zh-CN', {minimumFractionDigits: 0, maximumFractionDigits: 4});
+    // 渲染简写单位
+    document.getElementById("summary_short_display").innerText = formatShortVolume(totalAccumulator);
     document.getElementById("summary_wallet_count").innerText = walletList.length;
 }
 
-// ==================== 6. 人数统计初始化算法 ====================
+// ==================== 6. 人数统计初始化 ====================
 function initUserCounter() {
     let count = parseInt(localStorage.getItem("sys_user_count"));
     if (!count || isNaN(count)) {
