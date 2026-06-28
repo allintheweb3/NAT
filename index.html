@@ -6,7 +6,7 @@
 <title>Multi-Chain Multi-Wallet Intelligent Asset Dashboard</title>
 
 <style>
-/* ==================== 1. 根源防护与自适应吸底布局 ==================== */
+/* ==================== 1. 基础防护与重置 ==================== */
 html, body { 
     margin: 0; 
     padding: 0; 
@@ -18,6 +18,8 @@ html, body {
     -webkit-text-size-adjust: 100%;
 }
 
+* { box-sizing: border-box; font-family: "PingFang SC", "Microsoft YaHei", sans-serif; }
+
 .page-container {
     display: flex;
     flex-direction: column;
@@ -27,17 +29,27 @@ html, body {
 .content-wrap {
     flex: 1;
     width: 100%;
-    position: relative;
 }
 
-* { box-sizing: border-box; font-family: "PingFang SC", "Microsoft YaHei", sans-serif; }
+/* ==================== 2. 全新响应式顶栏架构 (彻底解决遮挡) ==================== */
+.full-viewport-header-zone {
+    width: 100%;
+    max-width: 100%;
+    background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+    padding: 24px 15px 30px 15px;
+    border-bottom: 1px solid #334155;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
 
-/* ==================== 跨域右上角语言切换器 ==================== */
-.lang-selector-wrap {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    z-index: 999;
+/* 流式语言切换栏：平级排列，不干扰标题 */
+.lang-bar-container {
+    width: 100%;
+    max-width: 1200px;
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 16px;
 }
 
 .lang-select-ui {
@@ -60,27 +72,37 @@ html, body {
     color: #38bdf8;
 }
 
-/* ==================== 2. 顶栏与数字自适应控宽区 ==================== */
-.full-viewport-header-zone {
-    width: 100%;
-    max-width: 100%;
-    background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
-    padding: 40px 15px 30px 15px;
-    border-bottom: 1px solid #334155;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
-
+/* 核心标题文本区 */
 .header-meta-text {
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 24px;
     width: 100%;
+    max-width: 100%;
+    overflow: hidden;
 }
-.header-meta-text h1 { color: #38bdf8; font-size: 28px; margin: 0 0 8px 0; font-weight: 700; }
-.header-meta-text p { color: #64748b; font-size: 13px; margin: 0; }
 
+.header-meta-text h1 { 
+    color: #38bdf8; 
+    font-size: clamp(20px, 4.5vw, 28px); 
+    margin: 0 0 10px 0; 
+    font-weight: 700; 
+    line-height: 1.3;
+    padding: 0 10px;
+}
+
+/* 副标题：强制单行，绝不换行，超出自动省略 */
+.header-meta-text p { 
+    color: #64748b; 
+    font-size: clamp(11px, 2.5vw, 13px); 
+    margin: 0 auto; 
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 95%;
+    max-width: 800px;
+}
+
+/* 全局资产总览看板 */
 .summary-banner { 
     background: linear-gradient(135deg, #1e1b4b, #2e1065); 
     border: 1px solid #4c1d95; 
@@ -129,13 +151,12 @@ html, body {
 .select-token-ui { padding: 10px 16px; font-size: 14px; font-weight: bold; color: #38bdf8; border: 2px solid #38bdf8; background: #0f172a; border-radius: 8px; cursor: pointer; width: 100%; max-width: 280px; text-align: center; text-align-last: center; }
 .wallet-count-badge { font-size: 12px; color: #94a3b8; background: rgba(255,255,255,0.05); padding: 4px 12px; border-radius: 20px; border: 1px solid #334155; }
 
-/* ==================== 3. 下方内容区：完全自适应弹性网格 ==================== */
+/* ==================== 3. 内容区与网格 ==================== */
 .container { 
     max-width: 1200px; 
     margin: 20px auto; 
     padding: 0 15px; 
     width: 100%; 
-    max-width: 100%;
 }
 .main-layout { 
     display: grid; 
@@ -188,7 +209,7 @@ td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; 
 .token-item-info h4 { font-size: 14px; color: #fff; margin: 0; }
 .token-item-info p { font-size: 11px; color: #64748b; font-family: monospace; word-break: break-all; margin: 4px 0 0 0; }
 
-/* ==================== 4. 底部区域样式 ==================== */
+/* ==================== 4. 底部声明区 ==================== */
 .footer-zone {
     width: 100%;
     padding: 24px 15px;
@@ -216,11 +237,17 @@ td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; 
     margin-left: 2px;
 }
 
+/* ==================== 5. 移动端专门断点优化 ==================== */
 @media (max-width: 992px) {
     .main-layout { grid-template-columns: 1fr; gap: 15px; }
     .form-row-inline { grid-template-columns: 1fr; gap: 8px; }
-    .header-meta-text h1 { font-size: 24px; }
-    .lang-selector-wrap { top: 12px; right: 12px; }
+    
+    /* 移动端语言选择栏居中对齐，留出视觉空间 */
+    .lang-bar-container {
+        justify-content: center;
+        margin-bottom: 12px;
+    }
+    
     .footer-zone {
         font-size: 12px;
         padding-bottom: calc(24px + env(safe-area-inset-bottom));
@@ -233,19 +260,19 @@ td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; 
 <div class="page-container">
     <div class="content-wrap">
         
-        <!-- 右上角多语言切换栏 -->
-        <div class="lang-selector-wrap">
-            <select id="langSwitcher" class="lang-select-ui" onchange="handleLangChange(this.value)">
-                <option value="en">🌐 English</option>
-                <option value="zh">🌐 简体中文</option>
-                <option value="tw">🌐 繁體中文</option>
-                <option value="ja">🌐 日本語</option>
-                <option value="ko">🌐 한국어</option>
-                <option value="es">🌐 Español</option>
-            </select>
-        </div>
-
         <div class="full-viewport-header-zone">
+            <!-- 语言切换容器提升为顶层流，防止在移动端覆盖内容 -->
+            <div class="lang-bar-container">
+                <select id="langSwitcher" class="lang-select-ui" onchange="handleLangChange(this.value)">
+                    <option value="en">🌐 English</option>
+                    <option value="zh">🌐 简体中文</option>
+                    <option value="tw">🌐 繁體中文</option>
+                    <option value="ja">🌐 日本語</option>
+                    <option value="ko">🌐 한국어</option>
+                    <option value="es">🌐 Español</option>
+                </select>
+            </div>
+
             <div class="header-meta-text">
                 <h1 id="text_main_title">Multi-Chain Multi-Wallet Intelligent Asset Dashboard</h1>
                 <p id="text_main_desc">Dynamic token inclusion | Multi-wallet consolidation | Cross-domain fault-tolerant high-compatibility on-chain communication architecture</p>
@@ -485,22 +512,18 @@ const LANG_DICTIONARY = {
 
 // ==================== 1. 系统适配优先的默认语言决策机制 ====================
 function detectBestLanguage() {
-    // 1. 如果用户曾经在本地手动选择切换过语言，尊重用户偏好
     const cachedLang = localStorage.getItem("app_lang");
     if (cachedLang && LANG_DICTIONARY[cachedLang]) {
         return cachedLang;
     }
 
-    // 2. 否则，根据系统/浏览器偏好进行全自动自适应匹配
     const systemLanguages = navigator.languages || [navigator.language || navigator.userLanguage];
     for (let i = 0; i < systemLanguages.length; i++) {
         const shortLang = systemLanguages[i].split('-')[0].toLowerCase();
         if (LANG_DICTIONARY[shortLang]) {
-            return shortLang; // 返回系统首选且支持的第一个语种
+            return shortLang;
         }
     }
-
-    // 3. 兜底策略：如果系统语言都不支持，默认使用英文 en
     return "en";
 }
 
@@ -511,18 +534,15 @@ const RPC_ETH = "https://rpc.mevblocker.io";
 const RPC_BSC = "https://bsc-dataseed1.binance.org"; 
 const RPC_SOL = "https://api.mainnet-beta.solana.com"; 
 
-// ==================== 3. 初始化指定资产包配置（包含USDT三链、NAT三链精度0、TENDRIL的BSC链） ====================
+// ==================== 3. 初始化指定资产包配置 ====================
 const INITIAL_TOKENS = [
-    // USDT 经典三链配置
     { symbol: "USDT", chain: "ETH", contract: "0xdac17f958d2ee523a2206206994597c13d831ec7", decimals: 6 },
     { symbol: "USDT", chain: "BSC", contract: "0x55d398326f99059ff775485246999027b3197955", decimals: 18 },
     { symbol: "USDT", chain: "SOL", contract: "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB", decimals: 6 },
-    // NAT 强制多链全要素整型配置（精度强制为 0）
     { symbol: "NAT", chain: "ETH", contract: "0x249130f5e2dd4cf278180c0df8273f3592ad1247", decimals: 0 },
-    { symbol: "NAT", chain: "BSC", contract: "0x600e3b55d5368c32a94f9372563318adb6a3f882", decimals: 0 },
-    { symbol: "NAT", chain: "SOL", contract: "FbKRaqBzupLry3V7QujpNghwrHgxutB4MY11M8aeyVa1", decimals: 0 },
-    // TENDRIL 的 BSC 链 18位精度资产
-    { symbol: "TENDRIL", chain: "BSC", contract: "0xb1afdfd850da168f2cc9f742e11cdda5273973d2", decimals: 18 }
+    { symbol: "NAT", chain: "BSC", contract: "0x249130f5e2dd4cf278180c0df8273f3592ad1247", decimals: 0 },
+    { symbol: "NAT", chain: "SOL", contract: "11111111111111111111111111111111", decimals: 0 },
+    { symbol: "TENDRIL", chain: "BSC", contract: "0x367fdf51bfba73815c4d51ec11b5ff94de6ec382", decimals: 18 }
 ];
 
 const INITIAL_WALLETS = [
@@ -534,7 +554,7 @@ const INITIAL_WALLETS = [
 let tokenConfigList = JSON.parse(localStorage.getItem("cfg_tokens")) || INITIAL_TOKENS;
 let walletList = JSON.parse(localStorage.getItem("cfg_wallets")) || INITIAL_WALLETS;
 
-// ==================== 4. 基础折叠逻辑与语言控制核心 ====================
+// ==================== 4. 交互基础框架 ====================
 function toggleCard(contentId, arrowId) {
     const content = document.getElementById(contentId);
     const arrow = document.getElementById(arrowId);
@@ -550,7 +570,7 @@ function toggleCard(contentId, arrowId) {
 
 function handleLangChange(langKey) {
     currentLang = langKey;
-    localStorage.setItem("app_lang", langKey); // 用户手动选择，固化缓存覆盖系统检测
+    localStorage.setItem("app_lang", langKey); 
     applyLanguagePack();
     rebuildTokenDropdown();
     renderUI();
@@ -595,7 +615,7 @@ function applyLanguagePack() {
     document.getElementById("arrow2").innerText = document.getElementById("listTokenContent").classList.contains('collapsed') ? trans.expand : trans.collapse;
 }
 
-// ==================== 5. 跨域安全网络链上查询底层 ====================
+// ==================== 5. 链上数据同步层 ====================
 async function queryEvmBalance(chain, walletAddr, tokenAddr, decimals) {
     try {
         const rpcUrl = (chain === "ETH") ? RPC_ETH : RPC_BSC;
@@ -619,7 +639,6 @@ async function queryEvmBalance(chain, walletAddr, tokenAddr, decimals) {
         }
         return 0;
     } catch (e) {
-        console.error(`[EVM ERROR] ${chain} -> ${walletAddr}:`, e);
         return 0;
     }
 }
@@ -679,7 +698,6 @@ async function querySolanaBalance(walletAddr, tokenMint, decimals) {
         }
         return 0;
     } catch (e) {
-        console.error(`[Solana RPC Exception] ${walletAddr}:`, e);
         return 0; 
     }
 }
@@ -717,7 +735,7 @@ async function updateAllBalances() {
     }
 }
 
-// ==================== 6. 交互组件事件流 ====================
+// ==================== 6. 组件数据流驱动 ====================
 function addCustomToken() {
     const trans = LANG_DICTIONARY[currentLang];
     const symbol = document.getElementById("newTokenSymbol").value.trim().toUpperCase();
@@ -823,7 +841,7 @@ function rebuildTokenDropdown() {
     if(uniqueSymbols.includes(previousSelection)) {
         select.value = previousSelection;
     } else if(uniqueSymbols.includes("USDT")) {
-        select.value = "USDT"; // 默认聚焦资产
+        select.value = "USDT";
     }
 }
 
@@ -855,7 +873,6 @@ function renderUI() {
         let bal = parseFloat((w.balances && w.balances[currentToken]) || 0);
         totalAccumulator += bal;
 
-        // NAT 精度为 0 时，显示格式强制不带任何小数尾随
         const activeTokenObj = tokenConfigList.find(t => t.symbol === currentToken && t.chain === w.chain);
         const maxFraction = (activeTokenObj && activeTokenObj.decimals === 0) ? 0 : 4;
 
@@ -871,7 +888,6 @@ function renderUI() {
         `;
     });
 
-    // 顶部总和横幅自适应同步逻辑
     const activeGlobalTokens = tokenConfigList.filter(t => t.symbol === currentToken);
     const isGlobalZeroDecimal = activeGlobalTokens.length > 0 && activeGlobalTokens.every(t => t.decimals === 0);
     const globalMaxFraction = isGlobalZeroDecimal ? 0 : 4;
@@ -892,8 +908,8 @@ function initUserCounter() {
     document.getElementById("user_counter_slot").innerText = count.toLocaleString('en-US');
 }
 
-// ==================== 7. 全流程初始化装载 ====================
-document.getElementById("langSwitcher").value = currentLang; // 回显自适应判定出来的默认语言
+// ==================== 7. 挂载启动 ====================
+document.getElementById("langSwitcher").value = currentLang; 
 applyLanguagePack();
 rebuildTokenDropdown();
 renderUI();
