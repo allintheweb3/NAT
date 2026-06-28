@@ -252,13 +252,17 @@ td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; 
         padding-right: 10px;
     }
 
-    /* 补丁C：副标题强制保持一行不抬头，空间不足自动处理 */
+    /* 补丁C：副标题动态控宽控字号自适应 */
     .header-meta-text p { 
-        font-size: 11px;
-        white-space: nowrap;     /* 核心：强制一行，绝对不换行 */
-        overflow: hidden;        /* 超出边界部分隐藏 */
-        text-overflow: ellipsis; /* 超出显示三个点，保护排版 */
-        width: 92%;
+        /* 使用 clamp() 根据设备视口宽度(vw)弹性收缩字号。
+           在小手机上字号能自动平滑缩小到最低 9.5px，在大手机上自动回弹，
+           从而在单行内挤下更多文本，配合 96% 的横向可用边界，最大程度让右侧内容显示完整 */
+        font-size: clamp(9.5px, 2.3vw, 12px); 
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: clip; /* 移除强硬的三个点，让文字自然衔接边缘 */
+        width: 96%;
+        letter-spacing: -0.2px; /* 移动端微调字间距，显著增加单行内容容纳度 */
     }
 }
 </style>
@@ -762,7 +766,6 @@ function addCustomToken() {
     updateAllBalances();
 }
 
-// 恢复删除逻辑及其他逻辑
 function deleteCustomToken(idx) {
     const trans = LANG_DICTIONARY[currentLang];
     if(confirm(trans.alert_del_token)) {
