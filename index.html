@@ -31,20 +31,20 @@ html, body {
     width: 100%;
 }
 
-/* ==================== 2. 头部视觉区（保留原本的绝对定位结构） ==================== */
+/* ==================== 2. 头部视觉区 ==================== */
 .full-viewport-header-zone {
     width: 100%;
     max-width: 100%;
     background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
     padding: 40px 15px 30px 15px;
     border-bottom: 1px solid #334155;
-    position: relative; /* 为语言按钮提供绝对定位基准 */
+    position: relative; 
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
-/* 原代码 PC 端绝对定位语言按钮 */
+/* 绝对定位语言选择组件 */
 .lang-select-ui {
     position: absolute;
     top: 20px;
@@ -227,16 +227,14 @@ td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; 
     margin-left: 2px;
 }
 
-/* ==================== 5. 精准补丁：只优化移动端不友好问题 ==================== */
+/* ==================== 5. 移动端适屏补丁 (按比例无缝自适应) ==================== */
 @media (max-width: 992px) {
     .main-layout { grid-template-columns: 1fr; gap: 15px; }
     .form-row-inline { grid-template-columns: 1fr; gap: 8px; }
     .footer-zone { font-size: 12px; padding-bottom: calc(24px + env(safe-area-inset-bottom)); }
 }
 
-/* 专门针对手机小屏进行排他性细节微调，绝不污染 PC 端样式 */
 @media screen and (max-width: 768px) {
-    /* 补丁A：按钮在小屏适当收敛定位 */
     .lang-select-ui {
         top: 12px;
         right: 12px;
@@ -244,25 +242,21 @@ td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; 
         font-size: 12px;
     }
 
-    /* 补丁B：通过 padding-top 把大标题压低，腾出顶部空间，物理解决遮挡问题 */
     .header-meta-text h1 { 
         font-size: 22px; 
-        padding-top: 35px; /* 关键：给右上角绝对定位的按钮留出充足垂直间距 */
+        padding-top: 35px; /* 给绝对定位选择框腾出垂直空间 */
         padding-left: 10px;
         padding-right: 10px;
     }
 
-    /* 补丁C：副标题动态控宽控字号自适应 */
+    /* 核心补丁：副标题在小屏上按视口宽度等比微调缩放，确保右侧全部可见不换行 */
     .header-meta-text p { 
-        /* 使用 clamp() 根据设备视口宽度(vw)弹性收缩字号。
-           在小手机上字号能自动平滑缩小到最低 9.5px，在大手机上自动回弹，
-           从而在单行内挤下更多文本，配合 96% 的横向可用边界，最大程度让右侧内容显示完整 */
         font-size: clamp(9.5px, 2.3vw, 12px); 
         white-space: nowrap;
         overflow: hidden;
-        text-overflow: clip; /* 移除强硬的三个点，让文字自然衔接边缘 */
+        text-overflow: clip; 
         width: 96%;
-        letter-spacing: -0.2px; /* 移动端微调字间距，显著增加单行内容容纳度 */
+        letter-spacing: -0.2px; 
     }
 }
 </style>
@@ -273,7 +267,6 @@ td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; 
     <div class="content-wrap">
         
         <div class="full-viewport-header-zone">
-            <!-- 保持原汁原味的绝对定位结构不变 -->
             <select id="langSwitcher" class="lang-select-ui" onchange="handleLangChange(this.value)">
                 <option value="en">🌐 English</option>
                 <option value="zh">🌐 简体中文</option>
@@ -305,7 +298,7 @@ td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; 
 
         <div class="container">
             <div class="main-layout">
-                <!-- 左侧：钱包管理与细则 -->
+                <!-- 左侧：监控钱包队列 -->
                 <div style="min-width: 0;">
                     <div class="card-box">
                         <div class="card-header-toggle" onclick="toggleCard('addWalletContent', 'arrowWallet')">
@@ -353,7 +346,7 @@ td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; 
                     </div>
                 </div>
 
-                <!-- 右侧：代币资产池配置 -->
+                <!-- 右侧：资产池定义 -->
                 <div style="min-width: 0;">
                     <div class="card-box">
                         <div class="card-header-toggle" onclick="toggleCard('addTokenContent', 'arrow1')">
@@ -398,7 +391,7 @@ td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; 
                         </div>
                         <div id="listTokenContent" class="toggle-content collapsed">
                             <div id="customTokenListSlot">
-                                <!-- 代币细项卡片 -->
+                                <!-- 代币配置卡片 -->
                             </div>
                         </div>
                     </div>
@@ -414,7 +407,7 @@ td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; 
 </div>
 
 <script>
-// ==================== 多语言字典矩阵配置 ====================
+// ==================== 多语言核心矩阵 ====================
 const LANG_DICTIONARY = {
     en: {
         main_title: "Multi-Chain Multi-Wallet Intelligent Asset Dashboard",
@@ -477,7 +470,7 @@ const LANG_DICTIONARY = {
         card_add_token: "🔧 カスタムトークン設定", label_symbol: "トークン記号 (Symbol)", label_chain: "対象ブロックチェーン",
         label_contract: "コントラクト/Mintアドレス (ネイティブ通貨は 32個の1 を入力)",
         label_decimals: "デシマルズ", btn_save_token: "💾 トークン情報を登録",
-        card_token_list: "📋 登録済みトークン資産", copyright: "著作権および解釈権はVine Protocol雲南ビジネススクールに帰属します",
+        card_token_list: "📋 登録済みトークン資産", copyright: "著作權および解釈權はVine Protocol雲南ビジネススクールに帰属します",
         sys_visits: "📊 累計システム利用回数：", sys_times: "回", dropdown_prefix: "🔍 資産を表示：",
         alert_empty_token: "トークン記号と契約アドレスを入力してください！", alert_invalid_dec: "正しいデシマルズの数値を入力してください！",
         alert_exist_token: "このトークンは既に登録されています！", alert_del_token: "このトークンを削除すると残高監視が停止します。よろしいですか？",
@@ -486,7 +479,7 @@ const LANG_DICTIONARY = {
     },
     ko: {
         main_title: "멀티체인 멀티지갑 인텔리전트 자산 대시보드",
-        main_desc: "동적 토큰 추가 | 다중 지갑 통합 계산 | 크로스 도메인 결함 허용 온체인 통신 아키텍처",
+        main_desc: "동적 토큰 추가 | 다중 지갑 통합 계산 | 크로스 도메인 결함 허용 온체인 통신 아키처",
         monitoring: "현재", wallets: "개의 지갑 감시 중",
         card_add_wallet: "➕ 감시 지갑 추가", btn_add_wallet: "대기열에 이 지갑 추가 확인",
         card_wallet_list: "지갑 내역 목록", btn_fetch: "🔄 실시간 온체인 잔액 동기화", btn_fetching: "⏳ 동기화 중...",
@@ -520,7 +513,7 @@ const LANG_DICTIONARY = {
     }
 };
 
-// ==================== 系统机制 ====================
+// ==================== 数据与网络机制 ====================
 function detectBestLanguage() {
     const cachedLang = localStorage.getItem("app_lang");
     if (cachedLang && LANG_DICTIONARY[cachedLang]) return cachedLang;
@@ -538,14 +531,15 @@ const RPC_ETH = "https://rpc.mevblocker.io";
 const RPC_BSC = "https://bsc-dataseed1.binance.org"; 
 const RPC_SOL = "https://api.mainnet-beta.solana.com"; 
 
+/* 已经包含最新更新的代币资产池初始地址 */
 const INITIAL_TOKENS = [
     { symbol: "USDT", chain: "ETH", contract: "0xdac17f958d2ee523a2206206994597c13d831ec7", decimals: 6 },
     { symbol: "USDT", chain: "BSC", contract: "0x55d398326f99059ff775485246999027b3197955", decimals: 18 },
     { symbol: "USDT", chain: "SOL", contract: "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB", decimals: 6 },
     { symbol: "NAT", chain: "ETH", contract: "0x249130f5e2dd4cf278180c0df8273f3592ad1247", decimals: 0 },
-    { symbol: "NAT", chain: "BSC", contract: "0x249130f5e2dd4cf278180c0df8273f3592ad1247", decimals: 0 },
-    { symbol: "NAT", chain: "SOL", contract: "11111111111111111111111111111111", decimals: 0 },
-    { symbol: "TENDRIL", chain: "BSC", contract: "0x367fdf51bfba73815c4d51ec11b5ff94de6ec382", decimals: 18 }
+    { symbol: "NAT", chain: "BSC", contract: "0x600e3b55d5368c32a94f9372563318adb6a3f882", decimals: 0 }, // 更新的地址
+    { symbol: "NAT", chain: "SOL", contract: "FbKRaqBzupLry3V7QujpNghwrHgxutB4MY11M8aeyVa1", decimals: 0 }, // 更新的地址
+    { symbol: "TENDRIL", chain: "BSC", contract: "0xb1afdfd850da168f2cc9f742e11cdda5273973d2", decimals: 18 } // 更新的地址
 ];
 
 const INITIAL_WALLETS = [
