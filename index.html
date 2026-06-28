@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>多链多钱包智能资产看板 (数字自适应适屏版)</title>
+<title>Multi-Chain Multi-Wallet Intelligent Asset Dashboard</title>
 
 <style>
 /* ==================== 1. 根源防护与自适应吸底布局 ==================== */
@@ -27,16 +27,45 @@ html, body {
 .content-wrap {
     flex: 1;
     width: 100%;
+    position: relative; /* 为右上角语言切换提供定位基准 */
 }
 
 * { box-sizing: border-box; font-family: "PingFang SC", "Microsoft YaHei", sans-serif; }
+
+/* ==================== 跨域右上角语言切换器 ==================== */
+.lang-selector-wrap {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 999;
+}
+
+.lang-select-ui {
+    padding: 6px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #94a3b8;
+    border: 1px solid #334155;
+    background: rgba(30, 41, 59, 0.6);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-radius: 6px;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.lang-select-ui:hover {
+    border-color: #38bdf8;
+    color: #38bdf8;
+}
 
 /* ==================== 2. 顶栏与数字自适应控宽区 ==================== */
 .full-viewport-header-zone {
     width: 100%;
     max-width: 100%;
     background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
-    padding: 30px 15px;
+    padding: 40px 15px 30px 15px; /* 顶部略微加高，防止语言栏拥挤 */
     border-bottom: 1px solid #334155;
     display: flex;
     flex-direction: column;
@@ -77,20 +106,20 @@ html, body {
     overflow: hidden;
 }
 
-/* 全自动缩放数字：通过 cqw (容器宽度单位) 与 clamp 确保数字长时自动变小、不溢出、不换行 */
+/* 全自动缩放数字 */
 .summary-display-box .total-val { 
     display: block;
-    font-size: clamp(24px, 7.5cqw, 48px); /* 智能在 24px 到 48px 之间随容器宽度线性缩放 */
+    font-size: clamp(24px, 7.5cqw, 48px); 
     font-weight: 800; 
     color: #10b981; 
     font-family: monospace; 
-    white-space: nowrap; /* 绝对禁止数字断行 */
+    white-space: nowrap; 
     text-overflow: clip;
     margin: 0; 
     line-height: 1.1; 
 }
 
-/* 简写小括号单位样式：稳定排在数字正下方 */
+/* 简写小括号单位样式 */
 .summary-display-box .total-short-val { 
     display: block;
     font-size: clamp(13px, 3cqw, 16px);
@@ -195,6 +224,7 @@ td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; 
     .main-layout { grid-template-columns: 1fr; gap: 15px; }
     .form-row-inline { grid-template-columns: 1fr; gap: 8px; }
     .header-meta-text h1 { font-size: 24px; }
+    .lang-selector-wrap { top: 12px; right: 12px; } /* 移动端靠边一点 */
     .footer-zone {
         font-size: 12px;
         padding-bottom: calc(24px + env(safe-area-inset-bottom));
@@ -207,14 +237,26 @@ td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; 
 <div class="page-container">
     
     <div class="content-wrap">
+        
+        <!-- 右上角多语言切换栏 -->
+        <div class="lang-selector-wrap">
+            <select id="langSwitcher" class="lang-select-ui" onchange="handleLangChange(this.value)">
+                <option value="en" selected>🌐 English</option>
+                <option value="zh">🌐 简体中文</option>
+                <option value="tw">🌐 繁體中文</option>
+                <option value="ja">🌐 日本語</option>
+                <option value="ko">🌐 한국어</option>
+                <option value="es">🌐 Español</option>
+            </select>
+        </div>
+
         <div class="full-viewport-header-zone">
             <div class="header-meta-text">
-                <h1>多链多钱包智能资产看板</h1>
-                <p>动态添加代币 | 多钱包合并计算 | 跨域容错高兼容链上通信架构</p>
+                <h1 id="text_main_title">Multi-Chain Multi-Wallet Intelligent Asset Dashboard</h1>
+                <p id="text_main_desc">Dynamic token inclusion | Multi-wallet consolidation | Cross-domain fault-tolerant high-compatibility on-chain communication architecture</p>
             </div>
             
             <div class="summary-banner">
-                <!-- 已完全移除原 <h3> 抬头，直接显示自适应大数字与下方小括号 -->
                 <div class="summary-display-box">
                     <span class="total-val" id="summary_total_display">0.00</span>
                     <span class="total-short-val" id="summary_short_display"></span>
@@ -224,7 +266,7 @@ td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; 
                     <select id="selectDisplayToken" class="select-token-ui" onchange="renderUI()">
                         <!-- 动态代币选项 -->
                     </select>
-                    <div class="wallet-count-badge">正在监控 <span id="summary_wallet_count" style="color:#38bdf8;font-weight:bold;">0</span> 个钱包</div>
+                    <div class="wallet-count-badge"><span id="text_monitoring">Monitoring</span> <span id="summary_wallet_count" style="color:#38bdf8;font-weight:bold;">0</span> <span id="text_wallets">wallets</span></div>
                 </div>
             </div>
         </div>
@@ -236,39 +278,39 @@ td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; 
                     <div class="card-box">
                         <div class="card-header-toggle" onclick="toggleCard('addWalletContent', 'arrowWallet')">
                             <div class="card-title">
-                                <span>➕ 监控钱包添加</span>
-                                <span id="arrowWallet" class="toggle-icon">展开 ▼</span>
+                                <span id="text_card_add_wallet">➕ Add Wallet to Monitor</span>
+                                <span id="arrowWallet" class="toggle-icon">Expand ▼</span>
                             </div>
                         </div>
                         <div id="addWalletContent" class="toggle-content collapsed">
                             <div class="form-row-inline">
-                                <input type="text" id="walletAddress" placeholder="输入钱包地址 (0x... 或 SOL地址)" />
-                                <input type="text" id="walletRemark" placeholder="钱包备注(如：巨鲸1号)" />
+                                <input type="text" id="walletAddress" placeholder="Wallet Address (0x... or SOL address)" />
+                                <input type="text" id="walletRemark" placeholder="Remark (e.g. Whale 1)" />
                                 <select id="walletChain">
-                                    <option value="ETH">Ethereum 链</option>
+                                    <option value="ETH">Ethereum Chain</option>
                                     <option value="BSC">BNB Smart Chain</option>
-                                    <option value="SOL">Solana 链</option>
+                                    <option value="SOL">Solana Chain</option>
                                 </select>
                             </div>
-                            <button class="btn-success" style="width:100%;" onclick="addWallet()">确认添加此钱包到观察队列</button>
+                            <button class="btn-success" style="width:100%;" id="text_btn_add_wallet" onclick="addWallet()">Confirm adding this wallet to query queue</button>
                         </div>
                     </div>
 
                     <div class="card-box" style="padding: 0; overflow: hidden;">
                         <div style="padding: 15px 20px 5px 20px; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap;">
-                            <div class="card-title" style="margin: 0; border:none; padding:0; width: auto;">钱包明细清单</div>
-                            <button onclick="updateAllBalances()" id="refreshBtn">🔄 一键拉取实时链上余额</button>
+                            <div class="card-title" id="text_card_wallet_list" style="margin: 0; border:none; padding:0; width: auto;">Wallet Breakdown List</div>
+                            <button onclick="updateAllBalances()" id="refreshBtn">🔄 Fetch Live Balances</button>
                         </div>
                         <div class="table-scroll-container">
                             <table>
                                 <thead>
                                     <tr>
-                                        <th style="text-align: center; width: 50px;">序号</th>
-                                        <th style="width: 80px;">网络</th>
-                                        <th style="width: 110px;">钱包备注</th>
-                                        <th>监控钱包地址</th>
-                                        <th style="text-align: right; width: 140px;" id="dynamicTableHeader">代币余额</th>
-                                        <th style="text-align: center; width: 70px;">操作</th>
+                                        <th style="text-align: center; width: 50px;" id="text_th_idx">Index</th>
+                                        <th style="width: 80px;" id="text_th_net">Network</th>
+                                        <th style="width: 110px;" id="text_th_rem">Remark</th>
+                                        <th id="text_th_addr">Monitored Wallet Address</th>
+                                        <th style="text-align: right; width: 140px;" id="dynamicTableHeader">Token Balance</th>
+                                        <th style="text-align: center; width: 70px;" id="text_th_act">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody id="walletTableBody">
@@ -284,18 +326,18 @@ td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; 
                     <div class="card-box">
                         <div class="card-header-toggle" onclick="toggleCard('addTokenContent', 'arrow1')">
                             <div class="card-title">
-                                <span>🔧 自定义备查代币添加</span>
-                                <span id="arrow1" class="toggle-icon">展开 ▼</span>
+                                <span id="text_card_add_token">🔧 Custom Tokens Setup</span>
+                                <span id="arrow1" class="toggle-icon">Expand ▼</span>
                             </div>
                         </div>
                         <div id="addTokenContent" class="toggle-content collapsed">
                             <div class="form-grid">
                                 <div>
-                                    <label style="font-size:12px; color:#94a3b8;">代币简称 (Symbol)</label>
-                                    <input type="text" id="newTokenSymbol" placeholder="例如：USDT, SOL, ETH" style="width:100%; margin-top:4px;" />
+                                    <label style="font-size:12px; color:#94a3b8;" id="text_label_symbol">Token Symbol</label>
+                                    <input type="text" id="newTokenSymbol" placeholder="e.g. USDT, SOL, ETH" style="width:100%; margin-top:4px;" />
                                 </div>
                                 <div>
-                                    <label style="font-size:12px; color:#94a3b8;">所属公链 (Chain)</label>
+                                    <label style="font-size:12px; color:#94a3b8;" id="text_label_chain">Target Blockchain</label>
                                     <select id="newTokenChain" style="width:100%; margin-top:4px;">
                                         <option value="ETH">Ethereum (ERC20)</option>
                                         <option value="BSC">BNB Smart Chain (BEP20)</option>
@@ -303,14 +345,14 @@ td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; 
                                     </select>
                                 </div>
                                 <div>
-                                    <label style="font-size:12px; color:#94a3b8;">代币智能合约/Mint地址 (原生币填: 11111111111111111111111111111111)</label>
-                                    <input type="text" id="newTokenContract" placeholder="EVM的0x地址 或 原生SOL填32个1" style="width:100%; margin-top:4px;" />
+                                    <label style="font-size:12px; color:#94a3b8;" id="text_label_contract">Smart Contract/Mint Address (Native: fill 11111111111111111111111111111111)</label>
+                                    <input type="text" id="newTokenContract" placeholder="0x address for EVM, or 32 ones for native SOL" style="width:100%; margin-top:4px;" />
                                 </div>
                                 <div>
-                                    <label style="font-size:12px; color:#94a3b8;">代币精度位 (Decimals - SOL填9, EVM一般填18)</label>
-                                    <input type="number" id="newTokenDecimals" value="18" min="0" max="18" style="width:100%; margin-top:4px;" />
+                                    <label style="font-size:12px; color:#94a3b8;" id="text_label_decimals">Token Decimals (SOL: 9, EVM usually: 18)</label>
+                                    <input type="number" id="newTokenDecimals" value="0" min="0" max="18" style="width:100%; margin-top:4px;" />
                                 </div>
-                                <button onclick="addCustomToken()" style="width:100%; margin-top:5px;">💾 录入并备查此代币</button>
+                                <button onclick="addCustomToken()" style="width:100%; margin-top:5px;" id="text_btn_save_token">💾 Save and Index Token</button>
                             </div>
                         </div>
                     </div>
@@ -318,8 +360,8 @@ td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; 
                     <div class="card-box">
                         <div class="card-header-toggle" onclick="toggleCard('listTokenContent', 'arrow2')">
                             <div class="card-title">
-                                <span>📋 现已备查的代币资产</span>
-                                <span id="arrow2" class="toggle-icon">展开 ▼</span>
+                                <span id="text_card_token_list">📋 Indexed Token Assets</span>
+                                <span id="arrow2" class="toggle-icon">Expand ▼</span>
                             </div>
                         </div>
                         <div id="listTokenContent" class="toggle-content collapsed">
@@ -334,50 +376,295 @@ td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; 
     </div>
 
     <div class="footer-zone">
-        <div>版权和解释权属于藤蔓协议云南商学院</div>
-        <div class="footer-counter">📊 系统累计使用人数：<span class="counter-num" id="user_counter_slot">1</span> 人次</div>
+        <div id="text_copyright">Copyright & Intellectual property belongs to Vine Protocol Yunnan Business School</div>
+        <div class="footer-counter"><span id="text_sys_visits">📊 Total system usage:</span> <span class="counter-num" id="user_counter_slot">1</span> <span id="text_sys_times">times</span></div>
     </div>
 
 </div>
 
 <script>
+// ==================== 多语言字典矩阵配置 ====================
+const LANG_DICTIONARY = {
+    en: {
+        main_title: "Multi-Chain Multi-Wallet Intelligent Asset Dashboard",
+        main_desc: "Dynamic token inclusion | Multi-wallet consolidation | Cross-domain fault-tolerant high-compatibility on-chain communication architecture",
+        monitoring: "Monitoring",
+        wallets: "wallets",
+        card_add_wallet: "➕ Add Wallet to Monitor",
+        btn_add_wallet: "Confirm adding this wallet to query queue",
+        card_wallet_list: "Wallet Breakdown List",
+        btn_fetch: "🔄 Fetch Live Balances",
+        btn_fetching: "⏳ Syncing...",
+        th_idx: "Index", th_net: "Network", th_rem: "Remark", th_addr: "Monitored Wallet Address", th_act: "Action",
+        card_add_token: "🔧 Custom Tokens Setup",
+        label_symbol: "Token Symbol",
+        label_chain: "Target Blockchain",
+        label_contract: "Smart Contract/Mint Address (Native: fill 11111111111111111111111111111111)",
+        label_decimals: "Token Decimals (SOL: 9, EVM usually: 18)",
+        btn_save_token: "💾 Save and Index Token",
+        card_token_list: "📋 Indexed Token Assets",
+        copyright: "Copyright & Intellectual property belongs to Vine Protocol Yunnan Business School",
+        sys_visits: "📊 Total system usage:",
+        sys_times: "times",
+        dropdown_prefix: "🔍 View Asset: ",
+        alert_empty_token: "Token symbol and Contract/Mint address cannot be empty!",
+        alert_invalid_dec: "Please enter a valid decimal number!",
+        alert_exist_token: "This asset already exists in the configuration pool!",
+        alert_del_token: "Removing this token will stop its balance monitoring, proceed?",
+        alert_empty_wallet: "Address cannot be empty!",
+        alert_exist_wallet: "This wallet address already exists under the chosen network!",
+        alert_del_wallet: "Permanently remove this wallet from monitoring?",
+        badge_del: "Delete",
+        expand: "Expand ▼", collapse: "Collapse ▲"
+    },
+    zh: {
+        main_title: "多链多钱包智能资产看板",
+        main_desc: "动态添加代币 | 多钱包合并计算 | 跨域容错高兼容链上通信架构",
+        monitoring: "正在监控",
+        wallets: "个钱包",
+        card_add_wallet: "➕ 监控钱包添加",
+        btn_add_wallet: "确认添加此钱包到观察队列",
+        card_wallet_list: "钱包明细清单",
+        btn_fetch: "🔄 一键拉取实时链上余额",
+        btn_fetching: "⏳ 同步中...",
+        th_idx: "序号", th_net: "网络", th_rem: "钱包备注", th_addr: "监控钱包地址", th_act: "操作",
+        card_add_token: "🔧 自定义备查代币添加",
+        label_symbol: "代币简称 (Symbol)",
+        label_chain: "所属公链 (Chain)",
+        label_contract: "代币智能合约/Mint地址 (原生币填: 11111111111111111111111111111111)",
+        label_decimals: "代币精度位 (Decimals - SOL填9, EVM一般填18)",
+        btn_save_token: "💾 录入并备查此代币",
+        card_token_list: "📋 现已备查的代币资产",
+        copyright: "版权和解释权属于藤蔓协议云南商学院",
+        sys_visits: "📊 系统累计使用人数：",
+        sys_times: "人次",
+        dropdown_prefix: "🔍 观察查看 ",
+        alert_empty_token: "代币简称与合约/Mint地址不可为空！",
+        alert_invalid_dec: "请输入有效的代币精度数值！",
+        alert_exist_token: "该代币资产已存在备查管理池中！",
+        alert_del_token: "移除该备查代币会导致对应监控停止，确认删除吗？",
+        alert_empty_wallet: "地址栏不可为空！",
+        alert_exist_wallet: "当前网络的该钱包地址已存在于监控清单中！",
+        alert_del_wallet: "确认从列表中永久移出此监控钱包吗？",
+        badge_del: "删除",
+        expand: "展开 ▼", collapse: "收起 ▲"
+    },
+    tw: {
+        main_title: "多鏈多錢包智能資產看板",
+        main_desc: "動態添加代幣 | 多錢包合併計算 | 跨域容錯高兼容鏈上通信架構",
+        monitoring: "正在監控",
+        wallets: "個錢包",
+        card_add_wallet: "➕ 監控錢包添加",
+        btn_add_wallet: "確認添加此錢包到觀察隊列",
+        card_wallet_list: "錢包明細清單",
+        btn_fetch: "🔄 一鍵拉取實時鏈上餘額",
+        btn_fetching: "⏳ 同步中...",
+        th_idx: "序號", th_net: "網絡", th_rem: "錢包備註", th_addr: "監控錢包地址", th_act: "操作",
+        card_add_token: "🔧 自定義備查代幣添加",
+        label_symbol: "代幣簡稱 (Symbol)",
+        label_chain: "所屬公鏈 (Chain)",
+        label_contract: "代幣智能合約/Mint地址 (原生幣填: 11111111111111111111111111111111)",
+        label_decimals: "代幣精度位 (Decimals - SOL填9, EVM一般填18)",
+        btn_save_token: "💾 錄入並備查此代幣",
+        card_token_list: "📋 現已備查的代幣資產",
+        copyright: "版權和解釋權屬於藤蔓協議雲南商學院",
+        sys_visits: "📊 系統累計使用人數：",
+        sys_times: "人次",
+        dropdown_prefix: "🔍 觀察查看 ",
+        alert_empty_token: "代幣簡稱與合約/Mint地址不可為空！",
+        alert_invalid_dec: "請輸入有效的代幣精度數值！",
+        alert_exist_token: "該代幣資產已存在備查管理池中！",
+        alert_del_token: "移除該備查代幣會導致對應監控停止，確認刪除嗎？",
+        alert_empty_wallet: "地址欄不可為空！",
+        alert_exist_wallet: "當前網絡的該錢包地址已存在於監控清單中！",
+        alert_del_wallet: "確認從列表中永久移出此監控錢包嗎？",
+        badge_del: "刪除",
+        expand: "展開 ▼", collapse: "收起 ▲"
+    },
+    ja: {
+        main_title: "マルチチェーン マルチウォレット インテリジェント ダッシュボード",
+        main_desc: "カスタムトークン追加 | 複数ウォレット一括計算 | クロスドメイン耐障害性オンチェーン通信",
+        monitoring: "現在",
+        wallets: "個のウォレットを監視中",
+        card_add_wallet: "➕ 監視ウォレット追加",
+        btn_add_wallet: "ウォレットを監視対象に追加する",
+        card_wallet_list: "ウォレット残高一覧",
+        btn_fetch: "🔄 リアルタイム残高を取得",
+        btn_fetching: "⏳ 同期中...",
+        th_idx: "番号", th_net: "ネット", th_rem: "備考", th_addr: "監視ウォレットアドレス", th_act: "操作",
+        card_add_token: "🔧 カスタムトークン設定",
+        label_symbol: "トークン記号 (Symbol)",
+        label_chain: "対象ブロックチェーン",
+        label_contract: "コントラクト/Mintアドレス (ネイティブ通貨は 11111111111111111111111111111111 を入力)",
+        label_decimals: "デシマルズ (SOLは9、EVMは通常18)",
+        btn_save_token: "💾 トークン情報を登録",
+        card_token_list: "📋 登録済みトークン資産",
+        copyright: "著作権および解釈権はVine Protocol雲南ビジネススクールに帰属します",
+        sys_visits: "📊 累計システム利用回数：",
+        sys_times: "回",
+        dropdown_prefix: "🔍 資産を表示：",
+        alert_empty_token: "トークン記号と契約アドレスを入力してください！",
+        alert_invalid_dec: "正しいデシマルズの数値を入力してください！",
+        alert_exist_token: "このトークンは既に登録されています！",
+        alert_del_token: "このトークンを削除すると残高監視が停止します。よろしいですか？",
+        alert_empty_wallet: "アドレスを入力してください！",
+        alert_exist_wallet: "このウォレットアドレスは選択されたネットワークに既に存在します！",
+        alert_del_wallet: "このウォレットを監視リストから削除しますか？",
+        badge_del: "削除",
+        expand: "展開 ▼", collapse: "折りたたむ ▲"
+    },
+    ko: {
+        main_title: "멀티체인 멀티지갑 인텔리전트 자산 대시보드",
+        main_desc: "동적 토큰 추가 | 다중 지갑 통합 계산 | 크로스 도메인 결함 허용 온체인 통신 아키텍처",
+        monitoring: "현재",
+        wallets: "개의 지갑 감시 중",
+        card_add_wallet: "➕ 감시 지갑 추가",
+        btn_add_wallet: "대기열에 이 지갑 추가 확인",
+        card_wallet_list: "지갑 내역 목록",
+        btn_fetch: "🔄 실시간 온체인 잔액 동기화",
+        btn_fetching: "⏳ 동기화 중...",
+        th_idx: "순번", th_net: "네트워크", th_rem: "지갑 메모", th_addr: "감시 지갑 주소", th_act: "작업",
+        card_add_token: "🔧 사용자 정의 토큰 추가",
+        label_symbol: "토큰 심볼 (Symbol)",
+        label_chain: "블록체인 네트워크",
+        label_contract: "스마트 계약/Mint 주소 (네이티브는 11111111111111111111111111111111 입력)",
+        label_decimals: "토큰 자릿수 (SOL: 9, EVM 일반: 18)",
+        btn_save_token: "💾 토큰 데이터 저장 및 감시",
+        card_token_list: "📋 저장된 자산 토큰 목록",
+        copyright: "판권 및 해석권은 Vine Protocol 운남 비즈니스 스쿨에 귀속됩니다",
+        sys_visits: "📊 시스템 누적 이용자 수:",
+        sys_times: "회",
+        dropdown_prefix: "🔍 자산 보기: ",
+        alert_empty_token: "토큰 심볼과 계약 주소는 필수 입력 사항입니다!",
+        alert_invalid_dec: "올바른 소수점 자릿수를 입력하세요!",
+        alert_exist_token: "이미 감시 풀에 존재하는 토큰 자산입니다!",
+        alert_del_token: "토큰을 제거하면 관련 모니터링이 중단됩니다. 삭제하시겠습니까?",
+        alert_empty_wallet: "지갑 주소를 입력하세요!",
+        alert_exist_wallet: "해당 네트워크에 동일한 지갑 주소가 이미 존재합니다!",
+        alert_del_wallet: "감시 목록에서 이 지갑을 완전히 삭제하시겠습니까?",
+        badge_del: "삭제",
+        expand: "펼치기 ▼", collapse: "접기 ▲"
+    },
+    es: {
+        main_title: "Panel Inteligente de Activos Multicadena y Multibilletera",
+        main_desc: "Inclusión dinámica de tokens | Consolidación de saldo de billeteras | Arquitectura de comunicación robusta",
+        monitoring: "Monitoreando",
+        wallets: "billeteras",
+        card_add_wallet: "➕ Añadir Billetera a Monitorear",
+        btn_add_wallet: "Confirmar adición de billetera a la cola",
+        card_wallet_list: "Lista Detallada de Billeteras",
+        btn_fetch: "🔄 Obtener Saldos en Vivo",
+        btn_fetching: "⏳ Sincronizando...",
+        th_idx: "Índice", th_net: "Red", th_rem: "Nota", th_addr: "Dirección de Billetera Monitoreada", th_act: "Acción",
+        card_add_token: "🔧 Configuración de Tokens Personalizados",
+        label_symbol: "Símbolo del Token",
+        label_chain: "Cadena de Bloques",
+        label_contract: "Contrato Inteligente/Dirección Mint (Nativo: llene con 32 unos)",
+        label_decimals: "Decimales del Token (SOL: 9, EVM normalmente: 18)",
+        btn_save_token: "💾 Guardar e Indexar Token",
+        card_token_list: "📋 Activos de Tokens Indexados",
+        copyright: "Los derechos de autor pertenecen a Vine Protocol Yunnan Business School",
+        sys_visits: "📊 Uso total del sistema:",
+        sys_times: "veces",
+        dropdown_prefix: "🔍 Ver activo: ",
+        alert_empty_token: "¡El símbolo del token y la dirección del contrato no pueden estar vacíos!",
+        alert_invalid_dec: "¡Por favor ingrese un número decimal válido!",
+        alert_exist_token: "¡Este activo ya existe en el panel de control!",
+        alert_del_token: "Eliminar este token detendrá su monitoreo. ¿Proceder?",
+        alert_empty_wallet: "¡La dirección no puede estar vacías!",
+        alert_exist_wallet: "¡Esta dirección de billetera ya existe bajo la red elegida!",
+        alert_del_wallet: "¿Eliminar permanentemente esta billetera del monitoreo?",
+        badge_del: "Eliminar",
+        expand: "Expandir ▼", collapse: "Contraer ▲"
+    }
+};
+
+let currentLang = localStorage.getItem("app_lang") || "en";
+
 // ==================== 1. RPC 节点配置 ====================
 const RPC_ETH = "https://rpc.mevblocker.io"; 
 const RPC_BSC = "https://bsc-dataseed1.binance.org"; 
 const RPC_SOL = "https://api.mainnet-beta.solana.com"; 
 
 // ==================== 2. 初始化缓存与示例数据 ====================
+// 已调整为 NAT 的 ETH、BSC、SOL 三链数组，且精度（decimals）全部强制设置为 0
 const INITIAL_TOKENS = [
-    { symbol: "USDT", chain: "ETH", contract: "0xdac17f958d2ee523a2206206994597c13d831ec7", decimals: 6 },
-    { symbol: "USDT", chain: "BSC", contract: "0x55d398326f99059ff775485246999027b3197955", decimals: 18 },
-    { symbol: "TENDRIL", chain: "BSC", contract: "0xb1afdfd850da168f2cc9f742e11cdda5273973d2", decimals: 18 },
-    { symbol: "SOL",  chain: "SOL", contract: "11111111111111111111111111111111", decimals: 9 }, 
-    { symbol: "NAT",  chain: "ETH", contract: "0x249130f5e2dd4cf278180c0df8273f3592ad1247", decimals: 0 },
-    { symbol: "NAT",  chain: "BSC", contract: "0x600e3b55d5368c32a94f9372563318adb6a3f882", decimals: 0 },
-    { symbol: "NAT",  chain: "SOL", contract: "FbKRaqBzupLry3V7QujpNghwrHgxutB4MY11M8aeyVa1", decimals: 0 },
-    { symbol: "USDT", chain: "SOL", contract: "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB", decimals: 6 }
+    { symbol: "NAT", chain: "ETH", contract: "0x249130f5e2dd4cf278180c0df8273f3592ad1247", decimals: 0 },
+    { symbol: "NAT", chain: "BSC", contract: "0x249130f5e2dd4cf278180c0df8273f3592ad1247", decimals: 0 },
+    { symbol: "NAT", chain: "SOL", contract: "11111111111111111111111111111111", decimals: 0 }
 ];
 
 const INITIAL_WALLETS = [
-    { chain: "ETH", remark: "V神钱包示例", address: "0xAb5801a7D398351b8bE11C439e05C5B3259aec9B", balances: {} },
-    { chain: "BSC", remark: "币安热钱包示例", address: "0xF977814e90dA44bFA03b6295A0616a897441aceC", balances: {} },
-    { chain: "SOL", remark: "SOL监控示例", address: "6ZRCB7v8gscuA2N6773FwYms48D6f4YfV2LnyfC8e96X", balances: {} }
+    { chain: "ETH", remark: "Vitalik Wallet", address: "0xAb5801a7D398351b8bE11C439e05C5B3259aec9B", balances: {} },
+    { chain: "BSC", remark: "Binance Hot Wallet", address: "0xF977814e90dA44bFA03b6295A0616a897441aceC", balances: {} },
+    { chain: "SOL", remark: "SOL Watcher", address: "6ZRCB7v8gscuA2N6773FwYms48D6f4YfV2LnyfC8e96X", balances: {} }
 ];
 
+// 首次加载或清除过缓存时强制注入新规则，若之前有缓存则保留用户配置
 let tokenConfigList = JSON.parse(localStorage.getItem("cfg_tokens")) || INITIAL_TOKENS;
 let walletList = JSON.parse(localStorage.getItem("cfg_wallets")) || INITIAL_WALLETS;
 
-// ==================== 3. 基础折叠逻辑 ====================
+// ==================== 3. 基础折叠逻辑与语言注入 ====================
 function toggleCard(contentId, arrowId) {
     const content = document.getElementById(contentId);
     const arrow = document.getElementById(arrowId);
+    const trans = LANG_DICTIONARY[currentLang];
     if(content.classList.contains('collapsed')) {
         content.classList.remove('collapsed');
-        arrow.innerText = "收起 ▲";
+        arrow.innerText = trans.collapse;
     } else {
         content.classList.add('collapsed');
-        arrow.innerText = "展开 ▼";
+        arrow.innerText = trans.expand;
     }
+}
+
+function handleLangChange(langKey) {
+    currentLang = langKey;
+    localStorage.setItem("app_lang", langKey);
+    applyLanguagePack();
+    rebuildTokenDropdown();
+    renderUI();
+}
+
+function applyLanguagePack() {
+    const trans = LANG_DICTIONARY[currentLang];
+    
+    // 注入全局文本域
+    document.getElementById("text_main_title").innerText = trans.main_title;
+    document.getElementById("text_main_desc").innerText = trans.main_desc;
+    document.getElementById("text_monitoring").innerText = trans.monitoring;
+    document.getElementById("text_wallets").innerText = trans.wallets;
+    
+    document.getElementById("text_card_add_wallet").innerText = trans.card_add_wallet;
+    document.getElementById("text_btn_add_wallet").innerText = trans.btn_add_wallet;
+    document.getElementById("text_card_wallet_list").innerText = trans.card_wallet_list;
+    
+    const refreshBtn = document.getElementById("refreshBtn");
+    if(refreshBtn && !refreshBtn.disabled) {
+        refreshBtn.innerText = trans.btn_fetch;
+    }
+    
+    document.getElementById("text_th_idx").innerText = trans.th_idx;
+    document.getElementById("text_th_net").innerText = trans.th_net;
+    document.getElementById("text_th_rem").innerText = trans.th_rem;
+    document.getElementById("text_th_addr").innerText = trans.th_addr;
+    document.getElementById("text_th_act").innerText = trans.th_act;
+    
+    document.getElementById("text_card_add_token").innerText = trans.card_add_token;
+    document.getElementById("text_label_symbol").innerText = trans.label_symbol;
+    document.getElementById("text_label_chain").innerText = trans.label_chain;
+    document.getElementById("text_label_contract").innerText = trans.label_contract;
+    document.getElementById("text_label_decimals").innerText = trans.label_decimals;
+    document.getElementById("text_btn_save_token").innerText = trans.btn_save_token;
+    document.getElementById("text_card_token_list").innerText = trans.card_token_list;
+    document.getElementById("text_copyright").innerText = trans.copyright;
+    document.getElementById("text_sys_visits").innerText = trans.sys_visits;
+    document.getElementById("text_sys_times").innerText = trans.sys_times;
+
+    // 校正展开折叠指示器文案
+    document.getElementById("arrowWallet").innerText = document.getElementById("addWalletContent").classList.contains('collapsed') ? trans.expand : trans.collapse;
+    document.getElementById("arrow1").innerText = document.getElementById("addTokenContent").classList.contains('collapsed') ? trans.expand : trans.collapse;
+    document.getElementById("arrow2").innerText = document.getElementById("listTokenContent").classList.contains('collapsed') ? trans.expand : trans.collapse;
 }
 
 // ==================== 4. 节点层跨域安全网络读取 ====================
@@ -458,7 +745,7 @@ async function querySolanaBalance(walletAddr, tokenMint, decimals) {
                     return parseFloat(accountInfo.uiAmount);
                 }
                 if (accountInfo.amount) {
-                    return Number(accountInfo.amount) / Math.pow(10, parseInt(decimals) || 6);
+                    return Number(accountInfo.amount) / Math.pow(10, parseInt(decimals) || 0);
                 }
             }
         }
@@ -471,8 +758,9 @@ async function querySolanaBalance(walletAddr, tokenMint, decimals) {
 
 async function updateAllBalances() {
     const btn = document.getElementById("refreshBtn");
+    const trans = LANG_DICTIONARY[currentLang];
     if(btn) {
-        btn.innerText = "⏳ 同步中...";
+        btn.innerText = trans.btn_fetching;
         btn.disabled = true;
     }
 
@@ -496,30 +784,31 @@ async function updateAllBalances() {
     renderUI();
 
     if(btn) {
-        btn.innerText = "🔄 一键拉取实时链上余额";
+        btn.innerText = trans.btn_fetch;
         btn.disabled = false;
     }
 }
 
 // ==================== 5. 交互与动态渲染 ====================
 function addCustomToken() {
+    const trans = LANG_DICTIONARY[currentLang];
     const symbol = document.getElementById("newTokenSymbol").value.trim().toUpperCase();
     const chain = document.getElementById("newTokenChain").value;
     const contract = document.getElementById("newTokenContract").value.trim();
     const decimals = parseInt(document.getElementById("newTokenDecimals").value);
 
     if (!symbol || !contract) {
-        alert("代币简称与合约/Mint地址不可为空！");
+        alert(trans.alert_empty_token);
         return;
     }
     if (isNaN(decimals) || decimals < 0) {
-        alert("请输入有效的代币精度数值！");
+        alert(trans.alert_invalid_dec);
         return;
     }
 
     const exist = tokenConfigList.some(t => t.symbol === symbol && t.chain === chain && t.contract.toLowerCase() === contract.toLowerCase());
     if(exist) {
-        alert("该代币资产已存在备查管理池中！");
+        alert(trans.alert_exist_token);
         return;
     }
 
@@ -532,7 +821,8 @@ function addCustomToken() {
 }
 
 function deleteCustomToken(idx) {
-    if(confirm("移除该备查代币会导致对应监控停止，确认删除吗？")) {
+    const trans = LANG_DICTIONARY[currentLang];
+    if(confirm(trans.alert_del_token)) {
         tokenConfigList.splice(idx, 1);
         localStorage.setItem("cfg_tokens", JSON.stringify(tokenConfigList));
         rebuildTokenDropdown();
@@ -551,25 +841,26 @@ function formatShortVolume(val) {
     for (let i = 0; i < units.length; i++) {
         if (val >= units[i].value) {
             const shortNum = (val / units[i].value).toFixed(2);
-            return `（${shortNum}${units[i].symbol}）`;
+            return ` (${shortNum}${units[i].symbol})`;
         }
     }
     return "";
 }
 
 function addWallet() {
+    const trans = LANG_DICTIONARY[currentLang];
     const address = document.getElementById("walletAddress").value.trim();
-    const remark = document.getElementById("walletRemark").value.trim() || "未命名钱包";
+    const remark = document.getElementById("walletRemark").value.trim() || "Wallet";
     const chain = document.getElementById("walletChain").value;
 
     if (!address) {
-        alert("地址栏不可为空！");
+        alert(trans.alert_empty_wallet);
         return;
     }
 
     const exist = walletList.some(w => w.address.toLowerCase() === address.toLowerCase() && w.chain === chain);
     if(exist) {
-        alert("当前网络的该钱包地址已存在于监控清单中！");
+        alert(trans.alert_exist_wallet);
         return;
     }
 
@@ -582,7 +873,8 @@ function addWallet() {
 }
 
 function deleteWallet(idx) {
-    if(confirm("确认从列表中永久移出此监控钱包吗？")) {
+    const trans = LANG_DICTIONARY[currentLang];
+    if(confirm(trans.alert_del_wallet)) {
         walletList.splice(idx, 1);
         localStorage.setItem("cfg_wallets", JSON.stringify(walletList));
         renderUI();
@@ -591,12 +883,13 @@ function deleteWallet(idx) {
 
 function rebuildTokenDropdown() {
     const select = document.getElementById("selectDisplayToken");
+    const trans = LANG_DICTIONARY[currentLang];
     const uniqueSymbols = [...new Set(tokenConfigList.map(t => t.symbol))];
     const previousSelection = select.value;
     select.innerHTML = "";
     
     uniqueSymbols.forEach(sym => {
-        select.innerHTML += `<option value="${sym}">🔍 观察查看 ${sym} 资产</option>`;
+        select.innerHTML += `<option value="${sym}">${trans.dropdown_prefix}${sym}</option>`;
     });
 
     if(uniqueSymbols.includes(previousSelection)) {
@@ -605,8 +898,9 @@ function rebuildTokenDropdown() {
 }
 
 function renderUI() {
-    const currentToken = document.getElementById("selectDisplayToken").value || "USDT";
-    document.getElementById("dynamicTableHeader").innerText = `${currentToken} 余额`;
+    const currentToken = document.getElementById("selectDisplayToken").value || "NAT";
+    const trans = LANG_DICTIONARY[currentLang];
+    document.getElementById("dynamicTableHeader").innerText = `${currentToken} ${currentLang === 'zh' || currentLang === 'tw' ? '餘額' : (currentLang === 'ja' ? '残高' : (currentLang === 'ko' ? '잔액' : 'Balance'))}`;
 
     const tokenSlot = document.getElementById("customTokenListSlot");
     tokenSlot.innerHTML = "";
@@ -615,9 +909,9 @@ function renderUI() {
             <div class="token-item">
                 <div class="token-item-info">
                     <h4>${t.symbol} <span class="chain-badge badge-${t.chain}">${t.chain}</span></h4>
-                    <p>合约:${t.contract.substring(0,6)}...${t.contract.substring(t.contract.length-6)} (精度:${t.decimals})</p>
+                    <p>${currentLang === 'zh' || currentLang === 'tw' ? '合約' : (currentLang === 'ja' ? '契約' : (currentLang === 'ko' ? '계약' : 'Contract'))}:${t.contract.substring(0,6)}...${t.contract.substring(t.contract.length-6)} (${currentLang === 'zh' || currentLang === 'tw' ? '精度' : 'Dec'}:${t.decimals})</p>
                 </div>
-                <button class="btn-danger" onclick="deleteCustomToken(${i})">删除</button>
+                <button class="btn-danger" onclick="deleteCustomToken(${i})">${trans.badge_del}</button>
             </div>
         `;
     });
@@ -636,13 +930,13 @@ function renderUI() {
                 <td><span class="chain-badge badge-${w.chain}">${w.chain}</span></td>
                 <td class="remark-cell">${w.remark}</td>
                 <td class="address-cell">${w.address}</td>
-                <td class="balance-cell">${bal.toLocaleString('zh-CN', {minimumFractionDigits: 0, maximumFractionDigits: 4})}</td>
-                <td style="text-align: center;"><button class="btn-danger" onclick="deleteWallet(${idx})">删除</button></td>
+                <td class="balance-cell">${bal.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 4})}</td>
+                <td style="text-align: center;"><button class="btn-danger" onclick="deleteWallet(${idx})">${trans.badge_del}</button></td>
             </tr>
         `;
     });
 
-    document.getElementById("summary_total_display").innerText = totalAccumulator.toLocaleString('zh-CN', {minimumFractionDigits: 0, maximumFractionDigits: 4});
+    document.getElementById("summary_total_display").innerText = totalAccumulator.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 4});
     document.getElementById("summary_short_display").innerText = formatShortVolume(totalAccumulator);
     document.getElementById("summary_wallet_count").innerText = walletList.length;
 }
@@ -656,10 +950,12 @@ function initUserCounter() {
         count += Math.floor(Math.random() * 3) + 1; 
     }
     localStorage.setItem("sys_user_count", count);
-    document.getElementById("user_counter_slot").innerText = count.toLocaleString('zh-CN');
+    document.getElementById("user_counter_slot").innerText = count.toLocaleString('en-US');
 }
 
 // ==================== 7. 初始化运行 ====================
+document.getElementById("langSwitcher").value = currentLang; // 回显缓存语言
+applyLanguagePack();
 rebuildTokenDropdown();
 renderUI();
 updateAllBalances();
