@@ -6,7 +6,7 @@
 <title>Multi-Chain Multi-Wallet Intelligent Asset Dashboard</title>
 
 <style>
-/* ==================== 1. 基础防护与重置 ==================== */
+/* ==================== 1. 基础重置 ==================== */
 html, body { 
     margin: 0; 
     padding: 0; 
@@ -31,28 +31,24 @@ html, body {
     width: 100%;
 }
 
-/* ==================== 2. 全新响应式顶栏架构 (彻底解决遮挡) ==================== */
+/* ==================== 2. 头部视觉区（保留原本的绝对定位结构） ==================== */
 .full-viewport-header-zone {
     width: 100%;
     max-width: 100%;
     background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
-    padding: 24px 15px 30px 15px;
+    padding: 40px 15px 30px 15px;
     border-bottom: 1px solid #334155;
+    position: relative; /* 为语言按钮提供绝对定位基准 */
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
-/* 流式语言切换栏：平级排列，不干扰标题 */
-.lang-bar-container {
-    width: 100%;
-    max-width: 1200px;
-    display: flex;
-    justify-content: flex-end;
-    margin-bottom: 16px;
-}
-
+/* 原代码 PC 端绝对定位语言按钮 */
 .lang-select-ui {
+    position: absolute;
+    top: 20px;
+    right: 20px;
     padding: 6px 12px;
     font-size: 13px;
     font-weight: 600;
@@ -65,6 +61,7 @@ html, body {
     cursor: pointer;
     outline: none;
     transition: all 0.2s ease;
+    z-index: 100;
 }
 
 .lang-select-ui:hover {
@@ -78,27 +75,20 @@ html, body {
     margin-bottom: 24px;
     width: 100%;
     max-width: 100%;
-    overflow: hidden;
 }
 
 .header-meta-text h1 { 
     color: #38bdf8; 
-    font-size: clamp(20px, 4.5vw, 28px); 
+    font-size: 28px; 
     margin: 0 0 10px 0; 
     font-weight: 700; 
     line-height: 1.3;
-    padding: 0 10px;
 }
 
-/* 副标题：强制单行，绝不换行，超出自动省略 */
 .header-meta-text p { 
     color: #64748b; 
-    font-size: clamp(11px, 2.5vw, 13px); 
+    font-size: 13px; 
     margin: 0 auto; 
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    width: 95%;
     max-width: 800px;
 }
 
@@ -151,7 +141,7 @@ html, body {
 .select-token-ui { padding: 10px 16px; font-size: 14px; font-weight: bold; color: #38bdf8; border: 2px solid #38bdf8; background: #0f172a; border-radius: 8px; cursor: pointer; width: 100%; max-width: 280px; text-align: center; text-align-last: center; }
 .wallet-count-badge { font-size: 12px; color: #94a3b8; background: rgba(255,255,255,0.05); padding: 4px 12px; border-radius: 20px; border: 1px solid #334155; }
 
-/* ==================== 3. 内容区与网格 ==================== */
+/* ==================== 3. 主体网格内容区 ==================== */
 .container { 
     max-width: 1200px; 
     margin: 20px auto; 
@@ -237,20 +227,38 @@ td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; 
     margin-left: 2px;
 }
 
-/* ==================== 5. 移动端专门断点优化 ==================== */
+/* ==================== 5. 精准补丁：只优化移动端不友好问题 ==================== */
 @media (max-width: 992px) {
     .main-layout { grid-template-columns: 1fr; gap: 15px; }
     .form-row-inline { grid-template-columns: 1fr; gap: 8px; }
-    
-    /* 移动端语言选择栏居中对齐，留出视觉空间 */
-    .lang-bar-container {
-        justify-content: center;
-        margin-bottom: 12px;
-    }
-    
-    .footer-zone {
+    .footer-zone { font-size: 12px; padding-bottom: calc(24px + env(safe-area-inset-bottom)); }
+}
+
+/* 专门针对手机小屏进行排他性细节微调，绝不污染 PC 端样式 */
+@media screen and (max-width: 768px) {
+    /* 补丁A：按钮在小屏适当收敛定位 */
+    .lang-select-ui {
+        top: 12px;
+        right: 12px;
+        padding: 4px 8px;
         font-size: 12px;
-        padding-bottom: calc(24px + env(safe-area-inset-bottom));
+    }
+
+    /* 补丁B：通过 padding-top 把大标题压低，腾出顶部空间，物理解决遮挡问题 */
+    .header-meta-text h1 { 
+        font-size: 22px; 
+        padding-top: 35px; /* 关键：给右上角绝对定位的按钮留出充足垂直间距 */
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    /* 补丁C：副标题强制保持一行不抬头，空间不足自动处理 */
+    .header-meta-text p { 
+        font-size: 11px;
+        white-space: nowrap;     /* 核心：强制一行，绝对不换行 */
+        overflow: hidden;        /* 超出边界部分隐藏 */
+        text-overflow: ellipsis; /* 超出显示三个点，保护排版 */
+        width: 92%;
     }
 }
 </style>
@@ -261,17 +269,15 @@ td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; 
     <div class="content-wrap">
         
         <div class="full-viewport-header-zone">
-            <!-- 语言切换容器提升为顶层流，防止在移动端覆盖内容 -->
-            <div class="lang-bar-container">
-                <select id="langSwitcher" class="lang-select-ui" onchange="handleLangChange(this.value)">
-                    <option value="en">🌐 English</option>
-                    <option value="zh">🌐 简体中文</option>
-                    <option value="tw">🌐 繁體中文</option>
-                    <option value="ja">🌐 日本語</option>
-                    <option value="ko">🌐 한국어</option>
-                    <option value="es">🌐 Español</option>
-                </select>
-            </div>
+            <!-- 保持原汁原味的绝对定位结构不变 -->
+            <select id="langSwitcher" class="lang-select-ui" onchange="handleLangChange(this.value)">
+                <option value="en">🌐 English</option>
+                <option value="zh">🌐 简体中文</option>
+                <option value="tw">🌐 繁體中文</option>
+                <option value="ja">🌐 日本語</option>
+                <option value="ko">🌐 한국어</option>
+                <option value="es">🌐 Español</option>
+            </select>
 
             <div class="header-meta-text">
                 <h1 id="text_main_title">Multi-Chain Multi-Wallet Intelligent Asset Dashboard</h1>
@@ -454,7 +460,7 @@ const LANG_DICTIONARY = {
         sys_visits: "📊 系統累計使用人數：", sys_times: "人次", dropdown_prefix: "🔍 觀察查看 ",
         alert_empty_token: "代幣簡稱與合約/Mint地址不可為空！", alert_invalid_dec: "請輸入有效的代幣精度數值！",
         alert_exist_token: "該代幣資產已存在備查管理池中！", alert_del_token: "移除該備查代幣會導致對應監控停止，確認刪除嗎？",
-        alert_empty_wallet: "地址欄不可為空！", alert_exist_wallet: "當前網絡的該錢包地址已存在於監控清單中！",
+        alert_empty_wallet: "地址欄不可為空！", alert_exist_wallet: "當前網絡的該錢包地址已存在於遷控清單中！",
         alert_del_wallet: "確認從列表中永久移出此監控錢包嗎？", badge_del: "刪除", expand: "展開 ▼", collapse: "收起 ▲"
     },
     ja: {
@@ -510,31 +516,24 @@ const LANG_DICTIONARY = {
     }
 };
 
-// ==================== 1. 系统适配优先的默认语言决策机制 ====================
+// ==================== 系统机制 ====================
 function detectBestLanguage() {
     const cachedLang = localStorage.getItem("app_lang");
-    if (cachedLang && LANG_DICTIONARY[cachedLang]) {
-        return cachedLang;
-    }
-
+    if (cachedLang && LANG_DICTIONARY[cachedLang]) return cachedLang;
     const systemLanguages = navigator.languages || [navigator.language || navigator.userLanguage];
     for (let i = 0; i < systemLanguages.length; i++) {
         const shortLang = systemLanguages[i].split('-')[0].toLowerCase();
-        if (LANG_DICTIONARY[shortLang]) {
-            return shortLang;
-        }
+        if (LANG_DICTIONARY[shortLang]) return shortLang;
     }
     return "en";
 }
 
 let currentLang = detectBestLanguage();
 
-// ==================== 2. RPC 基础节点配置 ====================
 const RPC_ETH = "https://rpc.mevblocker.io"; 
 const RPC_BSC = "https://bsc-dataseed1.binance.org"; 
 const RPC_SOL = "https://api.mainnet-beta.solana.com"; 
 
-// ==================== 3. 初始化指定资产包配置 ====================
 const INITIAL_TOKENS = [
     { symbol: "USDT", chain: "ETH", contract: "0xdac17f958d2ee523a2206206994597c13d831ec7", decimals: 6 },
     { symbol: "USDT", chain: "BSC", contract: "0x55d398326f99059ff775485246999027b3197955", decimals: 18 },
@@ -554,7 +553,6 @@ const INITIAL_WALLETS = [
 let tokenConfigList = JSON.parse(localStorage.getItem("cfg_tokens")) || INITIAL_TOKENS;
 let walletList = JSON.parse(localStorage.getItem("cfg_wallets")) || INITIAL_WALLETS;
 
-// ==================== 4. 交互基础框架 ====================
 function toggleCard(contentId, arrowId) {
     const content = document.getElementById(contentId);
     const arrow = document.getElementById(arrowId);
@@ -615,7 +613,6 @@ function applyLanguagePack() {
     document.getElementById("arrow2").innerText = document.getElementById("listTokenContent").classList.contains('collapsed') ? trans.expand : trans.collapse;
 }
 
-// ==================== 5. 链上数据同步层 ====================
 async function queryEvmBalance(chain, walletAddr, tokenAddr, decimals) {
     try {
         const rpcUrl = (chain === "ETH") ? RPC_ETH : RPC_BSC;
@@ -735,7 +732,6 @@ async function updateAllBalances() {
     }
 }
 
-// ==================== 6. 组件数据流驱动 ====================
 function addCustomToken() {
     const trans = LANG_DICTIONARY[currentLang];
     const symbol = document.getElementById("newTokenSymbol").value.trim().toUpperCase();
@@ -766,6 +762,7 @@ function addCustomToken() {
     updateAllBalances();
 }
 
+// 恢复删除逻辑及其他逻辑
 function deleteCustomToken(idx) {
     const trans = LANG_DICTIONARY[currentLang];
     if(confirm(trans.alert_del_token)) {
@@ -908,7 +905,7 @@ function initUserCounter() {
     document.getElementById("user_counter_slot").innerText = count.toLocaleString('en-US');
 }
 
-// ==================== 7. 挂载启动 ====================
+// ==================== 挂载启动 ====================
 document.getElementById("langSwitcher").value = currentLang; 
 applyLanguagePack();
 rebuildTokenDropdown();
