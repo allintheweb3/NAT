@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>多链多钱包智能资产看板 (无横向溢出真正全适屏版)</title>
+<title>多链多钱包智能资产看板 (数字自适应适屏版)</title>
 
 <style>
 /* ==================== 1. 根源防护与自适应吸底布局 ==================== */
@@ -18,14 +18,12 @@ html, body {
     -webkit-text-size-adjust: 100%;
 }
 
-/* 核心 Flex 吸底布局容器 */
 .page-container {
     display: flex;
     flex-direction: column;
-    min-height: 100vh; /* 确保网页至少占满一屏高度 */
+    min-height: 100vh;
 }
 
-/* 业务主内容包裹区：自动弹性吃满剩余空间，将页脚自然压至最底部 */
 .content-wrap {
     flex: 1;
     width: 100%;
@@ -33,7 +31,7 @@ html, body {
 
 * { box-sizing: border-box; font-family: "PingFang SC", "Microsoft YaHei", sans-serif; }
 
-/* ==================== 2. 顶栏：自适应 100% 宽度 ==================== */
+/* ==================== 2. 顶栏与数字自适应控宽区 ==================== */
 .full-viewport-header-zone {
     width: 100%;
     max-width: 100%;
@@ -54,11 +52,11 @@ html, body {
 .header-meta-text h1 { color: #38bdf8; font-size: 28px; margin: 0 0 8px 0; font-weight: 700; }
 .header-meta-text p { color: #64748b; font-size: 13px; margin: 0; }
 
-/* 核心总额大看板：流式自适应 */
+/* 核心总额看板：建立容器上下文以支持数字流式收缩 */
 .summary-banner { 
     background: linear-gradient(135deg, #1e1b4b, #2e1065); 
     border: 1px solid #4c1d95; 
-    padding: 20px; 
+    padding: 24px 20px; 
     border-radius: 12px; 
     width: 100%;
     max-width: 800px; 
@@ -69,28 +67,37 @@ html, body {
     text-align: center; 
     gap: 15px;
     box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+    container-type: inline-size; /* 声明为行宽容器 */
 }
-.summary-left { text-align: center; width: 100%; }
-.summary-left h3 { font-size: 13px; color: #a78bfa; margin: 0 0 6px 0; letter-spacing: 1px; }
 
-/* 总额数字样式 */
-.summary-left .total-val { 
-    display: block; /* 设为块级，独占一行 */
-    font-size: 38px; 
+/* 核心数字外包裹：强制单格不换行 */
+.summary-display-box {
+    width: 100%; 
+    text-align: center;
+    overflow: hidden;
+}
+
+/* 全自动缩放数字：通过 cqw (容器宽度单位) 与 clamp 确保数字长时自动变小、不溢出、不换行 */
+.summary-display-box .total-val { 
+    display: block;
+    font-size: clamp(24px, 7.5cqw, 48px); /* 智能在 24px 到 48px 之间随容器宽度线性缩放 */
     font-weight: 800; 
     color: #10b981; 
     font-family: monospace; 
-    word-break: break-all; 
+    white-space: nowrap; /* 绝对禁止数字断行 */
+    text-overflow: clip;
     margin: 0; 
-    line-height: 1.2; 
+    line-height: 1.1; 
 }
-/* 简写小括号单位样式：使其完美排在数字正下方 */
-.summary-left .total-short-val { 
-    display: block; /* 设为块级，另起一行排在下面 */
-    font-size: 16px; 
+
+/* 简写小括号单位样式：稳定排在数字正下方 */
+.summary-display-box .total-short-val { 
+    display: block;
+    font-size: clamp(13px, 3cqw, 16px);
     color: #34d399; 
     font-weight: 500; 
-    margin-top: 6px; /* 与上方数字保持呼吸间距 */
+    margin-top: 6px;
+    white-space: nowrap;
 }
 
 .summary-right { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; width: 100%; }
@@ -112,7 +119,6 @@ html, body {
     width: 100%;
 }
 
-/* 卡片容器 */
 .card-box { background: #1e293b; padding: 20px; border-radius: 12px; border: 1px solid #334155; margin-bottom: 20px; width: 100%; }
 .card-header-toggle { display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; }
 .card-title { font-size: 15px; color: #38bdf8; font-weight: bold; border-left: 4px solid #38bdf8; padding-left: 10px; display: flex; align-items: center; justify-content: space-between; width: 100%; }
@@ -120,7 +126,6 @@ html, body {
 .toggle-content { margin-top: 15px; }
 .toggle-content.collapsed { display: none; }
 
-/* 表单与输入框 */
 .form-grid { display: flex; flex-direction: column; gap: 12px; }
 .form-row-inline { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 10px; margin-bottom: 10px; width: 100%; }
 input, select, button { padding: 10px 12px; border-radius: 8px; border: 1px solid #475569; background: #0f172a; color: #fff; font-size: 14px; outline: none; max-width: 100%; }
@@ -132,7 +137,6 @@ button.btn-success:hover { background: #059669; }
 button.btn-danger { background: #ef4444; padding: 4px 8px; font-size: 12px; }
 button.btn-danger:hover { background: #dc2626; }
 
-/* 监控明细表响应式包裹器 */
 .table-scroll-container { 
     width: 100%; 
     overflow-x: auto; 
@@ -154,7 +158,6 @@ td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; 
 .badge-BSC { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid #f59e0b; }
 .badge-SOL { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid #10b981; }
 
-/* 代币配置单项 */
 .token-item { display: flex; justify-content: space-between; align-items: center; background: #0f172a; padding: 10px; border-radius: 8px; margin-bottom: 8px; border: 1px solid #334155; gap: 10px; }
 .token-item-info { flex: 1; min-width: 0; }
 .token-item-info h4 { font-size: 14px; color: #fff; margin: 0; }
@@ -188,15 +191,13 @@ td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; 
     margin-left: 2px;
 }
 
-/* 全自动视口断点 */
 @media (max-width: 992px) {
     .main-layout { grid-template-columns: 1fr; gap: 15px; }
     .form-row-inline { grid-template-columns: 1fr; gap: 8px; }
     .header-meta-text h1 { font-size: 24px; }
-    .summary-left .total-val { font-size: 32px; }
     .footer-zone {
         font-size: 12px;
-        padding-bottom: calc(24px + env(safe-area-inset-bottom)); /* 智能兼容全面屏小黑条 */
+        padding-bottom: calc(24px + env(safe-area-inset-bottom));
     }
 }
 </style>
@@ -213,14 +214,12 @@ td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; 
             </div>
             
             <div class="summary-banner">
-                <div class="summary-left">
-                    <h3>当前所选代币全网监控总额</h3>
-                    <!-- 调整上下级结构：使小括号简写单位完美呆在数字正下方 -->
-                    <div style="width: 100%; text-align: center;">
-                        <span class="total-val" id="summary_total_display">0.00</span>
-                        <span class="total-short-val" id="summary_short_display"></span>
-                    </div>
+                <!-- 已完全移除原 <h3> 抬头，直接显示自适应大数字与下方小括号 -->
+                <div class="summary-display-box">
+                    <span class="total-val" id="summary_total_display">0.00</span>
+                    <span class="total-short-val" id="summary_short_display"></span>
                 </div>
+                
                 <div class="summary-right">
                     <select id="selectDisplayToken" class="select-token-ui" onchange="renderUI()">
                         <!-- 动态代币选项 -->
@@ -232,7 +231,7 @@ td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; 
 
         <div class="container">
             <div class="main-layout">
-                <!-- 左侧：钱包监控明细与表单 -->
+                <!-- 左侧 -->
                 <div style="min-width: 0;">
                     <div class="card-box">
                         <div class="card-header-toggle" onclick="toggleCard('addWalletContent', 'arrowWallet')">
@@ -280,7 +279,7 @@ td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; 
                     </div>
                 </div>
 
-                <!-- 右侧：代币资产配置 -->
+                <!-- 右侧 -->
                 <div style="min-width: 0;">
                     <div class="card-box">
                         <div class="card-header-toggle" onclick="toggleCard('addTokenContent', 'arrow1')">
@@ -347,7 +346,7 @@ const RPC_ETH = "https://rpc.mevblocker.io";
 const RPC_BSC = "https://bsc-dataseed1.binance.org"; 
 const RPC_SOL = "https://api.mainnet-beta.solana.com"; 
 
-// ==================== 2. 初始化缓存与包含原生币特征的示例数据 ====================
+// ==================== 2. 初始化缓存与示例数据 ====================
 const INITIAL_TOKENS = [
     { symbol: "USDT", chain: "ETH", contract: "0xdac17f958d2ee523a2206206994597c13d831ec7", decimals: 6 },
     { symbol: "USDT", chain: "BSC", contract: "0x55d398326f99059ff775485246999027b3197955", decimals: 18 },
@@ -365,7 +364,7 @@ const INITIAL_WALLETS = [
 let tokenConfigList = JSON.parse(localStorage.getItem("cfg_tokens")) || INITIAL_TOKENS;
 let walletList = JSON.parse(localStorage.getItem("cfg_wallets")) || INITIAL_WALLETS;
 
-// ==================== 3. 基础可折叠卡片逻辑 ====================
+// ==================== 3. 基础折叠逻辑 ====================
 function toggleCard(contentId, arrowId) {
     const content = document.getElementById(contentId);
     const arrow = document.getElementById(arrowId);
@@ -462,7 +461,7 @@ async function querySolanaBalance(walletAddr, tokenMint, decimals) {
         }
         return 0;
     } catch (e) {
-        console.error(`[Solana Chain RPC Exception] ${walletAddr}:`, e);
+        console.error(`[Solana RPC Exception] ${walletAddr}:`, e);
         return 0; 
     }
 }
@@ -480,9 +479,7 @@ async function updateAllBalances() {
         
         for (let token of matchTokens) {
             let balance = 0;
-            if (wallet.chain === "BSC") {
-                balance = await queryEvmBalance(wallet.chain, wallet.address, token.contract, token.decimals);
-            } else if (wallet.chain === "ETH") {
+            if (wallet.chain === "BSC" || wallet.chain === "ETH") {
                 balance = await queryEvmBalance(wallet.chain, wallet.address, token.contract, token.decimals);
             } else if (wallet.chain === "SOL") {
                 balance = await querySolanaBalance(wallet.address, token.contract, token.decimals);
@@ -501,7 +498,7 @@ async function updateAllBalances() {
     }
 }
 
-// ==================== 5. 交互层与动态渲染 ====================
+// ==================== 5. 交互与动态渲染 ====================
 function addCustomToken() {
     const symbol = document.getElementById("newTokenSymbol").value.trim().toUpperCase();
     const chain = document.getElementById("newTokenChain").value;
@@ -540,7 +537,6 @@ function deleteCustomToken(idx) {
     }
 }
 
-/* 简写大数字量级转换算法 */
 function formatShortVolume(val) {
     if (val < 10000) return ""; 
     const units = [
@@ -552,7 +548,7 @@ function formatShortVolume(val) {
     for (let i = 0; i < units.length; i++) {
         if (val >= units[i].value) {
             const shortNum = (val / units[i].value).toFixed(2);
-            return `(${shortNum}${units[i].symbol})`;
+            return `（${shortNum}${units[i].symbol}）`;
         }
     }
     return "";
@@ -644,7 +640,6 @@ function renderUI() {
     });
 
     document.getElementById("summary_total_display").innerText = totalAccumulator.toLocaleString('zh-CN', {minimumFractionDigits: 0, maximumFractionDigits: 4});
-    // 渲染简写单位 (自动在CSS控制下排列在正下方)
     document.getElementById("summary_short_display").innerText = formatShortVolume(totalAccumulator);
     document.getElementById("summary_wallet_count").innerText = walletList.length;
 }
