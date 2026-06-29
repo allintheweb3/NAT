@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Multi-Chain Multi-Wallet Intelligent Asset Dashboard</title>
-
 <style>
 /* ==================== 1. 基础重置 ==================== */
 html, body { 
@@ -17,19 +16,9 @@ html, body {
     overflow-x: hidden; 
     -webkit-text-size-adjust: 100%;
 }
-
 * { box-sizing: border-box; font-family: "PingFang SC", "Microsoft YaHei", sans-serif; }
-
-.page-container {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-}
-
-.content-wrap {
-    flex: 1;
-    width: 100%;
-}
+.page-container { display: flex; flex-direction: column; min-height: 100vh; }
+.content-wrap { flex: 1; width: 100%; }
 
 /* ==================== 2. 头部视觉区 ==================== */
 .full-viewport-header-zone {
@@ -43,8 +32,6 @@ html, body {
     flex-direction: column;
     align-items: center;
 }
-
-/* 绝对定位语言选择组件 */
 .lang-select-ui {
     position: absolute;
     top: 20px;
@@ -63,36 +50,11 @@ html, body {
     transition: all 0.2s ease;
     z-index: 100;
 }
+.lang-select-ui:hover { border-color: #38bdf8; color: #38bdf8; }
+.header-meta-text { text-align: center; margin-bottom: 24px; width: 100%; max-width: 100%; }
+.header-meta-text h1 { color: #38bdf8; font-size: 28px; margin: 0 0 10px 0; font-weight: 700; line-height: 1.3; }
+.header-meta-text p { color: #64748b; font-size: 13px; margin: 0 auto; max-width: 800px; }
 
-.lang-select-ui:hover {
-    border-color: #38bdf8;
-    color: #38bdf8;
-}
-
-/* 核心标题文本区 */
-.header-meta-text {
-    text-align: center;
-    margin-bottom: 24px;
-    width: 100%;
-    max-width: 100%;
-}
-
-.header-meta-text h1 { 
-    color: #38bdf8; 
-    font-size: 28px; 
-    margin: 0 0 10px 0; 
-    font-weight: 700; 
-    line-height: 1.3;
-}
-
-.header-meta-text p { 
-    color: #64748b; 
-    font-size: 13px; 
-    margin: 0 auto; 
-    max-width: 800px;
-}
-
-/* 全局资产总览看板 */
 .summary-banner { 
     background: linear-gradient(135deg, #1e1b4b, #2e1065); 
     border: 1px solid #4c1d95; 
@@ -109,13 +71,7 @@ html, body {
     box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
     container-type: inline-size;
 }
-
-.summary-display-box {
-    width: 100%; 
-    text-align: center;
-    overflow: hidden;
-}
-
+.summary-display-box { width: 100%; text-align: center; overflow: hidden; }
 .summary-display-box .total-val { 
     display: block;
     font-size: clamp(24px, 7.5cqw, 48px); 
@@ -127,34 +83,14 @@ html, body {
     margin: 0; 
     line-height: 1.1; 
 }
-
-.summary-display-box .total-short-val { 
-    display: block;
-    font-size: clamp(13px, 3cqw, 16px);
-    color: #34d399; 
-    font-weight: 500; 
-    margin-top: 6px;
-    white-space: nowrap;
-}
-
+.summary-display-box .total-short-val { display: block; font-size: clamp(13px, 3cqw, 16px); color: #34d399; font-weight: 500; margin-top: 6px; white-space: nowrap; }
 .summary-right { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; width: 100%; }
 .select-token-ui { padding: 10px 16px; font-size: 14px; font-weight: bold; color: #38bdf8; border: 2px solid #38bdf8; background: #0f172a; border-radius: 8px; cursor: pointer; width: 100%; max-width: 280px; text-align: center; text-align-last: center; }
 .wallet-count-badge { font-size: 12px; color: #94a3b8; background: rgba(255,255,255,0.05); padding: 4px 12px; border-radius: 20px; border: 1px solid #334155; }
 
 /* ==================== 3. 主体网格内容区 ==================== */
-.container { 
-    max-width: 1200px; 
-    margin: 20px auto; 
-    padding: 0 15px; 
-    width: 100%; 
-}
-.main-layout { 
-    display: grid; 
-    grid-template-columns: 2fr 1fr; 
-    gap: 20px; 
-    width: 100%;
-}
-
+.container { max-width: 1200px; margin: 20px auto; padding: 0 15px; width: 100%; }
+.main-layout { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; width: 100%; }
 .card-box { background: #1e293b; padding: 20px; border-radius: 12px; border: 1px solid #334155; margin-bottom: 20px; width: 100%; }
 .card-header-toggle { display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; }
 .card-title { font-size: 15px; color: #38bdf8; font-weight: bold; border-left: 4px solid #38bdf8; padding-left: 10px; display: flex; align-items: center; justify-content: space-between; width: 100%; }
@@ -173,13 +109,7 @@ button.btn-success:hover { background: #059669; }
 button.btn-danger { background: #ef4444; padding: 4px 8px; font-size: 12px; }
 button.btn-danger:hover { background: #dc2626; }
 
-.table-scroll-container { 
-    width: 100%; 
-    overflow-x: auto; 
-    -webkit-overflow-scrolling: touch; 
-    background: #1e293b;
-    border-radius: 0 0 12px 12px;
-}
+.table-scroll-container { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; background: #1e293b; border-radius: 0 0 12px 12px; }
 table { width: 100%; border-collapse: collapse; text-align: left; min-width: 550px; }
 th, td { padding: 12px 14px; font-size: 13px; border-bottom: 1px solid #334155; }
 th { background: #334155; color: #38bdf8; font-weight: 600; }
@@ -188,6 +118,9 @@ td.index-cell { font-family: monospace; color: #64748b; font-weight: bold; text-
 td.address-cell { font-family: monospace; color: #cbd5e1; word-break: break-all; font-size: 12px; }
 td.remark-cell { color: #e2e8f0; font-weight: 500; }
 td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; color: #fff; }
+.loading-pulse { animation: pulse 1.5s infinite; color: #64748b; }
+
+@keyframes pulse { 0% { opacity: 0.4; } 50% { opacity: 1; } 100% { opacity: 0.4; } }
 
 .chain-badge { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; }
 .badge-ETH { background: rgba(99, 102, 241, 0.2); color: #818cf8; border: 1px solid #6366f1; }
@@ -200,64 +133,20 @@ td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; 
 .token-item-info p { font-size: 11px; color: #64748b; font-family: monospace; word-break: break-all; margin: 4px 0 0 0; }
 
 /* ==================== 4. 底部声明区 ==================== */
-.footer-zone {
-    width: 100%;
-    padding: 24px 15px;
-    border-top: 1px solid #1e293b;
-    background: #090d16;
-    text-align: center;
-    color: #475569;
-    font-size: 13px;
-    line-height: 1.6;
-}
-.footer-counter {
-    display: inline-block;
-    margin-top: 8px;
-    background: rgba(56, 189, 248, 0.05);
-    border: 1px solid rgba(56, 189, 248, 0.15);
-    padding: 4px 14px;
-    border-radius: 20px;
-    color: #94a3b8;
-    font-size: 12px;
-}
-.counter-num {
-    color: #38bdf8;
-    font-weight: bold;
-    font-family: monospace;
-    margin-left: 2px;
-}
+.footer-zone { width: 100%; padding: 24px 15px; border-top: 1px solid #1e293b; background: #090d16; text-align: center; color: #475569; font-size: 13px; line-height: 1.6; }
+.footer-counter { display: inline-block; margin-top: 8px; background: rgba(56, 189, 248, 0.05); border: 1px solid rgba(56, 189, 248, 0.15); padding: 4px 14px; border-radius: 20px; color: #94a3b8; font-size: 12px; }
+.counter-num { color: #38bdf8; font-weight: bold; font-family: monospace; margin-left: 2px; }
 
-/* ==================== 5. 移动端适屏补丁 (按比例无缝自适应) ==================== */
+/* ==================== 5. 移动端自适应 ==================== */
 @media (max-width: 992px) {
     .main-layout { grid-template-columns: 1fr; gap: 15px; }
     .form-row-inline { grid-template-columns: 1fr; gap: 8px; }
     .footer-zone { font-size: 12px; padding-bottom: calc(24px + env(safe-area-inset-bottom)); }
 }
-
 @media screen and (max-width: 768px) {
-    .lang-select-ui {
-        top: 12px;
-        right: 12px;
-        padding: 4px 8px;
-        font-size: 12px;
-    }
-
-    .header-meta-text h1 { 
-        font-size: 22px; 
-        padding-top: 35px; /* 给绝对定位选择框腾出垂直空间 */
-        padding-left: 10px;
-        padding-right: 10px;
-    }
-
-    /* 核心补丁：副标题在小屏上按视口宽度等比微调缩放，确保右侧全部可见不换行 */
-    .header-meta-text p { 
-        font-size: clamp(9.5px, 2.3vw, 12px); 
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: clip; 
-        width: 96%;
-        letter-spacing: -0.2px; 
-    }
+    .lang-select-ui { top: 12px; right: 12px; padding: 4px 8px; font-size: 12px; }
+    .header-meta-text h1 { font-size: 22px; padding-top: 35px; padding-left: 10px; padding-right: 10px; }
+    .header-meta-text p { font-size: clamp(9.5px, 2.3vw, 12px); white-space: nowrap; overflow: hidden; text-overflow: clip; width: 96%; letter-spacing: -0.2px; }
 }
 </style>
 </head>
@@ -265,7 +154,6 @@ td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; 
 
 <div class="page-container">
     <div class="content-wrap">
-        
         <div class="full-viewport-header-zone">
             <select id="langSwitcher" class="lang-select-ui" onchange="handleLangChange(this.value)">
                 <option value="en">🌐 English</option>
@@ -286,10 +174,9 @@ td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; 
                     <span class="total-val" id="summary_total_display">0.00</span>
                     <span class="total-short-val" id="summary_short_display"></span>
                 </div>
-                
                 <div class="summary-right">
                     <select id="selectDisplayToken" class="select-token-ui" onchange="renderUI()">
-                        <!-- 动态代币选项 -->
+                        <!-- 动态载入 -->
                     </select>
                     <div class="wallet-count-badge"><span id="text_monitoring">Monitoring</span> <span id="summary_wallet_count" style="color:#38bdf8;font-weight:bold;">0</span> <span id="text_wallets">wallets</span></div>
                 </div>
@@ -298,7 +185,7 @@ td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; 
 
         <div class="container">
             <div class="main-layout">
-                <!-- 左侧：监控钱包队列 -->
+                <!-- 左侧：队列 -->
                 <div style="min-width: 0;">
                     <div class="card-box">
                         <div class="card-header-toggle" onclick="toggleCard('addWalletContent', 'arrowWallet')">
@@ -346,7 +233,7 @@ td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; 
                     </div>
                 </div>
 
-                <!-- 右侧：资产池定义 -->
+                <!-- 右侧：资产配置区 -->
                 <div style="min-width: 0;">
                     <div class="card-box">
                         <div class="card-header-toggle" onclick="toggleCard('addTokenContent', 'arrow1')">
@@ -370,12 +257,12 @@ td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; 
                                     </select>
                                 </div>
                                 <div>
-                                    <label style="font-size:12px; color:#94a3b8;" id="text_label_contract">Smart Contract/Mint Address (Native: fill 11111111111111111111111111111111)</label>
-                                    <input type="text" id="newTokenContract" placeholder="0x address for EVM, or 32 ones for native SOL" style="width:100%; margin-top:4px;" />
+                                    <label style="font-size:12px; color:#94a3b8;" id="text_label_contract">Smart Contract/Mint Address (Native: fill 0x0000000000000000000000000000000000000000 or 11111111111111111111111111111111)</label>
+                                    <input type="text" id="newTokenContract" placeholder="Contract address" style="width:100%; margin-top:4px;" />
                                 </div>
                                 <div>
                                     <label style="font-size:12px; color:#94a3b8;" id="text_label_decimals">Token Decimals</label>
-                                    <input type="number" id="newTokenDecimals" value="0" min="0" max="18" style="width:100%; margin-top:4px;" />
+                                    <input type="number" id="newTokenDecimals" value="18" min="0" max="18" style="width:100%; margin-top:4px;" />
                                 </div>
                                 <button onclick="addCustomToken()" style="width:100%; margin-top:5px;" id="text_btn_save_token">💾 Save and Index Token</button>
                             </div>
@@ -390,9 +277,7 @@ td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; 
                             </div>
                         </div>
                         <div id="listTokenContent" class="toggle-content collapsed">
-                            <div id="customTokenListSlot">
-                                <!-- 代币配置卡片 -->
-                            </div>
+                            <div id="customTokenListSlot"></div>
                         </div>
                     </div>
                 </div>
@@ -417,7 +302,7 @@ const LANG_DICTIONARY = {
         card_wallet_list: "Wallet Breakdown List", btn_fetch: "🔄 Fetch Live Balances", btn_fetching: "⏳ Syncing...",
         th_idx: "Index", th_net: "Network", th_rem: "Remark", th_addr: "Monitored Wallet Address", th_act: "Action",
         card_add_token: "🔧 Custom Tokens Setup", label_symbol: "Token Symbol", label_chain: "Target Blockchain",
-        label_contract: "Smart Contract/Mint Address (Native: fill 11111111111111111111111111111111)",
+        label_contract: "Smart Contract/Mint Address (Native: fill 0x0000000000000000000000000000000000000000 or 11111111111111111111111111111111)",
         label_decimals: "Token Decimals", btn_save_token: "💾 Save and Index Token",
         card_token_list: "📋 Indexed Token Assets", copyright: "Copyright & Intellectual property belongs to Vine Protocol Yunnan Business School",
         sys_visits: "📊 Total system usage:", sys_times: "times", dropdown_prefix: "🔍 View Asset: ",
@@ -434,7 +319,7 @@ const LANG_DICTIONARY = {
         card_wallet_list: "钱包明细清单", btn_fetch: "🔄 一键拉取实时链上余额", btn_fetching: "⏳ 同步中...",
         th_idx: "序号", th_net: "网络", th_rem: "钱包备注", th_addr: "监控钱包地址", th_act: "操作",
         card_add_token: "🔧 自定义备查代币添加", label_symbol: "代币简称 (Symbol)", label_chain: "所属公链 (Chain)",
-        label_contract: "代币智能合约/Mint地址 (原生币填: 11111111111111111111111111111111)",
+        label_contract: "代币智能合约/Mint地址 (原生币填: 0x0000000000000000000000000000000000000000 或 11111111111111111111111111111111)",
         label_decimals: "代币精度位 (Decimals)", btn_save_token: "💾 录入并备查此代币",
         card_token_list: "📋 现已备查的代币资产", copyright: "版权和解释权属于藤蔓协议云南商学院",
         sys_visits: "📊 系统累计使用人数：", sys_times: "人次", dropdown_prefix: "🔍 观察查看 ",
@@ -451,7 +336,7 @@ const LANG_DICTIONARY = {
         card_wallet_list: "錢包明細清單", btn_fetch: "🔄 一鍵拉取實時鏈上餘額", btn_fetching: "⏳ 同步中...",
         th_idx: "序號", th_net: "網絡", th_rem: "錢包備註", th_addr: "監控錢包地址", th_act: "操作",
         card_add_token: "🔧 自定義備查代幣添加", label_symbol: "代幣簡稱 (Symbol)", label_chain: "所屬公鏈 (Chain)",
-        label_contract: "代幣智能合約/Mint地址 (原生幣填: 11111111111111111111111111111111)",
+        label_contract: "代幣智能合約/Mint地址 (原生幣填: 0x0000000000000000000000000000000000000000 或 11111111111111111111111111111111)",
         label_decimals: "代幣精度位 (Decimals)", btn_save_token: "💾 錄入並備查此代幣",
         card_token_list: "📋 現已備查的代幣資產", copyright: "版權和解釋權屬於藤蔓協議雲南商學院",
         sys_visits: "📊 系統累計使用人數：", sys_times: "人次", dropdown_prefix: "🔍 觀察查看 ",
@@ -468,7 +353,7 @@ const LANG_DICTIONARY = {
         card_wallet_list: "ウォレット残高一覧", btn_fetch: "🔄 リアルタイム残高を取得", btn_fetching: "⏳ 同期中...",
         th_idx: "番号", th_net: "ネット", th_rem: "備考", th_addr: "監視ウォレットアドレス", th_act: "操作",
         card_add_token: "🔧 カスタムトークン設定", label_symbol: "トークン記号 (Symbol)", label_chain: "対象ブロックチェーン",
-        label_contract: "コントラクト/Mintアドレス (ネイティブ通貨は 32個の1 を入力)",
+        label_contract: "コントラクト/Mintアドレス (ネイティブ通貨は オール0 または オール1 を入力)",
         label_decimals: "デシマルズ", btn_save_token: "💾 トークン情報を登録",
         card_token_list: "📋 登録済みトークン資産", copyright: "著作權および解釈權はVine Protocol雲南ビジネススクールに帰属します",
         sys_visits: "📊 累計システム利用回数：", sys_times: "回", dropdown_prefix: "🔍 資産を表示：",
@@ -485,7 +370,7 @@ const LANG_DICTIONARY = {
         card_wallet_list: "지갑 내역 목록", btn_fetch: "🔄 실시간 온체인 잔액 동기화", btn_fetching: "⏳ 동기화 중...",
         th_idx: "순번", th_net: "네트워크", th_rem: "지갑 메모", th_addr: "감시 지갑 주소", th_act: "작업",
         card_add_token: "🔧 사용자 정의 토큰 추가", label_symbol: "토큰 심볼 (Symbol)", label_chain: "블록체인 네트워크",
-        label_contract: "스마트 계약/Mint 주소 (네이티브는 32개의 1 입력)",
+        label_contract: "스마트 계약/Mint 주소 (네이티브는 0 또는 1로 채움)",
         label_decimals: "토큰 자릿수", btn_save_token: "💾 토큰 데이터 저장 및 감시",
         card_token_list: "📋 저장된 자산 토큰 목록", copyright: "판권 및 해석권은 Vine Protocol 운남 비즈니스 스쿨에 귀속됩니다",
         sys_visits: "📊 시스템 누적 이용자 수:", sys_times: "회", dropdown_prefix: "🔍 자산 보기: ",
@@ -502,7 +387,7 @@ const LANG_DICTIONARY = {
         card_wallet_list: "Lista Detallada de Billeteras", btn_fetch: "🔄 Obtener Saldos en Vivo", btn_fetching: "⏳ Sincronizando...",
         th_idx: "Índice", th_net: "Red", th_rem: "Nota", th_addr: "Dirección de Billetera Monitoreada", th_act: "Acción",
         card_add_token: "🔧 Configuración de Tokens Personalizados", label_symbol: "Símbolo del Token", label_chain: "Cadena de Bloques",
-        label_contract: "Contrato Inteligente/Dirección Mint (Nativo: llene con 32 unos)",
+        label_contract: "Contrato Inteligente/Dirección Mint (Nativo: llene con ceros o unos)",
         label_decimals: "Decimales del Token", btn_save_token: "💾 Guardar e Indexar Token",
         card_token_list: "📋 Activos de Tokens Indexados", copyright: "Los derechos de autor pertenecen a Vine Protocol Yunnan Business School",
         sys_visits: "📊 Uso total del sistema:", sys_times: "veces", dropdown_prefix: "🔍 Ver activo: ",
@@ -513,33 +398,19 @@ const LANG_DICTIONARY = {
     }
 };
 
-// ==================== 数据与网络机制 ====================
-function detectBestLanguage() {
-    const cachedLang = localStorage.getItem("app_lang");
-    if (cachedLang && LANG_DICTIONARY[cachedLang]) return cachedLang;
-    const systemLanguages = navigator.languages || [navigator.language || navigator.userLanguage];
-    for (let i = 0; i < systemLanguages.length; i++) {
-        const shortLang = systemLanguages[i].split('-')[0].toLowerCase();
-        if (LANG_DICTIONARY[shortLang]) return shortLang;
-    }
-    return "en";
-}
-
-let currentLang = detectBestLanguage();
-
+// ==================== 数据核心模型与RPC ====================
 const RPC_ETH = "https://rpc.mevblocker.io"; 
 const RPC_BSC = "https://bsc-dataseed1.binance.org"; 
 const RPC_SOL = "https://api.mainnet-beta.solana.com"; 
 
-/* 已经包含最新更新的代币资产池初始地址 */
 const INITIAL_TOKENS = [
     { symbol: "USDT", chain: "ETH", contract: "0xdac17f958d2ee523a2206206994597c13d831ec7", decimals: 6 },
     { symbol: "USDT", chain: "BSC", contract: "0x55d398326f99059ff775485246999027b3197955", decimals: 18 },
     { symbol: "USDT", chain: "SOL", contract: "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB", decimals: 6 },
     { symbol: "NAT", chain: "ETH", contract: "0x249130f5e2dd4cf278180c0df8273f3592ad1247", decimals: 0 },
-    { symbol: "NAT", chain: "BSC", contract: "0x600e3b55d5368c32a94f9372563318adb6a3f882", decimals: 0 }, // 更新的地址
-    { symbol: "NAT", chain: "SOL", contract: "FbKRaqBzupLry3V7QujpNghwrHgxutB4MY11M8aeyVa1", decimals: 0 }, // 更新的地址
-    { symbol: "TENDRIL", chain: "BSC", contract: "0xb1afdfd850da168f2cc9f742e11cdda5273973d2", decimals: 18 } // 更新的地址
+    { symbol: "NAT", chain: "BSC", contract: "0x600e3b55d5368c32a94f9372563318adb6a3f882", decimals: 0 }, 
+    { symbol: "NAT", chain: "SOL", contract: "FbKRaqBzupLry3V7QujpNghwrHgxutB4MY11M8aeyVa1", decimals: 0 }, 
+    { symbol: "TENDRIL", chain: "BSC", contract: "0xb1afdfd850da168f2cc9f742e11cdda5273973d2", decimals: 18 }
 ];
 
 const INITIAL_WALLETS = [
@@ -550,18 +421,127 @@ const INITIAL_WALLETS = [
 
 let tokenConfigList = JSON.parse(localStorage.getItem("cfg_tokens")) || INITIAL_TOKENS;
 let walletList = JSON.parse(localStorage.getItem("cfg_wallets")) || INITIAL_WALLETS;
+let isUpdating = false; 
+let currentLang = (() => {
+    const cached = localStorage.getItem("app_lang");
+    if (cached && LANG_DICTIONARY[cached]) return cached;
+    const sysLang = (navigator.languages || [navigator.language || "en"])[0].split('-')[0].toLowerCase();
+    return LANG_DICTIONARY[sysLang] ? sysLang : "en";
+})();
+
+// ==================== 链上核心通信器 (优化：全并发解耦) ====================
+async function callEvmRpc(rpcUrl, method, params) {
+    const response = await fetch(rpcUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ jsonrpc: "2.0", id: Math.floor(Math.random() * 10000), method, params })
+    });
+    if (!response.ok) throw new Error("RPC Node Disconnected");
+    return await response.json();
+}
+
+async function queryEvmSingleUnit(chain, walletAddr, tokenAddr, decimals) {
+    const rpcUrl = (chain === "ETH") ? RPC_ETH : RPC_BSC;
+    const isNative = /^0x0{40}$/.test(tokenAddr); // 适配0x0000...0000原生币逻辑
+
+    try {
+        if (isNative) {
+            const json = await callEvmRpc(rpcUrl, "eth_getBalance", [walletAddr, "latest"]);
+            return json.result ? (Number(BigInt(json.result)) / Math.pow(10, 18)) : 0;
+        } else {
+            const cleanAddress = walletAddr.toLowerCase().replace("0x", "");
+            const dataParam = "0x70a08231" + cleanAddress.padStart(64, "0");
+            const json = await callEvmRpc(rpcUrl, "eth_call", [{ to: tokenAddr, data: dataParam }, "latest"]);
+            return (json.result && json.result !== "0x") ? (Number(BigInt(json.result)) / Math.pow(10, decimals)) : 0;
+        }
+    } catch (e) {
+        return 0;
+    }
+}
+
+async function querySolanaSingleUnit(walletAddr, tokenMint, decimals) {
+    const isNative = tokenMint === "11111111111111111111111111111111" || !tokenMint.trim();
+    try {
+        const response = await fetch(RPC_SOL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                jsonrpc: "2.0",
+                id: Math.floor(Math.random() * 10000),
+                method: isNative ? "getBalance" : "getTokenAccountsByOwner",
+                params: isNative ? [walletAddr] : [walletAddr, { mint: tokenMint }, { encoding: "jsonParsed" }]
+            })
+        });
+        if (!response.ok) return 0;
+        const json = await response.json();
+        if (!json || !json.result) return 0;
+
+        if (isNative) {
+            return json.result.value !== undefined ? (Number(json.result.value) / 1e9) : 0;
+        } else {
+            if (json.result.value && json.result.value.length > 0) {
+                const info = json.result.value[0].account.data.parsed.info.tokenAmount;
+                if (info.uiAmountString !== undefined) return parseFloat(info.uiAmountString);
+                return info.amount ? (Number(info.amount) / Math.pow(10, parseInt(decimals) || 0)) : 0;
+            }
+        }
+        return 0;
+    } catch (e) {
+        return 0;
+    }
+}
+
+async function updateAllBalances() {
+    if (isUpdating) return;
+    isUpdating = true;
+    
+    const btn = document.getElementById("refreshBtn");
+    const trans = LANG_DICTIONARY[currentLang];
+    if (btn) { btn.innerText = trans.btn_fetching; btn.disabled = true; }
+
+    // 开启局部闪烁等待特效
+    document.querySelectorAll(".balance-cell").forEach(el => {
+        el.innerHTML = `<span class="loading-pulse">...</span>`;
+    });
+
+    const poolTasks = [];
+    walletList.forEach((wallet) => {
+        if (!wallet.balances) wallet.balances = {};
+        const matchTokens = tokenConfigList.filter(t => t.chain === wallet.chain);
+        
+        matchTokens.forEach((token) => {
+            let task;
+            if (wallet.chain === "BSC" || wallet.chain === "ETH") {
+                task = queryEvmSingleUnit(wallet.chain, wallet.address, token.contract, token.decimals)
+                    .then(val => { wallet.balances[token.symbol] = val; });
+            } else if (wallet.chain === "SOL") {
+                task = querySolanaSingleUnit(wallet.address, token.contract, token.decimals)
+                    .then(val => { wallet.balances[token.symbol] = val; });
+            }
+            if (task) poolTasks.push(task);
+        });
+    });
+
+    await Promise.all(poolTasks);
+    localStorage.setItem("cfg_wallets", JSON.stringify(walletList));
+    isUpdating = false;
+    
+    if (btn) { btn.innerText = trans.btn_fetch; btn.disabled = false; }
+    renderUI();
+}
+
+// ==================== UI 操控与自适应防错安全组件 ====================
+function escapeHtml(str) {
+    if (!str) return "";
+    return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
 
 function toggleCard(contentId, arrowId) {
     const content = document.getElementById(contentId);
     const arrow = document.getElementById(arrowId);
     const trans = LANG_DICTIONARY[currentLang];
-    if(content.classList.contains('collapsed')) {
-        content.classList.remove('collapsed');
-        arrow.innerText = trans.collapse;
-    } else {
-        content.classList.add('collapsed');
-        arrow.innerText = trans.expand;
-    }
+    const isCollapsed = content.classList.toggle('collapsed');
+    arrow.innerText = isCollapsed ? trans.expand : trans.collapse;
 }
 
 function handleLangChange(langKey) {
@@ -574,183 +554,52 @@ function handleLangChange(langKey) {
 
 function applyLanguagePack() {
     const trans = LANG_DICTIONARY[currentLang];
-    
-    document.getElementById("text_main_title").innerText = trans.main_title;
-    document.getElementById("text_main_desc").innerText = trans.main_desc;
-    document.getElementById("text_monitoring").innerText = trans.monitoring;
-    document.getElementById("text_wallets").innerText = trans.wallets;
-    
-    document.getElementById("text_card_add_wallet").innerText = trans.card_add_wallet;
-    document.getElementById("text_btn_add_wallet").innerText = trans.btn_add_wallet;
-    document.getElementById("text_card_wallet_list").innerText = trans.card_wallet_list;
+    document.getElementById("text_main_title").textContent = trans.main_title;
+    document.getElementById("text_main_desc").textContent = trans.main_desc;
+    document.getElementById("text_monitoring").textContent = trans.monitoring;
+    document.getElementById("text_wallets").textContent = trans.wallets;
+    document.getElementById("text_card_add_wallet").textContent = trans.card_add_wallet;
+    document.getElementById("text_btn_add_wallet").textContent = trans.btn_add_wallet;
+    document.getElementById("text_card_wallet_list").textContent = trans.card_wallet_list;
     
     const refreshBtn = document.getElementById("refreshBtn");
-    if(refreshBtn && !refreshBtn.disabled) {
-        refreshBtn.innerText = trans.btn_fetch;
-    }
+    if (refreshBtn && !isUpdating) refreshBtn.textContent = trans.btn_fetch;
     
-    document.getElementById("text_th_idx").innerText = trans.th_idx;
-    document.getElementById("text_th_net").innerText = trans.th_net;
-    document.getElementById("text_th_rem").innerText = trans.th_rem;
-    document.getElementById("text_th_addr").innerText = trans.th_addr;
-    document.getElementById("text_th_act").innerText = trans.th_act;
-    
-    document.getElementById("text_card_add_token").innerText = trans.card_add_token;
-    document.getElementById("text_label_symbol").innerText = trans.label_symbol;
-    document.getElementById("text_label_chain").innerText = trans.label_chain;
-    document.getElementById("text_label_contract").innerText = trans.label_contract;
-    document.getElementById("text_label_decimals").innerText = trans.label_decimals;
-    document.getElementById("text_btn_save_token").innerText = trans.btn_save_token;
-    document.getElementById("text_card_token_list").innerText = trans.card_token_list;
-    document.getElementById("text_copyright").innerText = trans.copyright;
-    document.getElementById("text_sys_visits").innerText = trans.sys_visits;
-    document.getElementById("text_sys_times").innerText = trans.sys_times;
+    document.getElementById("text_th_idx").textContent = trans.th_idx;
+    document.getElementById("text_th_net").textContent = trans.th_net;
+    document.getElementById("text_th_rem").textContent = trans.th_rem;
+    document.getElementById("text_th_addr").textContent = trans.th_addr;
+    document.getElementById("text_th_act").textContent = trans.th_act;
+    document.getElementById("text_card_add_token").textContent = trans.card_add_token;
+    document.getElementById("text_label_symbol").textContent = trans.label_symbol;
+    document.getElementById("text_label_chain").textContent = trans.label_chain;
+    document.getElementById("text_label_contract").textContent = trans.label_contract;
+    document.getElementById("text_label_decimals").textContent = trans.label_decimals;
+    document.getElementById("text_btn_save_token").textContent = trans.btn_save_token;
+    document.getElementById("text_card_token_list").textContent = trans.card_token_list;
+    document.getElementById("text_copyright").textContent = trans.copyright;
+    document.getElementById("text_sys_visits").textContent = trans.sys_visits;
+    document.getElementById("text_sys_times").textContent = trans.sys_times;
 
-    document.getElementById("arrowWallet").innerText = document.getElementById("addWalletContent").classList.contains('collapsed') ? trans.expand : trans.collapse;
-    document.getElementById("arrow1").innerText = document.getElementById("addTokenContent").classList.contains('collapsed') ? trans.expand : trans.collapse;
-    document.getElementById("arrow2").innerText = document.getElementById("listTokenContent").classList.contains('collapsed') ? trans.expand : trans.collapse;
-}
-
-async function queryEvmBalance(chain, walletAddr, tokenAddr, decimals) {
-    try {
-        const rpcUrl = (chain === "ETH") ? RPC_ETH : RPC_BSC;
-        const cleanAddress = walletAddr.toLowerCase().replace("0x", "");
-        const dataParam = "0x70a08231" + cleanAddress.padStart(64, "0");
-
-        const response = await fetch(rpcUrl, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                jsonrpc: "2.0",
-                method: "eth_call",
-                params: [{ to: tokenAddr, data: dataParam }, "latest"],
-                id: Math.floor(Math.random() * 1000)
-            })
-        });
-        const json = await response.json();
-        if (json.result && json.result !== "0x") {
-            const rawBalance = BigInt(json.result);
-            return Number(rawBalance) / Math.pow(10, decimals);
-        }
-        return 0;
-    } catch (e) {
-        return 0;
-    }
-}
-
-async function querySolanaBalance(walletAddr, tokenMint, decimals) {
-    try {
-        if (tokenMint === "11111111111111111111111111111111" || tokenMint.trim() === "") {
-            const response = await fetch(RPC_SOL, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    jsonrpc: "2.0",
-                    id: Math.floor(Math.random() * 1000),
-                    method: "getBalance", 
-                    params: [walletAddr]
-                })
-            });
-            if (!response.ok) return 0;
-            const json = await response.json();
-            if (json && json.result && json.result.value !== undefined) {
-                return Number(json.result.value) / Math.pow(10, 9);
-            }
-            return 0;
-        }
-
-        const response = await fetch(RPC_SOL, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                jsonrpc: "2.0",
-                id: Math.floor(Math.random() * 1000), 
-                method: "getTokenAccountsByOwner",
-                params: [
-                    walletAddr,
-                    { mint: tokenMint },
-                    { encoding: "jsonParsed" }
-                ]
-            })
-        });
-        
-        if (!response.ok) return 0;
-        const json = await response.json();
-        
-        if (json && json.result && json.result.value && json.result.value.length > 0) {
-            const accountInfo = json.result.value[0].account.data.parsed.info.tokenAmount;
-            if (accountInfo) {
-                if (accountInfo.uiAmountString !== undefined && accountInfo.uiAmountString !== null) {
-                    return parseFloat(accountInfo.uiAmountString);
-                }
-                if (accountInfo.uiAmount !== undefined && accountInfo.uiAmount !== null) {
-                    return parseFloat(accountInfo.uiAmount);
-                }
-                if (accountInfo.amount) {
-                    return Number(accountInfo.amount) / Math.pow(10, parseInt(decimals) || 0);
-                }
-            }
-        }
-        return 0;
-    } catch (e) {
-        return 0; 
-    }
-}
-
-async function updateAllBalances() {
-    const btn = document.getElementById("refreshBtn");
-    const trans = LANG_DICTIONARY[currentLang];
-    if(btn) {
-        btn.innerText = trans.btn_fetching;
-        btn.disabled = true;
-    }
-
-    const tasks = walletList.map(async (wallet) => {
-        if (!wallet.balances) wallet.balances = {};
-        const matchTokens = tokenConfigList.filter(t => t.chain === wallet.chain);
-        
-        for (let token of matchTokens) {
-            let balance = 0;
-            if (wallet.chain === "BSC" || wallet.chain === "ETH") {
-                balance = await queryEvmBalance(wallet.chain, wallet.address, token.contract, token.decimals);
-            } else if (wallet.chain === "SOL") {
-                balance = await querySolanaBalance(wallet.address, token.contract, token.decimals);
-            }
-            wallet.balances[token.symbol] = balance;
-        }
-    });
-
-    await Promise.all(tasks);
-    localStorage.setItem("cfg_wallets", JSON.stringify(walletList));
-    renderUI();
-
-    if(btn) {
-        btn.innerText = trans.btn_fetch;
-        btn.disabled = false;
-    }
+    document.getElementById("arrowWallet").textContent = document.getElementById("addWalletContent").classList.contains('collapsed') ? trans.expand : trans.collapse;
+    document.getElementById("arrow1").textContent = document.getElementById("addTokenContent").classList.contains('collapsed') ? trans.expand : trans.collapse;
+    document.getElementById("arrow2").textContent = document.getElementById("listTokenContent").classList.contains('collapsed') ? trans.expand : trans.collapse;
 }
 
 function addCustomToken() {
     const trans = LANG_DICTIONARY[currentLang];
     const symbol = document.getElementById("newTokenSymbol").value.trim().toUpperCase();
     const chain = document.getElementById("newTokenChain").value;
-    const contract = document.getElementById("newTokenContract").value.trim();
+    let contract = document.getElementById("newTokenContract").value.trim();
     const decimals = parseInt(document.getElementById("newTokenDecimals").value);
 
-    if (!symbol || !contract) {
-        alert(trans.alert_empty_token);
-        return;
-    }
-    if (isNaN(decimals) || decimals < 0) {
-        alert(trans.alert_invalid_dec);
-        return;
-    }
+    if (!symbol || !contract) { alert(trans.alert_empty_token); return; }
+    if (isNaN(decimals) || decimals < 0) { alert(trans.alert_invalid_dec); return; }
+
+    if (chain !== "SOL" && !contract.startsWith("0x")) contract = "0x" + contract;
 
     const exist = tokenConfigList.some(t => t.symbol === symbol && t.chain === chain && t.contract.toLowerCase() === contract.toLowerCase());
-    if(exist) {
-        alert(trans.alert_exist_token);
-        return;
-    }
+    if (exist) { alert(trans.alert_exist_token); return; }
 
     tokenConfigList.push({ symbol, chain, contract, decimals });
     localStorage.setItem("cfg_tokens", JSON.stringify(tokenConfigList));
@@ -761,30 +610,12 @@ function addCustomToken() {
 }
 
 function deleteCustomToken(idx) {
-    const trans = LANG_DICTIONARY[currentLang];
-    if(confirm(trans.alert_del_token)) {
+    if (confirm(LANG_DICTIONARY[currentLang].alert_del_token)) {
         tokenConfigList.splice(idx, 1);
         localStorage.setItem("cfg_tokens", JSON.stringify(tokenConfigList));
         rebuildTokenDropdown();
         renderUI();
     }
-}
-
-function formatShortVolume(val) {
-    if (val < 10000) return ""; 
-    const units = [
-        { value: 1e12, symbol: "T" }, 
-        { value: 1e9,  symbol: "B" }, 
-        { value: 1e6,  symbol: "M" }, 
-        { value: 1e3,  symbol: "K" }  
-    ];
-    for (let i = 0; i < units.length; i++) {
-        if (val >= units[i].value) {
-            const shortNum = (val / units[i].value).toFixed(2);
-            return ` (${shortNum}${units[i].symbol})`;
-        }
-    }
-    return "";
 }
 
 function addWallet() {
@@ -793,16 +624,9 @@ function addWallet() {
     const remark = document.getElementById("walletRemark").value.trim() || "Wallet";
     const chain = document.getElementById("walletChain").value;
 
-    if (!address) {
-        alert(trans.alert_empty_wallet);
-        return;
-    }
-
+    if (!address) { alert(trans.alert_empty_wallet); return; }
     const exist = walletList.some(w => w.address.toLowerCase() === address.toLowerCase() && w.chain === chain);
-    if(exist) {
-        alert(trans.alert_exist_wallet);
-        return;
-    }
+    if (exist) { alert(trans.alert_exist_wallet); return; }
 
     walletList.push({ chain, remark, address, balances: {} });
     localStorage.setItem("cfg_wallets", JSON.stringify(walletList));
@@ -813,12 +637,20 @@ function addWallet() {
 }
 
 function deleteWallet(idx) {
-    const trans = LANG_DICTIONARY[currentLang];
-    if(confirm(trans.alert_del_wallet)) {
+    if (confirm(LANG_DICTIONARY[currentLang].alert_del_wallet)) {
         walletList.splice(idx, 1);
         localStorage.setItem("cfg_wallets", JSON.stringify(walletList));
         renderUI();
     }
+}
+
+function formatShortVolume(val) {
+    if (val < 10000) return ""; 
+    const units = [{v:1e12,s:"T"},{v:1e9,s:"B"},{v:1e6,s:"M"},{v:1e3,s:"K"}];
+    for (let i = 0; i < units.length; i++) {
+        if (val >= units[i].v) return ` (${(val / units[i].v).toFixed(2)}${units[i].s})`;
+    }
+    return "";
 }
 
 function rebuildTokenDropdown() {
@@ -826,83 +658,86 @@ function rebuildTokenDropdown() {
     const trans = LANG_DICTIONARY[currentLang];
     const uniqueSymbols = [...new Set(tokenConfigList.map(t => t.symbol))];
     const previousSelection = select.value;
-    select.innerHTML = "";
     
+    select.innerHTML = "";
     uniqueSymbols.forEach(sym => {
-        select.innerHTML += `<option value="${sym}">${trans.dropdown_prefix}${sym}</option>`;
+        const op = document.createElement("option");
+        op.value = sym;
+        op.textContent = `${trans.dropdown_prefix}${sym}`;
+        select.appendChild(op);
     });
-
-    if(uniqueSymbols.includes(previousSelection)) {
-        select.value = previousSelection;
-    } else if(uniqueSymbols.includes("USDT")) {
-        select.value = "USDT";
-    }
+    if (uniqueSymbols.includes(previousSelection)) select.value = previousSelection;
+    else if (uniqueSymbols.includes("USDT")) select.value = "USDT";
 }
 
 function renderUI() {
     const selectEl = document.getElementById("selectDisplayToken");
     const currentToken = selectEl.value || "USDT";
     const trans = LANG_DICTIONARY[currentLang];
-    document.getElementById("dynamicTableHeader").innerText = `${currentToken} ${currentLang === 'zh' || currentLang === 'tw' ? '餘額' : (currentLang === 'ja' ? '残高' : (currentLang === 'ko' ? '잔액' : 'Balance'))}`;
+    
+    // 更新表格头部资产简称
+    const labelMapping = { zh: '餘額', tw: '餘額', ja: '残高', ko: '잔액' };
+    document.getElementById("dynamicTableHeader").textContent = `${currentToken} ${labelMapping[currentLang] || 'Balance'}`;
 
+    // 1. 渲染已注册资产池标签卡
     const tokenSlot = document.getElementById("customTokenListSlot");
     tokenSlot.innerHTML = "";
     tokenConfigList.forEach((t, i) => {
-        tokenSlot.innerHTML += `
-            <div class="token-item">
-                <div class="token-item-info">
-                    <h4>${t.symbol} <span class="chain-badge badge-${t.chain}">${t.chain}</span></h4>
-                    <p>${currentLang === 'zh' || currentLang === 'tw' ? '合約' : (currentLang === 'ja' ? '契約' : (currentLang === 'ko' ? '계약' : 'Contract'))}:${t.contract.substring(0,6)}...${t.contract.substring(t.contract.length-6)} (${currentLang === 'zh' || currentLang === 'tw' ? '精度' : 'Dec'}:${t.decimals})</p>
-                </div>
-                <button class="btn-danger" onclick="deleteCustomToken(${i})">${trans.badge_del}</button>
+        const row = document.createElement("div");
+        row.className = "token-item";
+        row.innerHTML = `
+            <div class="token-item-info">
+                <h4>${escapeHtml(t.symbol)} <span class="chain-badge badge-${t.chain}">${t.chain}</span></h4>
+                <p>${currentLang==='zh'||currentLang==='tw'?'合约':'Contract'}:${t.contract.substring(0,6)}...${t.contract.substring(t.contract.length-6)} (Dec:${t.decimals})</p>
             </div>
+            <button class="btn-danger" onclick="deleteCustomToken(${i})">${trans.badge_del}</button>
         `;
+        tokenSlot.appendChild(row);
     });
 
+    // 2. 渲染主表格观察队列
     const tbody = document.getElementById("walletTableBody");
     tbody.innerHTML = "";
     let totalAccumulator = 0;
 
     walletList.forEach((w, idx) => {
-        let bal = parseFloat((w.balances && w.balances[currentToken]) || 0);
+        const bal = parseFloat((w.balances && w.balances[currentToken]) || 0);
         totalAccumulator += bal;
 
         const activeTokenObj = tokenConfigList.find(t => t.symbol === currentToken && t.chain === w.chain);
         const maxFraction = (activeTokenObj && activeTokenObj.decimals === 0) ? 0 : 4;
 
-        tbody.innerHTML += `
-            <tr>
-                <td class="index-cell">${idx + 1}</td>
-                <td><span class="chain-badge badge-${w.chain}">${w.chain}</span></td>
-                <td class="remark-cell">${w.remark}</td>
-                <td class="address-cell">${w.address}</td>
-                <td class="balance-cell">${bal.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: maxFraction})}</td>
-                <td style="text-align: center;"><button class="btn-danger" onclick="deleteWallet(${idx})">${trans.badge_del}</button></td>
-            </tr>
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+            <td class="index-cell">${idx + 1}</td>
+            <td><span class="chain-badge badge-${w.chain}">${w.chain}</span></td>
+            <td class="remark-cell">${escapeHtml(w.remark)}</td>
+            <td class="address-cell">${escapeHtml(w.address)}</td>
+            <td class="balance-cell">${isUpdating ? '<span class="loading-pulse">...</span>' : bal.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: maxFraction})}</td>
+            <td style="text-align: center;"><button class="btn-danger" onclick="deleteWallet(${idx})">${trans.badge_del}</button></td>
         `;
+        tbody.appendChild(tr);
     });
 
+    // 3. 看板总金额计算逻辑与高阶精度截断
     const activeGlobalTokens = tokenConfigList.filter(t => t.symbol === currentToken);
     const isGlobalZeroDecimal = activeGlobalTokens.length > 0 && activeGlobalTokens.every(t => t.decimals === 0);
     const globalMaxFraction = isGlobalZeroDecimal ? 0 : 4;
 
-    document.getElementById("summary_total_display").innerText = totalAccumulator.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: globalMaxFraction});
-    document.getElementById("summary_short_display").innerText = formatShortVolume(totalAccumulator);
-    document.getElementById("summary_wallet_count").innerText = walletList.length;
+    document.getElementById("summary_total_display").textContent = totalAccumulator.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: globalMaxFraction});
+    document.getElementById("summary_short_display").textContent = formatShortVolume(totalAccumulator);
+    document.getElementById("summary_wallet_count").textContent = walletList.length;
 }
 
 function initUserCounter() {
     let count = parseInt(localStorage.getItem("sys_user_count"));
-    if (!count || isNaN(count)) {
-        count = Math.floor(Math.random() * 400) + 1200; 
-    } else {
-        count += Math.floor(Math.random() * 3) + 1; 
-    }
+    if (!count || isNaN(count)) count = Math.floor(Math.random() * 400) + 1200; 
+    else count += Math.floor(Math.random() * 3) + 1; 
     localStorage.setItem("sys_user_count", count);
-    document.getElementById("user_counter_slot").innerText = count.toLocaleString('en-US');
+    document.getElementById("user_counter_slot").textContent = count.toLocaleString('en-US');
 }
 
-// ==================== 挂载启动 ====================
+// ==================== 挂载初始化启动 ====================
 document.getElementById("langSwitcher").value = currentLang; 
 applyLanguagePack();
 rebuildTokenDropdown();
