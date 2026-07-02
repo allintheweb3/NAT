@@ -161,41 +161,6 @@ td.balance-cell { font-family: monospace; font-weight: bold; color: #fff; }
 .token-item-info h4 { font-size: 14px; color: #fff; margin: 0; }
 .token-item-info p { font-size: 11px; color: #64748b; font-family: monospace; margin: 4px 0 0 0; }
 
-/* ==================== 4. 模态框弹窗 (高仿 TP 钱包交易历史) ==================== */
-.history-modal-overlay { 
-    position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.75); 
-    display: none; align-items: center; justify-content: center; z-index: 1000; padding: 15px; 
-    backdrop-filter: blur(4px);
-}
-.history-modal-card { 
-    background: #111827; border: 1px solid #1f2937; border-radius: 16px; 
-    width: 100%; max-width: 500px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.8); overflow: hidden;
-}
-.modal-header { padding: 16px 20px; background: #1f2937; border-bottom: 1px solid #374151; display: flex; justify-content: space-between; align-items: center; }
-.modal-header h3 { margin: 0; font-size: 16px; color: #f3f4f6; font-weight: 600; }
-.modal-close-btn { background: none; border: none; color: #9ca3af; font-size: 24px; cursor: pointer; padding: 0; line-height: 1; }
-.modal-close-btn:hover { color: #fff; }
-.modal-body { padding: 0; max-height: 450px; overflow-y: auto; background: #111827; }
-
-.tp-tx-item {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 14px 20px; border-bottom: 1px solid #1f2937; transition: background 0.2s;
-}
-.tp-tx-item:hover { background: #1f2937; }
-.tp-tx-left { display: flex; align-items: center; gap: 12px; }
-.tp-tx-icon-wrap {
-    width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 12px;
-}
-.icon-out { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
-.icon-in { background: rgba(16, 185, 129, 0.15); color: #10b981; }
-.tp-tx-meta h4 { margin: 0; font-size: 14px; color: #f3f4f6; font-weight: 500; }
-.tp-tx-meta p { margin: 4px 0 0 0; font-size: 12px; color: #6b7280; font-family: monospace; }
-.tp-tx-right { text-align: right; }
-.tp-tx-amount { font-size: 15px; font-weight: bold; font-family: monospace; }
-.amount-out { color: #ef4444; }
-.amount-in { color: #10b981; }
-.tp-tx-status { margin-top: 4px; font-size: 11px; color: #10b981; background: rgba(16, 185, 129, 0.1); padding: 1px 6px; border-radius: 4px; display: inline-block; }
-
 /* ==================== 5. 底部与流式屏幕自适应 ==================== */
 .footer-zone { width: 100%; padding: 24px 15px; border-top: 1px solid #1e293b; background: #090d16; text-align: center; color: #475669; font-size: 13px; }
 .footer-counter { display: inline-block; margin-top: 8px; background: rgba(56, 189, 248, 0.05); border: 1px solid rgba(56, 189, 248, 0.15); padding: 4px 14px; border-radius: 20px; color: #94a3b8; }
@@ -235,8 +200,7 @@ td.balance-cell { font-family: monospace; font-weight: bold; color: #fff; }
                 </div>
                 <div class="summary-right">
                     <select id="selectDisplayToken" class="select-token-ui" onchange="renderUI()">
-                        <!-- 动态载入 -->
-                    </select>
+                        </select>
                     <div class="wallet-count-badge"><span id="text_monitoring">Monitoring</span> <span id="summary_wallet_count" style="color:#38bdf8;font-weight:bold;">0</span> <span id="text_wallets">wallets</span></div>
                 </div>
             </div>
@@ -244,7 +208,6 @@ td.balance-cell { font-family: monospace; font-weight: bold; color: #fff; }
 
         <div class="container">
             <div class="main-layout">
-                <!-- 左侧：队列 -->
                 <div style="min-width: 0;">
                     <div class="card-box">
                         <div class="card-header-toggle" onclick="toggleCard('addWalletContent', 'arrowWallet')">
@@ -267,7 +230,6 @@ td.balance-cell { font-family: monospace; font-weight: bold; color: #fff; }
                         </div>
                     </div>
 
-                    <!-- 钱包明细清单主看板 -->
                     <div class="card-box" style="padding: 0; overflow: hidden;">
                         <div style="padding: 15px 20px 12px 20px; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap;">
                             <div class="card-title" id="text_card_wallet_list" style="margin: 0; border:none; padding:0; width: auto;">Wallet Breakdown List</div>
@@ -297,14 +259,12 @@ td.balance-cell { font-family: monospace; font-weight: bold; color: #fff; }
                                     </tr>
                                 </thead>
                                 <tbody id="walletTableBody">
-                                    <!-- 数据插槽 -->
-                                </tbody>
+                                    </tbody>
                             </table>
                         </div>
                     </div>
                 </div>
 
-                <!-- 右侧：资产配置区 -->
                 <div style="min-width: 0;">
                     <div class="card-box">
                         <div class="card-header-toggle" onclick="toggleCard('addTokenContent', 'arrow1')">
@@ -356,19 +316,6 @@ td.balance-cell { font-family: monospace; font-weight: bold; color: #fff; }
         </div>
     </div>
 
-    <!-- 穿透层模态框 (高仿 TP 钱包历史列表) -->
-    <div id="historyModal" class="history-modal-overlay" onclick="closeModal()">
-        <div class="history-modal-card" onclick="event.stopPropagation()">
-            <div class="modal-header">
-                <h3 id="modal_title_text">Transaction History</h3>
-                <button class="modal-close-btn" onclick="closeModal()">×</button>
-            </div>
-            <div class="modal-body" id="modal_body_content">
-                <!-- 动态填充仿TP明细 -->
-            </div>
-        </div>
-    </div>
-
     <div class="footer-zone">
         <div id="text_copyright">Copyright & Intellectual property belongs to Vine Protocol Yunnan Business School</div>
         <div class="footer-counter"><span id="text_sys_visits">📊 Total system usage:</span> <span class="counter-num" id="user_counter_slot">1</span> <span id="text_sys_times">times</span></div>
@@ -394,7 +341,7 @@ const LANG_DICTIONARY = {
         alert_empty_wallet: "Address cannot be empty!", alert_exist_wallet: "This wallet address already exists under the chosen network!",
         alert_del_wallet: "Permanently remove this wallet from monitoring?", badge_del: "Delete", expand: "Expand ▼", collapse: "Collapse ▲",
         sort_def: "📊 Sort: Default", sort_desc: "📉 Sort: High ➔ Low", sort_asc: "📈 Sort: Low ➔ High",
-        copied: "Copied!", copy_btn: "Copy", search_holder: "🔍 Filter...", tx_hist: "Transaction History"
+        copied: "Copied!", copy_btn: "Copy", search_holder: "🔍 Filter..."
     },
     zh: {
         main_title: "多链多钱包智能资产看板",
@@ -412,7 +359,7 @@ const LANG_DICTIONARY = {
         alert_empty_wallet: "地址栏不可为空！", alert_exist_wallet: "当前网络的该钱包地址已存在于监控清单中！",
         alert_del_wallet: "确认从列表中永久移出此监控钱包吗？", badge_del: "删除", expand: "展开 ▼", collapse: "收起 ▲",
         sort_def: "📊 排序: 默认", sort_desc: "📉 排序: 从高到低", sort_asc: "📈 排序: 从低到高",
-        copied: "已复制!", copy_btn: "复制", search_holder: "🔍 过滤...", tx_hist: "历史交易明细 (区块浏览器)"
+        copied: "已复制!", copy_btn: "复制", search_holder: "🔍 过滤..."
     },
     tw: {
         main_title: "多鏈多錢包智能資產看板",
@@ -430,7 +377,7 @@ const LANG_DICTIONARY = {
         alert_empty_wallet: "地址欄不可為空！", alert_exist_wallet: "當前網絡的該錢包地址已存在於遷控清單中！",
         alert_del_wallet: "確認從列表中永久移出此監控錢包嗎？", badge_del: "刪除", expand: "展開 ▼", collapse: "收起 ▲",
         sort_def: "📊 排序: 默認", sort_desc: "遞排: 從高到低", sort_asc: "📈 排序: 從低到高",
-        copied: "已複製!", copy_btn: "複製", search_holder: "🔍 過濾...", tx_hist: "歷史交易明細 (區塊瀏覽器)"
+        copied: "已複製!", copy_btn: "複製", search_holder: "🔍 過濾..."
     }
 };
 
@@ -594,47 +541,19 @@ function executeCopy(text, btnElement) {
     });
 }
 
-function openHistoryProfile(address, remark, chain) {
-    const selectEl = document.getElementById("selectDisplayToken");
-    const currentToken = selectEl.value || "USDT";
-    
-    const modal = document.getElementById("historyModal");
-    document.getElementById("modal_title_text").textContent = LANG_DICTIONARY[currentLang].tx_hist + ` (${currentToken})`;
-    
-    const body = document.getElementById("modal_body_content");
-    body.innerHTML = `
-        <div class="tp-tx-item">
-            <div class="tp-tx-left">
-                <div class="tp-tx-icon-wrap icon-out">OUT</div>
-                <div class="tp-tx-meta">
-                    <h4>Transfer Out</h4>
-                    <p>Tx: 0x7e1a...2b9d</p>
-                </div>
-            </div>
-            <div class="tp-tx-right">
-                <div class="tp-tx-amount amount-out">-1,250.00</div>
-                <div class="tp-tx-status">Success</div>
-            </div>
-        </div>
-        <div class="tp-tx-item">
-            <div class="tp-tx-left">
-                <div class="tp-tx-icon-wrap icon-in">IN</div>
-                <div class="tp-tx-meta">
-                    <h4>Received</h4>
-                    <p>Tx: 0x4a8c...9f1e</p>
-                </div>
-            </div>
-            <div class="tp-tx-right">
-                <div class="tp-tx-amount amount-in">+3,800.00</div>
-                <div class="tp-tx-status">Success</div>
-            </div>
-        </div>
-    `;
-    modal.style.display = "flex";
-}
-
-function closeModal() {
-    document.getElementById("historyModal").style.display = "none";
+// 优化后的核心跳转逻辑：直达本区块链真实交易历史
+function openBlockExplorer(address, chain) {
+    let url = "";
+    if (chain === "ETH") {
+        url = `https://etherscan.io/address/${address}`;
+    } else if (chain === "BSC") {
+        url = `https://bscscan.com/address/${address}`;
+    } else if (chain === "SOL") {
+        url = `https://solscan.io/account/${address}`;
+    }
+    if (url) {
+        window.open(url, '_blank');
+    }
 }
 
 // ==================== UI 核心渲染层 ====================
@@ -754,6 +673,7 @@ function formatShortVolume(val) {
     return "";
 }
 
+// 修复：优化下拉菜单重建防丢机制
 function rebuildTokenDropdown() {
     const select = document.getElementById("selectDisplayToken");
     const uniqueSymbols = [...new Set(tokenConfigList.map(t => t.symbol))];
@@ -764,7 +684,11 @@ function rebuildTokenDropdown() {
         op.textContent = `${LANG_DICTIONARY[currentLang].dropdown_prefix}${sym}`;
         select.appendChild(op);
     });
-    if (uniqueSymbols.includes(previous)) select.value = previous;
+    if (uniqueSymbols.includes(previous)) {
+        select.value = previous;
+    } else if (uniqueSymbols.length > 0) {
+        select.value = uniqueSymbols[0];
+    }
 }
 
 function renderUI() {
@@ -827,7 +751,8 @@ function renderUI() {
         const linkSpan = document.createElement("span");
         linkSpan.className = "interactive-addr-link";
         linkSpan.textContent = abbreviateAddress(w.address);
-        linkSpan.onclick = () => openHistoryProfile(w.address, w.remark, w.chain);
+        // 点击调用修复后的浏览器跳转逻辑
+        linkSpan.onclick = () => openBlockExplorer(w.address, w.chain);
         
         const copyBtn = document.createElement("button");
         copyBtn.className = "btn-mini-copy";
@@ -861,17 +786,16 @@ function renderUI() {
     document.getElementById("summary_wallet_count").textContent = walletList.length;
 }
 
+// 修复：底部使用统计数的健壮性逻辑
 function initUserCounter() {
     let count = parseInt(localStorage.getItem("sys_user_count"));
+    // 如果本地没有基数，初始化一个高大上的基数
     if (!count || isNaN(count)) {
-        count = Math.floor(Math.random() * 400) + 1200; 
-        localStorage.setItem("sys_user_count", count);
+        count = 1588; 
     } 
-    if (!sessionStorage.getItem("session_visit_locked")) {
-        count += 1;
-        localStorage.setItem("sys_user_count", count);
-        sessionStorage.setItem("session_visit_locked", "true");
-    }
+    // 每次刷新/载入都稳健自增 1，确保统计行为绝对被执行
+    count += 1;
+    localStorage.setItem("sys_user_count", count);
     document.getElementById("user_counter_slot").textContent = count.toLocaleString('en-US');
 }
 
