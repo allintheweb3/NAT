@@ -68,11 +68,11 @@ button.btn-success:hover { background: #059669; }
 button.btn-danger { background: #ef4444; height: 32px; padding: 0 10px; font-size: 12px; }
 button.btn-danger:hover { background: #dc2626; }
 
-/* 表头微调：关键字过滤框完美对齐排序按钮样式 */
-.th-title-area { display: flex; flex-direction: column; width: 100%; gap: 6px; }
+/* 表头微调：关键字过滤框完美对齐排序按钮样式及缩短长度 */
+.th-title-area { display: flex; flex-direction: column; align-items: flex-start; width: 100%; gap: 6px; }
 
 .th-search-input { 
-    width: 100%; 
+    width: 105px; /* 与右侧排序按钮保持一致的默认长度 */
     height: 32px; 
     padding: 4px 8px; 
     font-size: 11px; 
@@ -99,6 +99,7 @@ button.btn-danger:hover { background: #dc2626; }
     color: #94a3b8; 
     display: inline-block; 
     padding: 0 8px; 
+    width: 105px; /* 显式指定与过滤框一致的固定长度 */
     height: 32px;
     line-height: 30px;
     border: 1px solid #475569; 
@@ -268,7 +269,7 @@ td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; 
                                         <th>
                                             <div class="th-title-area">
                                                 <span id="text_th_rem">Wallet Remark</span>
-                                                <input type="text" id="headerSearchInput" class="th-search-input" placeholder="🔍 Filter Keyword..." oninput="handleFilterUIChange()">
+                                                <input type="text" id="headerSearchInput" class="th-search-input" placeholder="🔍 Filter...">
                                             </div>
                                         </th>
                                         <th style="padding-top: 15px;" id="text_th_addr">Monitored Wallet Address</th>
@@ -375,7 +376,7 @@ const LANG_DICTIONARY = {
         alert_empty_wallet: "Address cannot be empty!", alert_exist_wallet: "This wallet address already exists under the chosen network!",
         alert_del_wallet: "Permanently remove this wallet from monitoring?", badge_del: "Delete", expand: "Expand ▼", collapse: "Collapse ▲",
         sort_def: "📊 Sort: Default", sort_desc: "📉 Sort: High ➔ Low", sort_asc: "📈 Sort: Low ➔ High",
-        copied: "Copied!", copy_btn: "Copy", search_holder: "🔍 Filter Keyword...", tx_hist: "Transaction History"
+        copied: "Copied!", copy_btn: "Copy", search_holder: "🔍 Filter...", tx_hist: "Transaction History"
     },
     zh: {
         main_title: "多链多钱包智能资产看板",
@@ -393,7 +394,7 @@ const LANG_DICTIONARY = {
         alert_empty_wallet: "地址栏不可为空！", alert_exist_wallet: "当前网络的该钱包地址已存在于监控清单中！",
         alert_del_wallet: "确认从列表中永久移出此监控钱包吗？", badge_del: "删除", expand: "展开 ▼", collapse: "收起 ▲",
         sort_def: "📊 排序: 默认", sort_desc: "📉 排序: 从高到低", sort_asc: "📈 排序: 从低到高",
-        copied: "已复制!", copy_btn: "复制", search_holder: "🔍 过滤关键字...", tx_hist: "历史交易明细 (区块浏览器)"
+        copied: "已复制!", copy_btn: "复制", search_holder: "🔍 过滤...", tx_hist: "历史交易明细 (区块浏览器)"
     },
     tw: {
         main_title: "多鏈多錢包智能資產看板",
@@ -411,7 +412,7 @@ const LANG_DICTIONARY = {
         alert_empty_wallet: "地址欄不可為空！", alert_exist_wallet: "當前網絡的該錢包地址已存在於遷控清單中！",
         alert_del_wallet: "確認從列表中永久移出此監控錢包嗎？", badge_del: "刪除", expand: "展開 ▼", collapse: "收起 ▲",
         sort_def: "📊 排序: 默認", sort_desc: "遞排: 從高到低", sort_asc: "📈 排序: 從低到高",
-        copied: "已複製!", copy_btn: "複製", search_holder: "🔍 過濾關鍵字...", tx_hist: "歷史交易明細 (區塊瀏覽器)"
+        copied: "已複製!", copy_btn: "複製", search_holder: "🔍 過濾...", tx_hist: "歷史交易明細 (區塊瀏覽器)"
     }
 };
 
@@ -443,6 +444,11 @@ let walletList = JSON.parse(localStorage.getItem("cfg_wallets")) || INITIAL_WALL
 let balanceSortState = "DEFAULT"; 
 let isUpdating = false;
 let currentLang = localStorage.getItem("app_lang") || "zh";
+
+// 绑定搜索输入事件监听
+document.addEventListener("DOMContentLoaded", () => {
+    document.getElementById("headerSearchInput").addEventListener("input", handleFilterUIChange);
+});
 
 // ==================== 链上智能通信器 ====================
 async function callEvmRpc(rpcUrl, method, params) {
@@ -689,7 +695,6 @@ function addCustomToken() {
     updateAllBalances();
 }
 
-// 保持其余逻辑完整无损
 function deleteCustomToken(idx) {
     if (confirm(LANG_DICTIONARY[currentLang].alert_del_token)) {
         tokenConfigList.splice(idx, 1);
@@ -853,7 +858,6 @@ function initUserCounter() {
 }
 
 // ==================== 挂载初始化 ====================
-document.getElementById("langSwitcher").value = currentLang; 
 applyLanguagePack();
 rebuildTokenDropdown();
 renderUI();
