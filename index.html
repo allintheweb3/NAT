@@ -68,11 +68,19 @@ button.btn-success:hover { background: #059669; }
 button.btn-danger { background: #ef4444; height: 32px; padding: 0 10px; font-size: 12px; }
 button.btn-danger:hover { background: #dc2626; }
 
-/* 表头微调：关键字过滤框完美对齐排序按钮样式及缩短长度 */
-.th-title-area { display: flex; flex-direction: column; align-items: flex-start; width: 100%; gap: 6px; }
+/* 表头统一布局：垂直容器且子项居中对齐 */
+.th-title-area { 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: center;
+    width: 100%; 
+    gap: 6px; 
+}
 
+/* 过滤框与排序按钮宽高完全一致，并消除额外块级偏移 */
 .th-search-input { 
-    width: 105px; /* 与右侧排序按钮保持一致的默认长度 */
+    width: 105px; 
     height: 32px; 
     padding: 4px 8px; 
     font-size: 11px; 
@@ -83,6 +91,7 @@ button.btn-danger:hover { background: #dc2626; }
     margin-top: 4px; 
     font-weight: normal;
     outline: none;
+    text-align: center; /* 让输入的过滤文字也居中显示 */
     transition: border-color 0.15s ease, color 0.15s ease;
 }
 .th-search-input:focus { 
@@ -92,14 +101,14 @@ button.btn-danger:hover { background: #dc2626; }
 }
 .th-search-input::placeholder { color: #475569; }
 
-/* 排序按钮基础定位 */
+/* 排序按钮，完全对齐过滤输入框 */
 .sort-mini-trigger { 
     cursor: pointer; 
     font-size: 11px; 
     color: #94a3b8; 
     display: inline-block; 
     padding: 0 8px; 
-    width: 105px; /* 显式指定与过滤框一致的固定长度 */
+    width: 105px; 
     height: 32px;
     line-height: 30px;
     border: 1px solid #475569; 
@@ -200,7 +209,7 @@ td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; 
         <div class="full-viewport-header-zone">
             <select id="langSwitcher" class="lang-select-ui" onchange="handleLangChange(this.value)">
                 <option value="en">🌐 English</option>
-                <option value="zh">🌐 简体中文</option>
+                <option value="zh" selected>🌐 简体中文</option>
                 <option value="tw">🌐 繁體中文</option>
             </select>
 
@@ -273,9 +282,9 @@ td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; 
                                             </div>
                                         </th>
                                         <th style="padding-top: 15px;" id="text_th_addr">Monitored Wallet Address</th>
-                                        <th style="text-align: right;">
-                                            <span id="dynamicTableHeader">Token Balance</span>
-                                            <div>
+                                        <th>
+                                            <div class="th-title-area">
+                                                <span id="dynamicTableHeader">Token Balance</span>
                                                 <span class="sort-mini-trigger" id="btn_sort_balance" onclick="toggleBalanceSort()">📊 Sort: Default</span>
                                             </div>
                                         </th>
@@ -403,8 +412,8 @@ const LANG_DICTIONARY = {
         card_add_wallet: "➕ 監控錢包添加", btn_add_wallet: "確認添加此錢包到觀察隊列",
         card_wallet_list: "錢包明細清單", btn_fetch: "🔄 一鍵拉取實時鏈上餘額", btn_fetching: "⏳ 同步中...",
         th_idx: "序號", th_net: "網絡", th_rem: "備註名稱", th_addr: "監控錢包地址", th_act: "操作",
-        card_add_token: "🔧 自定義備查代幣添加", label_symbol: "代幣簡稱 (Symbol)", label_chain: "所屬公鏈 (Chain)",
-        label_contract: "代幣智能合約/Mint地址", label_decimals: "代幣精度位 (Decimals)", btn_save_token: "💾 錄入並備查此代幣",
+        card_add_token: "🔧 自定義備備查代幣添加", label_symbol: "代幣簡稱 (Symbol)", label_chain: "所屬公鏈 (Chain)",
+        label_contract: "代幣智慧合約/Mint地址", label_decimals: "代幣精度位 (Decimals)", btn_save_token: "💾 錄入並備查此代幣",
         card_token_list: "📋 現已備查的代幣資產", copyright: "版權和解釋權屬於藤蔓協議雲南商學院",
         sys_visits: "📊 系統累計使用人數：", sys_times: "人次", dropdown_prefix: "🔍 觀察查看 ",
         alert_empty_token: "代幣簡稱與合約/Mint地址不可為空！", alert_invalid_dec: "請輸入有效的代幣精度數值！",
