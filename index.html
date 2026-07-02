@@ -42,7 +42,6 @@ html, body {
 }
 .summary-display-box .total-short-val { display: block; font-size: clamp(13px, 3cqw, 16px); color: #34d399; margin-top: 6px; }
 
-/* 选项栏与按钮高度对齐优化 */
 .summary-right { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; width: 100%; }
 .select-token-ui { height: 42px; padding: 0 16px; font-size: 14px; font-weight: bold; color: #38bdf8; border: 2px solid #38bdf8; background: #0f172a; border-radius: 8px; cursor: pointer; width: 100%; max-width: 280px; text-align-last: center; line-height: 38px; }
 .wallet-count-badge { font-size: 12px; color: #94a3b8; background: rgba(255,255,255,0.05); padding: 4px 12px; border-radius: 20px; border: 1px solid #334155; }
@@ -62,7 +61,6 @@ html, body {
 input, select, button { padding: 10px 12px; border-radius: 8px; border: 1px solid #475569; background: #0f172a; color: #fff; font-size: 14px; outline: none; }
 input:focus, select:focus { border-color: #38bdf8; }
 
-/* 统一样式按钮高度对齐 */
 button { height: 42px; background: #2563eb; cursor: pointer; border: none; font-weight: bold; transition: background 0.2s; white-space: nowrap; display: inline-flex; align-items: center; justify-content: center; }
 button:hover { background: #3b82f6; }
 button.btn-success { background: #10b981; }
@@ -70,13 +68,48 @@ button.btn-success:hover { background: #059669; }
 button.btn-danger { background: #ef4444; height: 32px; padding: 0 10px; font-size: 12px; }
 button.btn-danger:hover { background: #dc2626; }
 
-/* 表头微调 */
+/* 表头微调：关键字过滤框完美对齐排序按钮样式 */
 .th-title-area { display: flex; flex-direction: column; width: 100%; gap: 6px; }
-.th-search-input { width: 100%; height: 32px; padding: 6px 8px; font-size: 12px; background: #0f172a; border: 1px solid #475569; border-radius: 4px; color: #fff; margin-top: 4px; font-weight: normal; }
-.th-search-input:focus { border-color: #38bdf8; box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2); }
+
+.th-search-input { 
+    width: 100%; 
+    height: 32px; 
+    padding: 4px 8px; 
+    font-size: 11px; 
+    color: #94a3b8; 
+    border: 1px solid #475569; 
+    border-radius: 4px; 
+    background: #0f172a; 
+    margin-top: 4px; 
+    font-weight: normal;
+    outline: none;
+    transition: border-color 0.15s ease, color 0.15s ease;
+}
+.th-search-input:focus { 
+    border-color: #38bdf8; 
+    color: #fff;
+    box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.15); 
+}
 .th-search-input::placeholder { color: #475569; }
 
-.sort-mini-trigger { cursor: pointer; font-size: 11px; color: #94a3b8; display: inline-block; padding: 4px 8px; border: 1px solid #475569; border-radius: 4px; background: #0f172a; font-weight: normal; margin-top: 4px; user-select: none;}
+/* 排序按钮基础定位 */
+.sort-mini-trigger { 
+    cursor: pointer; 
+    font-size: 11px; 
+    color: #94a3b8; 
+    display: inline-block; 
+    padding: 0 8px; 
+    height: 32px;
+    line-height: 30px;
+    border: 1px solid #475569; 
+    border-radius: 4px; 
+    background: #0f172a; 
+    font-weight: normal; 
+    margin-top: 4px; 
+    user-select: none;
+    text-align: center;
+    white-space: nowrap;
+}
 .sort-mini-trigger:hover { border-color: #38bdf8; color: #38bdf8; }
 
 /* 表格展示区 */
@@ -88,7 +121,6 @@ tr:hover td { background: rgba(51, 65, 85, 0.3); }
 td.index-cell { font-family: monospace; color: #64748b; font-weight: bold; text-align: center; width: 45px; }
 td.address-cell { font-family: monospace; color: #38bdf8; font-size: 13px; }
 
-/* 复制按钮横向紧跟布局 */
 .address-inline-container { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; }
 .interactive-addr-link { cursor: pointer; text-decoration: underline; font-weight: 500; white-space: nowrap; }
 .interactive-addr-link:hover { color: #60a5fa; }
@@ -125,7 +157,6 @@ td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; 
 .modal-close-btn:hover { color: #fff; }
 .modal-body { padding: 0; max-height: 450px; overflow-y: auto; background: #111827; }
 
-/* TP风格交易条目 */
 .tp-tx-item {
     display: flex; justify-content: space-between; align-items: center;
     padding: 14px 20px; border-bottom: 1px solid #1f2937; transition: background 0.2s;
@@ -539,7 +570,6 @@ function executeCopy(text, btnElement) {
     });
 }
 
-// 高仿 TP 钱包资产交易历史穿透层
 function openHistoryProfile(address, remark, chain) {
     const selectEl = document.getElementById("selectDisplayToken");
     const currentToken = selectEl.value || "USDT";
@@ -547,7 +577,6 @@ function openHistoryProfile(address, remark, chain) {
     const modal = document.getElementById("historyModal");
     document.getElementById("modal_title_text").textContent = LANG_DICTIONARY[currentLang].tx_hist + ` (${currentToken})`;
     
-    // 自动为演示生成更加精准的哈希截断和交易方向
     const body = document.getElementById("modal_body_content");
     body.innerHTML = `
         <div class="tp-tx-item">
@@ -573,32 +602,6 @@ function openHistoryProfile(address, remark, chain) {
             </div>
             <div class="tp-tx-right">
                 <div class="tp-tx-amount amount-in">+3,800.00</div>
-                <div class="tp-tx-status">Success</div>
-            </div>
-        </div>
-        <div class="tp-tx-item">
-            <div class="tp-tx-left">
-                <div class="tp-tx-icon-wrap icon-out">OUT</div>
-                <div class="tp-tx-meta">
-                    <h4>Contract Interacted</h4>
-                    <p>Tx: 0x9b3f...5c2d</p>
-                </div>
-            </div>
-            <div class="tp-tx-right">
-                <div class="tp-tx-amount amount-out">-500.00</div>
-                <div class="tp-tx-status">Success</div>
-            </div>
-        </div>
-        <div class="tp-tx-item">
-            <div class="tp-tx-left">
-                <div class="tp-tx-icon-wrap icon-in">IN</div>
-                <div class="tp-tx-meta">
-                    <h4>Staking Rewards</h4>
-                    <p>Tx: 0x1c4e...8a7b</p>
-                </div>
-            </div>
-            <div class="tp-tx-right">
-                <div class="tp-tx-amount amount-in">+125.50</div>
                 <div class="tp-tx-status">Success</div>
             </div>
         </div>
@@ -686,6 +689,7 @@ function addCustomToken() {
     updateAllBalances();
 }
 
+// 保持其余逻辑完整无损
 function deleteCustomToken(idx) {
     if (confirm(LANG_DICTIONARY[currentLang].alert_del_token)) {
         tokenConfigList.splice(idx, 1);
@@ -747,7 +751,6 @@ function renderUI() {
     
     document.getElementById("dynamicTableHeader").textContent = `${currentToken} ${currentLang==='zh'||currentLang==='tw'?'余额':'Balance'}`;
 
-    // 1. 渲染代币管理列表
     const tokenSlot = document.getElementById("customTokenListSlot");
     tokenSlot.innerHTML = "";
     tokenConfigList.forEach((t, i) => {
@@ -762,7 +765,6 @@ function renderUI() {
         tokenSlot.appendChild(row);
     });
 
-    // 2. 纯关键词过滤逻辑
     let processedWallets = walletList.map((w, originalIndex) => ({ ...w, originalIndex }));
     const keyword = document.getElementById("headerSearchInput").value.trim().toLowerCase();
 
@@ -770,7 +772,6 @@ function renderUI() {
         processedWallets = processedWallets.filter(w => w.remark.toLowerCase().includes(keyword));
     }
 
-    // 数据排序
     if (balanceSortState !== "DEFAULT") {
         processedWallets.sort((a, b) => {
             const balA = parseFloat((a.balances && a.balances[currentToken]) || 0);
@@ -779,7 +780,6 @@ function renderUI() {
         });
     }
 
-    // 3. 数据渲染到主体表格视图
     const tbody = document.getElementById("walletTableBody");
     tbody.innerHTML = "";
     let totalAccumulator = 0;
@@ -797,9 +797,7 @@ function renderUI() {
         const tdNet = document.createElement("td"); tdNet.innerHTML = `<span class="chain-badge badge-${w.chain}">${w.chain}</span>`; tr.appendChild(tdNet);
         const tdRem = document.createElement("td"); tdRem.className = "remark-cell"; tdRem.textContent = w.remark; tr.appendChild(tdRem);
         
-        // 地址单元格横向流布局优化
         const tdAddr = document.createElement("td"); tdAddr.className = "address-cell";
-        
         const wrapDiv = document.createElement("div");
         wrapDiv.className = "address-inline-container";
         
