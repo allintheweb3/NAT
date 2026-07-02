@@ -702,4 +702,165 @@ function addWallet() {
     const chain = document.getElementById("walletChain").value;
 
     if (!address) { alert(trans.alert_empty_wallet); return; }
-    walletList.push({ chain, remark, address,
+    walletList.push({ chain, remark, address, balances: {} });
+    localStorage.setItem("cfg_wallets", JSON.stringify(walletList));
+    document.getElementById("walletAddress").value = "";
+    document.getElementById("walletRemark").value = "";
+    renderUI();
+    updateAllBalances();
+}
+
+function deleteWallet(idx) {
+    if (confirm(LANG_DICTIONARY[currentLang].alert_del_wallet)) {
+        walletList.splice(idx, 1);
+        localStorage.setItem("cfg_wallets", JSON.stringify(walletList));
+        renderUI();
+    }
+}
+
+function formatShortVolume(val) {
+    if (val < 10000) return ""; 
+    const units = [{v:1e12,s:"T"},{v:1e9,s:"B"},{v:1e6,s:"M"},{v:1e3,s:"K"}];
+    for (let i = 0; i < units.length; i++) {
+        if (val >= units[i].v) return ` (${(val / units[i].v).toFixed(2)}${units[i].s})`;
+    }
+    return "";
+}
+
+function rebuildTokenDropdown() {
+    const select = document.getElementById("selectDisplayToken");
+    const uniqueSymbols = [...new Set(tokenConfigList.map(t => t.symbol))];
+    const previous = select.value;
+    select.innerHTML = "";
+    uniqueSymbols.forEach(sym => {
+        const op = document.createElement("option"); op.value = sym;
+        op.textContent = `${LANG_DICTIONARY[currentLang].dropdown_prefix}${sym}`;
+        select.appendChild(op);
+    });
+    if (uniqueSymbols.includes(previous)) select.value = previous;
+}
+
+function renderUI() {
+    const selectEl = document.getElementById("selectDisplayToken");
+    const currentToken = selectEl.value || "USDT";
+    const trans = LANG_DICTIONARY[currentLang];
+    
+    document.getElementById("dynamicTableHeader").textContent = `${currentToken} ${currentLang==='zh'||currentLang==='tw'?'余额':'Balance'}`;
+
+    // 1. 渲染代币管理列表
+    const tokenSlot = document.getElementById("customTokenListSlot");
+    tokenSlot.innerHTML = "";
+    tokenConfigList.forEach((t, i) => {
+        const row = document.createElement("div"); row.className = "token-item";
+        row.innerHTML = `
+            <div class="token-item-info">
+                <h4>${escapeHtml(t.symbol)} <span class="chain-badge badge-${t.chain}">${t.chain}</span></h4>
+                <p>Contract:${t.contract.substring(0,6)}...${t.contract.substring(t.contract.length-6)}</p>
+            </div>
+            <button class="btn-danger" onclick="deleteCustomToken(${i})">${trans.badge_del}</button>
+        `;
+        tokenSlot.appendChild(row);
+    });
+
+    // 2. 纯关键词过滤逻辑
+    let processedWallets = walletList.map((w, originalIndex) => ({ ...w, originalIndex }));
+    const keyword = document.getElementById("headerSearchInput").value.trim().toLowerCase();
+
+    if (keyword !== "") {
+        processedWallets = processedWallets.filter(w => w.remark.toLowerCase().includes(keyword));
+    }
+
+    // 数据排序
+    if (balanceSortState !== "DEFAULT") {
+        processedWallets.sort((a, b) => {
+            const balA = parseFloat((a.balances && a.balances[currentToken]) || 0);
+            const balB = parseFloat((b.balances && b.balances[currentToken]) || 0);
+            return balanceSortState === "DESC" ? (balB - balA) : (balA - balB);
+        });
+    }
+
+    // 3. 数据渲染到主体表格视图
+    const tbody = document.getElementById("walletTableBody");
+    tbody.innerHTML = "";
+    let totalAccumulator = 0;
+
+    processedWallets.forEach((w, viewIdx) => {
+        const bal = parseFloat((w.balances && w.balances[currentToken]) || 0);
+        totalAccumulator += bal;
+
+        const activeTokenObj = tokenConfigList.find(t => t.symbol === currentToken && t.chain === w.chain);
+        const maxFraction = (activeTokenObj && activeTokenObj.decimals === 0) ? 0 : 4;
+
+        const tr = document.createElement("tr");
+        
+        const tdIdx = document.createElement("td"); tdIdx.className = "index-cell"; tdIdx.textContent = viewIdx + 1; tr.appendChild(tdIdx);
+        const tdNet = document.createElement("td"); tdNet.innerHTML = `<span class="chain-badge badge-${w.chain}">${w.chain}</span>`; tr.appendChild(tdNet);
+        const tdRem = document.createElement("td"); tdRem.className = "remark-cell"; tdRem.textContent = w.remark; tr.appendChild(tdRem);
+        
+        // 地址单元格横向流布局优化
+        const tdAddr = document.createElement("td"); tdAddr.className = "address-cell";
+        
+        const wrapDiv = document.createElement("div");
+        wrapDiv.className = "address-inline-container";
+        
+        const linkSpan = document.createElement("span");
+        linkSpan.className = "interactive-addr-link";
+        linkSpan.textContent = abbreviateAddress(w.address);
+        linkSpan.onclick = () => openHistoryProfile(w.address, w.remark, w.chain);
+        
+        const copyBtn = document.createElement("button");
+        copyBtn.className = "btn-mini-copy";
+        copyBtn.textContent = trans.copy_btn;
+        copyBtn.onclick = (e) => { e.stopPropagation(); executeCopy(w.address, copyBtn); };
+        
+        wrapDiv.appendChild(linkSpan);
+        wrapDiv.appendChild(copyBtn);
+        tdAddr.appendChild(wrapDiv);
+        tr.appendChild(tdAddr);
+
+        const tdBal = document.createElement("td"); tdBal.className = "balance-cell";
+        tdBal.innerHTML = isUpdating ? '<span class="loading-pulse">...</span>' : bal.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: maxFraction});
+        tr.appendChild(tdBal);
+
+        const tdAct = document.createElement("td"); 
+        const delBtn = document.createElement("button"); delBtn.className = "btn-danger"; delBtn.textContent = trans.badge_del;
+        delBtn.onclick = () => deleteWallet(w.originalIndex); 
+        tdAct.appendChild(delBtn);
+        tr.appendChild(tdAct);
+
+        tbody.appendChild(tr);
+    });
+
+    const activeGlobalTokens = tokenConfigList.filter(t => t.symbol === currentToken);
+    const isGlobalZeroDecimal = activeGlobalTokens.length > 0 && activeGlobalTokens.every(t => t.decimals === 0);
+    const globalMaxFraction = isGlobalZeroDecimal ? 0 : 4;
+
+    document.getElementById("summary_total_display").textContent = totalAccumulator.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: globalMaxFraction});
+    document.getElementById("summary_short_display").textContent = formatShortVolume(totalAccumulator);
+    document.getElementById("summary_wallet_count").textContent = walletList.length;
+}
+
+function initUserCounter() {
+    let count = parseInt(localStorage.getItem("sys_user_count"));
+    if (!count || isNaN(count)) {
+        count = Math.floor(Math.random() * 400) + 1200; 
+        localStorage.setItem("sys_user_count", count);
+    } 
+    if (!sessionStorage.getItem("session_visit_locked")) {
+        count += 1;
+        localStorage.setItem("sys_user_count", count);
+        sessionStorage.setItem("session_visit_locked", "true");
+    }
+    document.getElementById("user_counter_slot").textContent = count.toLocaleString('en-US');
+}
+
+// ==================== 挂载初始化 ====================
+document.getElementById("langSwitcher").value = currentLang; 
+applyLanguagePack();
+rebuildTokenDropdown();
+renderUI();
+updateAllBalances();
+initUserCounter();
+</script>
+</body>
+</html>
