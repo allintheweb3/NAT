@@ -67,16 +67,22 @@ button.btn-danger { background: #ef4444; padding: 4px 8px; font-size: 12px; }
 button.btn-danger:hover { background: #dc2626; }
 
 /* 复合型表头嵌入筛选下拉组件样式 */
-.th-filter-wrapper { display: flex; flex-direction: column; gap: 6px; margin-top: 6px; font-weight: normal; }
-.th-search-input { width: 100%; padding: 4px 8px; font-size: 11px; background: #0f172a; border: 1px solid #475569; border-radius: 4px; color: #fff; }
+.th-title-area { display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 6px; }
+.th-filter-trigger { cursor: pointer; padding: 2px 6px; background: #1e293b; border: 1px solid #475569; border-radius: 4px; font-size: 11px; color: #38bdf8; font-weight: normal; transition: all 0.2s; }
+.th-filter-trigger:hover { background: #38bdf8; color: #0f172a; border-color: #38bdf8; }
+.th-filter-wrapper { display: flex; flex-direction: column; gap: 6px; margin-top: 6px; font-weight: normal; width: 100%; }
+.th-filter-wrapper.hide-panel { display: none !important; }
+.th-search-input { width: 100%; padding: 6px 8px; font-size: 12px; background: #0f172a; border: 1px solid #38bdf8; border-radius: 4px; color: #fff; }
+.th-search-input:focus { border-color: #60a5fa; box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2); }
 .th-search-input::placeholder { color: #475569; }
 .th-dropdown-box { 
-    max-height: 120px; overflow-y: auto; background: #0f172a; border: 1px solid #475569; 
+    max-height: 140px; overflow-y: auto; background: #0f172a; border: 1px solid #475569; 
     border-radius: 4px; padding: 6px; display: flex; flex-direction: column; gap: 4px;
 }
-.th-dropdown-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #cbd5e1; cursor: pointer; user-select: none; }
+.th-dropdown-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #cbd5e1; cursor: pointer; user-select: none; padding: 2px 0; }
+.th-dropdown-item:hover { color: #fff; }
 .th-dropdown-item input[type="checkbox"] { margin: 0; width: 13px; height: 13px; cursor: pointer; }
-.th-dropdown-actions { display: flex; gap: 8px; font-size: 10px; border-bottom: 1px solid #334155; padding-bottom: 4px; margin-bottom: 2px; }
+.th-dropdown-actions { display: flex; gap: 8px; font-size: 11px; border-bottom: 1px solid #334155; padding-bottom: 6px; margin-bottom: 2px; font-weight: bold; }
 .th-action-link { color: #38bdf8; cursor: pointer; text-decoration: underline; }
 .th-action-link:hover { color: #60a5fa; }
 
@@ -86,8 +92,8 @@ button.btn-danger:hover { background: #dc2626; }
 
 /* 表格展示区 */
 .table-scroll-container { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; background: #1e293b; }
-table { width: 100%; border-collapse: collapse; text-align: left; min-width: 700px; }
-th, td { padding: 12px 14px; font-size: 13px; border-bottom: 1px solid #334155; vertical-align: top; }
+table { width: 100%; border-collapse: collapse; text-align: left; min-width: 700px; table-layout: fixed; }
+th, td { padding: 12px 14px; font-size: 13px; border-bottom: 1px solid #334155; vertical-align: top; overflow: visible; }
 th { background: #334155; color: #38bdf8; font-weight: 600; }
 tr:hover td { background: rgba(51, 65, 85, 0.3); }
 td.index-cell { font-family: monospace; color: #64748b; font-weight: bold; text-align: center; width: 45px; }
@@ -212,15 +218,26 @@ td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; 
 
                         <div class="table-scroll-container">
                             <table>
+                                <colgroup>
+                                    <col style="width: 55px;">
+                                    <col style="width: 85px;">
+                                    <col style="width: 220px;">
+                                    <col style="width: auto;">
+                                    <col style="width: 170px;">
+                                    <col style="width: 75px;">
+                                </colgroup>
                                 <thead>
                                     <tr>
-                                        <th style="text-align: center; width: 50px; padding-top: 15px;" id="text_th_idx">Index</th>
-                                        <th style="width: 80px; padding-top: 15px;" id="text_th_net">Network</th>
+                                        <th style="text-align: center; padding-top: 15px;" id="text_th_idx">Index</th>
+                                        <th style="padding-top: 15px;" id="text_th_net">Network</th>
                                         
                                         <!-- 嵌入式复合筛选表头 -->
-                                        <th style="width: 180px;">
-                                            <span id="text_th_rem">Remark Filter</span>
-                                            <div class="th-filter-wrapper">
+                                        <th>
+                                            <div class="th-title-area">
+                                                <span id="text_th_rem">Wallet Remark</span>
+                                                <span class="th-filter-trigger" onclick="toggleFilterPanel(event)">▼ Filter</span>
+                                            </div>
+                                            <div class="th-filter-wrapper hide-panel" id="filterDropdownPanel">
                                                 <input type="text" id="headerSearchInput" class="th-search-input" placeholder="🔍 Filter Keyword..." oninput="handleFilterUIChange()">
                                                 <div class="th-dropdown-box" id="headerCheckboxContainer">
                                                     <!-- 动态打勾项目 -->
@@ -231,15 +248,15 @@ td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; 
                                         <th style="padding-top: 15px;" id="text_th_addr">Monitored Wallet Address</th>
                                         
                                         <!-- 嵌入式排序表头 -->
-                                        <th style="text-align: right; width: 170px;">
+                                        <th style="text-align: right;">
                                             <span id="dynamicTableHeader">Token Balance</span>
                                             <div>
                                                 <span class="sort-mini-trigger" id="btn_sort_balance" onclick="toggleBalanceSort()">📊 Sort: Default</span>
                                             </div>
                                         </th>
-                                        <th style="text-align: center; width: 70px; padding-top: 15px;" id="text_th_act">Action</th>
+                                        <th style="text-align: center; padding-top: 15px;" id="text_th_act">Action</th>
                                     </tr>
-                                endthead>
+                                </thead>
                                 <tbody id="walletTableBody">
                                     <!-- 数据插槽 -->
                                 </tbody>
@@ -338,7 +355,7 @@ const LANG_DICTIONARY = {
         alert_empty_wallet: "Address cannot be empty!", alert_exist_wallet: "This wallet address already exists under the chosen network!",
         alert_del_wallet: "Permanently remove this wallet from monitoring?", badge_del: "Delete", expand: "Expand ▼", collapse: "Collapse ▲",
         sort_def: "📊 Sort: Default", sort_desc: "📉 Sort: High ➔ Low", sort_asc: "📈 Sort: Low ➔ High",
-        copied: "Copied!", copy_btn: "Copy", check_all: "All", check_none: "None", search_holder: "🔍 Filter Keyword..."
+        copied: "Copied!", copy_btn: "Copy", check_all: "All", check_none: "None", search_holder: "🔍 Filter Keyword...", filter_btn: "▼ Filter"
     },
     zh: {
         main_title: "多链多钱包智能资产看板",
@@ -346,7 +363,7 @@ const LANG_DICTIONARY = {
         monitoring: "正在监控", wallets: "个钱包",
         card_add_wallet: "➕ 监控钱包添加", btn_add_wallet: "确认添加此钱包到观察队列",
         card_wallet_list: "钱包明细清单", btn_fetch: "🔄 一键拉取实时链上余额", btn_fetching: "⏳ 同步中...",
-        th_idx: "序号", th_net: "网络", th_rem: "钱包备注筛选", th_addr: "监控钱包地址", th_act: "操作",
+        th_idx: "序号", th_net: "网络", th_rem: "备注名称", th_addr: "监控钱包地址", th_act: "操作",
         card_add_token: "🔧 自定义备查代币添加", label_symbol: "代币简称 (Symbol)", label_chain: "所属公链 (Chain)",
         label_contract: "代币智能合约/Mint地址", label_decimals: "代币精度位 (Decimals)", btn_save_token: "💾 录入并备查此代币",
         card_token_list: "📋 现已备查的代币资产", copyright: "版权和解释权属于藤蔓协议云南商学院",
@@ -356,15 +373,15 @@ const LANG_DICTIONARY = {
         alert_empty_wallet: "地址栏不可为空！", alert_exist_wallet: "当前网络的该钱包地址已存在于监控清单中！",
         alert_del_wallet: "确认从列表中永久移出此监控钱包吗？", badge_del: "删除", expand: "展开 ▼", collapse: "收起 ▲",
         sort_def: "📊 排序: 默认", sort_desc: "📉 排序: 从高到低", sort_asc: "📈 排序: 从低到高",
-        copied: "已复制!", copy_btn: "复制", check_all: "全选", check_none: "清空", search_holder: "🔍 过滤关键字..."
+        copied: "已复制!", copy_btn: "复制", check_all: "全选", check_none: "清空", search_holder: "🔍 过滤关键字...", filter_btn: "▼ 筛选"
     },
     tw: {
         main_title: "多鏈多錢包智能資產看板",
-        main_desc: "動態添加代幣 | 多錢包合併計算 | 跨域容錯高兼容鏈上通信架構",
+        main_desc: "動態添加代幣 | 多錢包合併計算 | 跨域容錯高兼容鏈上通信架訊",
         monitoring: "正在監控", wallets: "個錢包",
         card_add_wallet: "➕ 監控錢包添加", btn_add_wallet: "確認添加此錢包到觀察隊列",
         card_wallet_list: "錢包明細清單", btn_fetch: "🔄 一鍵拉取實時鏈上餘額", btn_fetching: "⏳ 同步中...",
-        th_idx: "序號", th_net: "網絡", th_rem: "錢包備註篩選", th_addr: "監控錢包地址", th_act: "操作",
+        th_idx: "序號", th_net: "網絡", th_rem: "備註名稱", th_addr: "監控錢包地址", th_act: "操作",
         card_add_token: "🔧 自定義備查代幣添加", label_symbol: "代幣簡稱 (Symbol)", label_chain: "所屬公鏈 (Chain)",
         label_contract: "代幣智能合約/Mint地址", label_decimals: "代幣精度位 (Decimals)", btn_save_token: "💾 錄入並備查此代幣",
         card_token_list: "📋 現已備查的代幣資產", copyright: "版權和解釋權屬於藤蔓協議雲南商學院",
@@ -374,7 +391,7 @@ const LANG_DICTIONARY = {
         alert_empty_wallet: "地址欄不可為空！", alert_exist_wallet: "當前網絡的該錢包地址已存在於遷控清單中！",
         alert_del_wallet: "確認從列表中永久移出此監控錢包嗎？", badge_del: "刪除", expand: "展開 ▼", collapse: "收起 ▲",
         sort_def: "📊 排序: 默認", sort_desc: "📉 排序: 從高到低", sort_asc: "📈 排序: 從低到高",
-        copied: "已複製!", copy_btn: "複製", check_all: "全選", check_none: "清空", search_holder: "🔍 過濾關鍵字..."
+        copied: "已複製!", copy_btn: "複製", check_all: "全選", check_none: "清空", search_holder: "🔍 過濾關鍵字...", filter_btn: "▼ 篩選"
     }
 };
 
@@ -408,7 +425,7 @@ let tokenConfigList = JSON.parse(localStorage.getItem("cfg_tokens")) || INITIAL_
 let walletList = JSON.parse(localStorage.getItem("cfg_wallets")) || INITIAL_WALLETS;
 
 let balanceSortState = "DEFAULT"; 
-let checkedRemarksPool = []; // 存储当前被打勾勾选的备注数组
+let checkedRemarksPool = []; // 存储选中的备注名称
 let isUpdating = false;
 let currentLang = localStorage.getItem("app_lang") || "zh";
 
@@ -498,22 +515,27 @@ async function updateAllBalances() {
     renderUI();
 }
 
-// ==================== 表头嵌入式复杂过滤逻辑 ====================
+// ==================== 表头嵌入式筛选显隐控制 ====================
+function toggleFilterPanel(event) {
+    if (event) event.stopPropagation();
+    const panel = document.getElementById("filterDropdownPanel");
+    panel.classList.toggle("hide-panel");
+}
+
 function syncEmbedRemarkFilter() {
     const container = document.getElementById("headerCheckboxContainer");
     const uniqueRemarks = [...new Set(walletList.map(w => w.remark).filter(Boolean))];
     
-    // 如果还没初始化勾选池，默认全选
+    // 初始化勾选状态（首次默认全选）
     if (checkedRemarksPool.length === 0) {
         checkedRemarksPool = [...uniqueRemarks];
     } else {
-        // 确保勾选池里不包含已经不存在的旧备注
         checkedRemarksPool = checkedRemarksPool.filter(r => uniqueRemarks.includes(r));
     }
 
     container.innerHTML = "";
 
-    // 添加快捷操作栏
+    // 快捷全选操作栏
     const actions = document.createElement("div");
     actions.className = "th-dropdown-actions";
     actions.innerHTML = `
@@ -522,7 +544,7 @@ function syncEmbedRemarkFilter() {
     `;
     container.appendChild(actions);
 
-    // 渲染各个打勾选项
+    // 渲染筛选列表
     uniqueRemarks.forEach(rem => {
         const label = document.createElement("label");
         label.className = "th-dropdown-item";
@@ -624,7 +646,7 @@ function closeModal() {
     document.getElementById("historyModal").style.display = "none";
 }
 
-// ==================== UI 基础层渲染 ====================
+// ==================== UI 核心双重筛选渲染层 ====================
 function escapeHtml(str) {
     if (!str) return "";
     return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -666,6 +688,9 @@ function applyLanguagePack() {
     document.getElementById("text_th_act").textContent = trans.th_act;
     document.getElementById("headerSearchInput").placeholder = trans.search_holder;
     
+    const triggerBtn = document.querySelector(".th-filter-trigger");
+    if (triggerBtn) triggerBtn.textContent = trans.filter_btn;
+
     document.getElementById("text_card_add_token").textContent = trans.card_add_token;
     document.getElementById("text_label_symbol").textContent = trans.label_symbol;
     document.getElementById("text_label_chain").textContent = trans.label_chain;
@@ -744,6 +769,7 @@ function formatShortVolume(val) {
     return "";
 }
 
+// 刷新顶部资产资产选择选择器
 function rebuildTokenDropdown() {
     const select = document.getElementById("selectDisplayToken");
     const uniqueSymbols = [...new Set(tokenConfigList.map(t => t.symbol))];
@@ -764,7 +790,7 @@ function renderUI() {
     
     document.getElementById("dynamicTableHeader").textContent = `${currentToken} ${currentLang==='zh'||currentLang==='tw'?'余额':'Balance'}`;
 
-    // 1. 渲染代币配置
+    // 1. 渲染代币管理列表
     const tokenSlot = document.getElementById("customTokenListSlot");
     tokenSlot.innerHTML = "";
     tokenConfigList.forEach((t, i) => {
@@ -779,18 +805,18 @@ function renderUI() {
         tokenSlot.appendChild(row);
     });
 
-    // 2. 双重过滤核心流（1.关键词包含过滤 + 2.打勾多选过滤）
+    // 2. 双重交叉筛选核心算法（核心逻辑：交集运算）
     let processedWallets = walletList.map((w, originalIndex) => ({ ...w, originalIndex }));
     const keyword = document.getElementById("headerSearchInput").value.trim().toLowerCase();
 
-    // 过滤器A：关键词检索
-    if (keyword) {
-        processedWallets = processedWallets.filter(w => w.remark.toLowerCase().includes(keyword));
-    }
-    // 过滤器B：备注勾选状态检测
-    processedWallets = processedWallets.filter(w => checkedRemarksPool.includes(w.remark));
+    // 双重校验：既要在打勾池里，同时又要符合文本搜索词
+    processedWallets = processedWallets.filter(w => {
+        const matchesKeyword = keyword === "" || w.remark.toLowerCase().includes(keyword);
+        const matchesCheckbox = checkedRemarksPool.includes(w.remark);
+        return matchesKeyword && matchesCheckbox;
+    });
 
-    // 排序器
+    // 数据排序
     if (balanceSortState !== "DEFAULT") {
         processedWallets.sort((a, b) => {
             const balA = parseFloat((a.balances && a.balances[currentToken]) || 0);
@@ -799,7 +825,7 @@ function renderUI() {
         });
     }
 
-    // 3. 数据渲染到主体视图
+    // 3. 数据渲染到主体表格视图
     const tbody = document.getElementById("walletTableBody");
     tbody.innerHTML = "";
     let totalAccumulator = 0;
@@ -873,7 +899,7 @@ function initUserCounter() {
 document.getElementById("langSwitcher").value = currentLang; 
 applyLanguagePack();
 rebuildTokenDropdown();
-syncEmbedRemarkFilter(); // 载入表头内嵌筛选条件
+syncEmbedRemarkFilter(); // 初始化载入内嵌数据
 renderUI();
 updateAllBalances();
 initUserCounter();
