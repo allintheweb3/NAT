@@ -66,25 +66,11 @@ button.btn-success:hover { background: #059669; }
 button.btn-danger { background: #ef4444; padding: 4px 8px; font-size: 12px; }
 button.btn-danger:hover { background: #dc2626; }
 
-/* 复合型表头嵌入筛选下拉组件样式 */
-.th-title-area { display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 6px; }
-.th-filter-trigger { cursor: pointer; padding: 2px 6px; background: #1e293b; border: 1px solid #475569; border-radius: 4px; font-size: 11px; color: #38bdf8; font-weight: normal; transition: all 0.2s; }
-.th-filter-trigger:hover { background: #38bdf8; color: #0f172a; border-color: #38bdf8; }
-.th-filter-wrapper { display: flex; flex-direction: column; gap: 6px; margin-top: 6px; font-weight: normal; width: 100%; }
-.th-filter-wrapper.hide-panel { display: none !important; }
-.th-search-input { width: 100%; padding: 6px 8px; font-size: 12px; background: #0f172a; border: 1px solid #38bdf8; border-radius: 4px; color: #fff; }
-.th-search-input:focus { border-color: #60a5fa; box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2); }
+/* 复合型表头嵌入筛选输入框样式 */
+.th-title-area { display: flex; flex-direction: column; width: 100%; gap: 6px; }
+.th-search-input { width: 100%; padding: 6px 8px; font-size: 12px; background: #0f172a; border: 1px solid #475569; border-radius: 4px; color: #fff; margin-top: 4px; font-weight: normal; }
+.th-search-input:focus { border-color: #38bdf8; box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2); }
 .th-search-input::placeholder { color: #475569; }
-.th-dropdown-box { 
-    max-height: 140px; overflow-y: auto; background: #0f172a; border: 1px solid #475569; 
-    border-radius: 4px; padding: 6px; display: flex; flex-direction: column; gap: 4px;
-}
-.th-dropdown-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #cbd5e1; cursor: pointer; user-select: none; padding: 2px 0; }
-.th-dropdown-item:hover { color: #fff; }
-.th-dropdown-item input[type="checkbox"] { margin: 0; width: 13px; height: 13px; cursor: pointer; }
-.th-dropdown-actions { display: flex; gap: 8px; font-size: 11px; border-bottom: 1px solid #334155; padding-bottom: 6px; margin-bottom: 2px; font-weight: bold; }
-.th-action-link { color: #38bdf8; cursor: pointer; text-decoration: underline; }
-.th-action-link:hover { color: #60a5fa; }
 
 /* 排序小按钮样式优化 */
 .sort-mini-trigger { cursor: pointer; font-size: 11px; color: #94a3b8; display: inline-block; padding: 2px 6px; border: 1px solid #475569; border-radius: 4px; background: #0f172a; font-weight: normal; margin-top: 4px;}
@@ -231,17 +217,11 @@ td.balance-cell { font-family: monospace; font-weight: bold; text-align: right; 
                                         <th style="text-align: center; padding-top: 15px;" id="text_th_idx">Index</th>
                                         <th style="padding-top: 15px;" id="text_th_net">Network</th>
                                         
-                                        <!-- 嵌入式复合筛选表头 -->
+                                        <!-- 直观的备注搜索表头 -->
                                         <th>
                                             <div class="th-title-area">
                                                 <span id="text_th_rem">Wallet Remark</span>
-                                                <span class="th-filter-trigger" onclick="toggleFilterPanel(event)">▼ Filter</span>
-                                            </div>
-                                            <div class="th-filter-wrapper hide-panel" id="filterDropdownPanel">
                                                 <input type="text" id="headerSearchInput" class="th-search-input" placeholder="🔍 Filter Keyword..." oninput="handleFilterUIChange()">
-                                                <div class="th-dropdown-box" id="headerCheckboxContainer">
-                                                    <!-- 动态打勾项目 -->
-                                                </div>
                                             </div>
                                         </th>
                                         
@@ -355,7 +335,7 @@ const LANG_DICTIONARY = {
         alert_empty_wallet: "Address cannot be empty!", alert_exist_wallet: "This wallet address already exists under the chosen network!",
         alert_del_wallet: "Permanently remove this wallet from monitoring?", badge_del: "Delete", expand: "Expand ▼", collapse: "Collapse ▲",
         sort_def: "📊 Sort: Default", sort_desc: "📉 Sort: High ➔ Low", sort_asc: "📈 Sort: Low ➔ High",
-        copied: "Copied!", copy_btn: "Copy", check_all: "All", check_none: "None", search_holder: "🔍 Filter Keyword...", filter_btn: "▼ Filter"
+        copied: "Copied!", copy_btn: "Copy", search_holder: "🔍 Filter Keyword..."
     },
     zh: {
         main_title: "多链多钱包智能资产看板",
@@ -373,7 +353,7 @@ const LANG_DICTIONARY = {
         alert_empty_wallet: "地址栏不可为空！", alert_exist_wallet: "当前网络的该钱包地址已存在于监控清单中！",
         alert_del_wallet: "确认从列表中永久移出此监控钱包吗？", badge_del: "删除", expand: "展开 ▼", collapse: "收起 ▲",
         sort_def: "📊 排序: 默认", sort_desc: "📉 排序: 从高到低", sort_asc: "📈 排序: 从低到高",
-        copied: "已复制!", copy_btn: "复制", check_all: "全选", check_none: "清空", search_holder: "🔍 过滤关键字...", filter_btn: "▼ 筛选"
+        copied: "已复制!", copy_btn: "复制", search_holder: "🔍 过滤关键字..."
     },
     tw: {
         main_title: "多鏈多錢包智能資產看板",
@@ -391,7 +371,7 @@ const LANG_DICTIONARY = {
         alert_empty_wallet: "地址欄不可為空！", alert_exist_wallet: "當前網絡的該錢包地址已存在於遷控清單中！",
         alert_del_wallet: "確認從列表中永久移出此監控錢包嗎？", badge_del: "刪除", expand: "展開 ▼", collapse: "收起 ▲",
         sort_def: "📊 排序: 默認", sort_desc: "📉 排序: 從高到低", sort_asc: "📈 排序: 從低到高",
-        copied: "已複製!", copy_btn: "複製", check_all: "全選", check_none: "清空", search_holder: "🔍 過濾關鍵字...", filter_btn: "▼ 篩選"
+        copied: "已複製!", copy_btn: "複製", search_holder: "🔍 過濾關鍵字..."
     }
 };
 
@@ -425,7 +405,6 @@ let tokenConfigList = JSON.parse(localStorage.getItem("cfg_tokens")) || INITIAL_
 let walletList = JSON.parse(localStorage.getItem("cfg_wallets")) || INITIAL_WALLETS;
 
 let balanceSortState = "DEFAULT"; 
-let checkedRemarksPool = []; // 存储选中的备注名称
 let isUpdating = false;
 let currentLang = localStorage.getItem("app_lang") || "zh";
 
@@ -511,69 +490,6 @@ async function updateAllBalances() {
     localStorage.setItem("cfg_wallets", JSON.stringify(walletList));
     isUpdating = false;
     if (btn) { btn.innerText = LANG_DICTIONARY[currentLang].btn_fetch; btn.disabled = false; }
-    syncEmbedRemarkFilter(); 
-    renderUI();
-}
-
-// ==================== 表头嵌入式筛选显隐控制 ====================
-function toggleFilterPanel(event) {
-    if (event) event.stopPropagation();
-    const panel = document.getElementById("filterDropdownPanel");
-    panel.classList.toggle("hide-panel");
-}
-
-function syncEmbedRemarkFilter() {
-    const container = document.getElementById("headerCheckboxContainer");
-    const uniqueRemarks = [...new Set(walletList.map(w => w.remark).filter(Boolean))];
-    
-    // 初始化勾选状态（首次默认全选）
-    if (checkedRemarksPool.length === 0) {
-        checkedRemarksPool = [...uniqueRemarks];
-    } else {
-        checkedRemarksPool = checkedRemarksPool.filter(r => uniqueRemarks.includes(r));
-    }
-
-    container.innerHTML = "";
-
-    // 快捷全选操作栏
-    const actions = document.createElement("div");
-    actions.className = "th-dropdown-actions";
-    actions.innerHTML = `
-        <span class="th-action-link" onclick="handleSelectAllRemarks(true)">${LANG_DICTIONARY[currentLang].check_all}</span>
-        <span class="th-action-link" onclick="handleSelectAllRemarks(false)">${LANG_DICTIONARY[currentLang].check_none}</span>
-    `;
-    container.appendChild(actions);
-
-    // 渲染筛选列表
-    uniqueRemarks.forEach(rem => {
-        const label = document.createElement("label");
-        label.className = "th-dropdown-item";
-        
-        const chk = document.createElement("input");
-        chk.type = "checkbox";
-        chk.value = rem;
-        chk.checked = checkedRemarksPool.includes(rem);
-        chk.onchange = () => {
-            if (chk.checked) {
-                if (!checkedRemarksPool.includes(rem)) checkedRemarksPool.push(rem);
-            } else {
-                checkedRemarksPool = checkedRemarksPool.filter(item => item !== rem);
-            }
-            renderUI();
-        };
-
-        label.appendChild(chk);
-        label.appendChild(document.createTextNode(rem));
-        container.appendChild(label);
-    });
-}
-
-function handleSelectAllRemarks(status) {
-    const uniqueRemarks = [...new Set(walletList.map(w => w.remark).filter(Boolean))];
-    checkedRemarksPool = status ? [...uniqueRemarks] : [];
-    
-    const checkboxes = document.querySelectorAll("#headerCheckboxContainer input[type='checkbox']");
-    checkboxes.forEach(chk => chk.checked = status);
     renderUI();
 }
 
@@ -646,7 +562,7 @@ function closeModal() {
     document.getElementById("historyModal").style.display = "none";
 }
 
-// ==================== UI 核心双重筛选渲染层 ====================
+// ==================== UI 核心渲染层 ====================
 function escapeHtml(str) {
     if (!str) return "";
     return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -664,7 +580,6 @@ function handleLangChange(langKey) {
     localStorage.setItem("app_lang", langKey); 
     applyLanguagePack();
     rebuildTokenDropdown();
-    syncEmbedRemarkFilter();
     renderUI();
 }
 
@@ -687,9 +602,6 @@ function applyLanguagePack() {
     document.getElementById("text_th_addr").textContent = trans.th_addr;
     document.getElementById("text_th_act").textContent = trans.th_act;
     document.getElementById("headerSearchInput").placeholder = trans.search_holder;
-    
-    const triggerBtn = document.querySelector(".th-filter-trigger");
-    if (triggerBtn) triggerBtn.textContent = trans.filter_btn;
 
     document.getElementById("text_card_add_token").textContent = trans.card_add_token;
     document.getElementById("text_label_symbol").textContent = trans.label_symbol;
@@ -746,7 +658,6 @@ function addWallet() {
     localStorage.setItem("cfg_wallets", JSON.stringify(walletList));
     document.getElementById("walletAddress").value = "";
     document.getElementById("walletRemark").value = "";
-    syncEmbedRemarkFilter();
     renderUI();
     updateAllBalances();
 }
@@ -755,7 +666,6 @@ function deleteWallet(idx) {
     if (confirm(LANG_DICTIONARY[currentLang].alert_del_wallet)) {
         walletList.splice(idx, 1);
         localStorage.setItem("cfg_wallets", JSON.stringify(walletList));
-        syncEmbedRemarkFilter();
         renderUI();
     }
 }
@@ -769,7 +679,7 @@ function formatShortVolume(val) {
     return "";
 }
 
-// 刷新顶部资产资产选择选择器
+// 刷新顶部资产选择器
 function rebuildTokenDropdown() {
     const select = document.getElementById("selectDisplayToken");
     const uniqueSymbols = [...new Set(tokenConfigList.map(t => t.symbol))];
@@ -805,16 +715,13 @@ function renderUI() {
         tokenSlot.appendChild(row);
     });
 
-    // 2. 双重交叉筛选核心算法（核心逻辑：交集运算）
+    // 2. 纯关键词过滤逻辑
     let processedWallets = walletList.map((w, originalIndex) => ({ ...w, originalIndex }));
     const keyword = document.getElementById("headerSearchInput").value.trim().toLowerCase();
 
-    // 双重校验：既要在打勾池里，同时又要符合文本搜索词
-    processedWallets = processedWallets.filter(w => {
-        const matchesKeyword = keyword === "" || w.remark.toLowerCase().includes(keyword);
-        const matchesCheckbox = checkedRemarksPool.includes(w.remark);
-        return matchesKeyword && matchesCheckbox;
-    });
+    if (keyword !== "") {
+        processedWallets = processedWallets.filter(w => w.remark.toLowerCase().includes(keyword));
+    }
 
     // 数据排序
     if (balanceSortState !== "DEFAULT") {
@@ -899,7 +806,6 @@ function initUserCounter() {
 document.getElementById("langSwitcher").value = currentLang; 
 applyLanguagePack();
 rebuildTokenDropdown();
-syncEmbedRemarkFilter(); // 初始化载入内嵌数据
 renderUI();
 updateAllBalances();
 initUserCounter();
