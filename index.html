@@ -155,9 +155,9 @@ table {
 /* 严格分配各列占比 */
 th:nth-child(1), td:nth-child(1) { width: 55px; text-align: center; } 
 th:nth-child(2), td:nth-child(2) { width: 85px; text-align: center; } 
-th:nth-child(3), td:nth-child(3) { width: 160px; text-align: left; } 
+th:nth-child(3), td:nth-child(3) { width: 180px; text-align: left; } 
 th:nth-child(4), td:nth-child(4) { width: auto; text-align: left; }  
-th:nth-child(5), td:nth-child(5) { width: 160px; text-align: left; }  
+th:nth-child(5), td:nth-child(5) { width: 180px; text-align: left; }  
 th:nth-child(6), td:nth-child(6) { width: 80px; text-align: center; } 
 
 th, td { padding: 14px 12px; font-size: 13px; border-bottom: 1px solid #334155; vertical-align: middle; overflow: hidden; }
@@ -170,7 +170,7 @@ td.remark-cell { color: #e2e8f0; font-weight: 500; }
 td.balance-cell { font-family: monospace; font-weight: bold; color: #fff; text-align: left; } 
 
 .remark-inline-container { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; min-width: 0; }
-.remark-text-span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 110px; }
+.remark-text-span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 130px; }
 
 .edit-remark-icon { 
     cursor: pointer; color: #64748b; font-size: 10px; display: inline-flex; 
@@ -181,40 +181,50 @@ td.balance-cell { font-family: monospace; font-weight: bold; color: #fff; text-a
 
 .th-title-area { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; width: 100%; gap: 6px; }
 
-/* 统一设计的控制区按钮样式（用于排序按钮和过滤框） */
+/* * 【视觉友好性改造的核心控制组件】
+ * 强制使过滤输入框与排序按钮在高度上绝对一致 (32px)
+ * 宽度上根据内容自适应 (width: max-content / width: 100%)
+ */
 .control-dark-btn {
-    width: 100%; 
-    max-width: 140px; 
-    height: 30px; 
-    padding: 4px 8px; 
+    height: 32px;                     /* 绝对统一的高度线 */
+    padding: 4px 12px;                /* 精确均匀的内边距 */
     font-size: 11px; 
     color: #94a3b8; 
     border: 1px solid #475569; 
-    border-radius: 4px; 
-    background: #0f172a; /* 统一暗黑背景 */
+    border-radius: 6px; 
+    background: #0f172a;              /* 一致的黑色质感背景 */
     outline: none; 
     transition: all 0.15s ease; 
     font-weight: normal;
-    text-align: center;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
 }
+
+/* 过滤搜索框：宽度在可利用空间内自适应，不超过容器 */
+input.control-dark-btn {
+    width: 100%;
+    max-width: 156px;
+    text-align: left;
+}
+
+/* 排序触发按钮：宽度根据翻译的文案长度完全自适应 */
+.sort-mini-trigger { 
+    cursor: pointer; 
+    user-select: none; 
+    white-space: nowrap; 
+    width: max-content;              /* 内容自适应宽度 */
+    margin-top: 4px;
+    border: 1px solid #475569;
+}
+
 .control-dark-btn:focus, .control-dark-btn:hover { 
     border-color: #38bdf8; 
     color: #38bdf8; 
     box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.15); 
 }
 .control-dark-btn::placeholder { color: #475569; }
-
-/* 覆写一下排序按钮，使其看起来高度对齐 */
-.sort-mini-trigger { 
-    cursor: pointer; 
-    display: inline-block; 
-    line-height: 20px; 
-    user-select: none; 
-    white-space: nowrap; 
-    overflow: hidden; 
-    text-overflow: ellipsis; 
-    margin-top: 4px;
-}
 
 .address-inline-container { display: inline-flex; align-items: center; gap: 8px; max-width: 100%; min-width: 0; }
 .interactive-addr-link { cursor: pointer; text-decoration: underline; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
@@ -336,14 +346,14 @@ td.balance-cell { font-family: monospace; font-weight: bold; color: #fff; text-a
                                     <th>
                                         <div class="th-title-area">
                                             <span data-i18n="th_rem">备注名称</span>
-                                            <input type="text" id="headerSearchInput" class="control-dark-btn" style="text-align: left;" oninput="handleFilterUIChange()" placeholder="🔍 过滤备注或地址...">
+                                            <input type="text" id="headerSearchInput" class="control-dark-btn" oninput="handleFilterUIChange()" placeholder="🔍 过滤备注或地址...">
                                         </div>
                                     </th>
                                     <th data-i18n="th_addr">监控钱包地址</th>
                                     <th>
                                         <div class="th-title-area">
                                             <span id="dynamicTableHeader">Token 余额</span>
-                                            <span class="control-dark-btn sort-mini-trigger" id="btn_sort_balance" onclick="toggleBalanceSort()" data-i18n="sort_def">📊 排序: 默认</span>
+                                            <button class="control-dark-btn sort-mini-trigger" id="btn_sort_balance" onclick="toggleBalanceSort()" data-i18n="sort_def">📊 排序: 默认</button>
                                         </div>
                                     </th>
                                     <th style="text-align: center;" data-i18n="th_act">操作</th>
@@ -669,7 +679,6 @@ async function updateAllBalances() {
     isUpdating = false;
     if (btn) { btn.innerText = I18N_DICTS[currentLang].btn_fetch; btn.disabled = false; }
     
-    // 调用重绘UI，由于过滤输入框在 <tbody> 外部，这里的重绘不会影响过滤输入框中的任何文字
     renderUI();
 }
 
@@ -849,7 +858,7 @@ function renderUI() {
     let processedWallets = walletList.map((w, originalIndex) => ({ ...w, originalIndex }));
     const keyword = document.getElementById("headerSearchInput").value.trim().toLowerCase();
 
-    // 过滤逻辑正常运转，且绝对不会影响过滤文本框里正在输入的文本
+    // 过滤逻辑正常运转
     if (keyword !== "") {
         processedWallets = processedWallets.filter(w => 
             w.remark.toLowerCase().includes(keyword) || 
@@ -865,7 +874,7 @@ function renderUI() {
         });
     }
 
-    // 只修改 <tbody> 内部，完全隔离表头的输入框，保障输入框不失焦、不重置、不自动清空！
+    // 只修改 tbody 内部，完全隔离表头输入框
     const tbody = document.getElementById("walletTableBody");
     tbody.innerHTML = "";
     let totalAccumulator = 0;
