@@ -177,9 +177,7 @@ td.balance-cell { font-family: monospace; font-weight: bold; color: #fff; text-a
 
 .th-title-area { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; width: 100%; gap: 6px; }
 
-/* * 【视觉控制优化核心】
- * 1. 过滤和排序按钮完美高度对齐 (32px) 
- * 2. 彻底去除了点击或获得焦点的半透明蓝色阴影和蓝色外框 (box-shadow/outline)
+/* * 【视觉核心修改 1】：统一控制按钮样式，彻底剥离点击/焦点态的蓝色半透样式
  */
 .control-dark-btn {
     height: 32px;                     
@@ -189,8 +187,9 @@ td.balance-cell { font-family: monospace; font-weight: bold; color: #fff; text-a
     border: 1px solid #475569; 
     border-radius: 6px; 
     background: #0f172a;              
-    outline: none;                    /* 移除默认蓝色焦点轮廓 */
-    -webkit-tap-highlight-color: transparent; /* 移除移动端点击半透蓝背景 */
+    outline: none !important;                    
+    -webkit-tap-highlight-color: transparent !important; /* 彻底阻断移动端 WebView 的点击半透蓝反馈 */
+    -webkit-user-modify: read-only;
     transition: border-color 0.15s ease, color 0.15s ease; 
     font-weight: normal;
     display: inline-flex;
@@ -199,14 +198,14 @@ td.balance-cell { font-family: monospace; font-weight: bold; color: #fff; text-a
     box-sizing: border-box;
 }
 
-/* ① 过滤输入框自适应限制：大幅缩短，提升美观度 */
+/* ① 过滤输入框尺寸大大缩短，排版更匀称 */
 input.control-dark-btn {
     width: 100%;
-    max-width: 110px;                 /* 缩短自适应边界，确保紧凑和排版匀称 */
+    max-width: 110px;                 /* 从 156px 缩减至 110px */
     text-align: left;
 }
 
-/* 排序按钮宽度自适应 */
+/* 排序按钮 */
 .sort-mini-trigger { 
     cursor: pointer; 
     user-select: none; 
@@ -215,14 +214,26 @@ input.control-dark-btn {
     margin-top: 4px;
     border: 1px solid #475569;
 }
-
-/* ② 悬停及激活态优化：无蓝色阴影，视觉风格纯净 */
-.control-dark-btn:focus, .control-dark-btn:hover { 
-    border-color: #38bdf8; 
-    color: #38bdf8; 
-    box-shadow: none;                 /* 彻底剥离任何蓝色阴影/外发光样式 */
-    outline: none;                    
+/* 解决点击时触发系统选区产生的底色高亮 */
+.sort-mini-trigger::selection {
+    background: transparent;
 }
+
+/* * 【视觉核心修改 2】：彻底去除聚焦和激活状态下的 box-shadow（蓝色半透层/蓝发光）和变暗变灰样式
+ * 点击时底色保持纯净的暗色卡片背景（#0f172a），且无任何附加修饰 
+ */
+.control-dark-btn:focus, 
+.control-dark-btn:hover,
+.control-dark-btn:active,
+.control-dark-btn:focus-visible,
+.control-dark-btn:focus-within { 
+    border-color: #38bdf8 !important; 
+    color: #38bdf8 !important; 
+    background: #0f172a !important;   /* 底色绝对保持不变 */
+    box-shadow: none !important;      /* 彻底抹去蓝色半透投影 */
+    outline: none !important;         /* 彻底抹去默认系统蓝框 */
+}
+
 .control-dark-btn::placeholder { color: #475569; }
 
 .address-inline-container { display: inline-flex; align-items: center; gap: 8px; max-width: 100%; min-width: 0; }
@@ -473,7 +484,7 @@ const I18N_DICTS = {
         card_add_wallet: "➕ 監控錢包添加", btn_add_wallet: "確認添加此錢包到觀察隊列",
         card_wallet_list: "錢包明細清單", btn_fetch: "🔄 一鍵拉取實時鏈上餘額", btn_fetching: "⏳ 同步中...",
         th_idx: "序號", th_net: "網絡", th_rem: "備註名稱", th_addr: "監控錢包地址", th_act: "操作",
-        card_add_token: "🔧 自定義備查代幣添加", label_symbol: "代幣簡稱 (Symbol)", label_chain: "所屬公鏈 (Chain)",
+        card_add_token: "🔧 自定義備備查代幣添加", label_symbol: "代幣簡稱 (Symbol)", label_chain: "所屬公鏈 (Chain)",
         label_contract: "代幣智慧合約/Mint地址", label_decimals: "代幣精度位 (Decimals)", btn_save_token: "💾 錄入並備查此代幣",
         card_token_list: "📋 現已備查的代幣資產", copyright: "版權和解釋權屬於藤蔓協議雲南商學院",
         sys_visits: "📊 系統累計使用人數：", sys_times: "人次", dropdown_prefix: "🔍 觀察查看 ",
