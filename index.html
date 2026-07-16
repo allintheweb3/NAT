@@ -71,6 +71,18 @@ html, body {
 .container { max-width: 1280px; margin: 20px auto; padding: 0 15px; width: 100%; }
 .main-layout { display: grid; grid-template-columns: 2.3fr 1fr; gap: 24px; width: 100%; }
 .card-box { background: #1e293b; padding: 20px; border-radius: 12px; border: 1px solid #334155; margin-bottom: 20px; width: 100%; }
+
+/* 资产明细卡片头部布局重构 */
+.card-list-header {
+    padding: 15px 20px 12px 20px; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    gap: 15px; 
+    flex-wrap: wrap; 
+    position: relative;
+}
+
 .card-header-toggle { display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; }
 .card-title { font-size: 15px; color: #38bdf8; font-weight: bold; border-left: 4px solid #38bdf8; padding-left: 10px; display: flex; align-items: center; justify-content: space-between; width: 100%; }
 .toggle-icon { font-size: 12px; color: #64748b; }
@@ -105,12 +117,12 @@ table {
     min-width: 680px; 
 }
 
-/* 严格分配PC端各列占比，实现对仗美感 */
+/* 严格分配各列占比 */
 th:nth-child(1), td:nth-child(1) { width: 55px; text-align: center; } 
 th:nth-child(2), td:nth-child(2) { width: 85px; text-align: center; } 
 th:nth-child(3), td:nth-child(3) { width: 150px; text-align: left; } 
-th:nth-child(4), td:nth-child(4) { width: auto; text-align: left; }  
-th:nth-child(5), td:nth-child(5) { width: 160px; text-align: left; } /* ① 余额对齐：前对齐（左对齐） */
+th:nth-child(4), td:nth-child(4) { width: auto; text-align: left; }  /* 地址列自适应 */
+th:nth-child(5), td:nth-child(5) { width: 160px; text-align: left; }  /* 余额前对齐（左对齐） */
 th:nth-child(6), td:nth-child(6) { width: 80px; text-align: center; } 
 
 th, td { padding: 14px 12px; font-size: 13px; border-bottom: 1px solid #334155; vertical-align: middle; overflow: hidden; }
@@ -120,7 +132,7 @@ tr:hover td { background: rgba(51, 65, 85, 0.3); }
 td.index-cell { font-family: monospace; color: #64748b; font-weight: bold; }
 td.address-cell { font-family: monospace; color: #38bdf8; font-size: 13px; }
 td.remark-cell { color: #e2e8f0; font-weight: 500; }
-td.balance-cell { font-family: monospace; font-weight: bold; color: #fff; text-align: left; } /* ① 保证余额单元格左对齐 */
+td.balance-cell { font-family: monospace; font-weight: bold; color: #fff; text-align: left; } 
 
 /* 备注容器控制 */
 .remark-inline-container { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; min-width: 0; }
@@ -134,9 +146,25 @@ td.balance-cell { font-family: monospace; font-weight: bold; color: #fff; text-a
 }
 .edit-remark-icon:hover { color: #38bdf8; background: rgba(56, 189, 248, 0.1); border-color: rgba(56, 189, 248, 0.2); }
 
-/* 表头搜索与排序 */
+/* 表头内元素排版 */
 .th-title-area { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; width: 100%; gap: 6px; }
-.th-search-input { width: 100%; max-width: 130px; height: 30px; padding: 4px 8px; font-size: 11px; color: #94a3b8; border: 1px solid #475569; border-radius: 4px; background: #0f172a; margin-top: 4px; font-weight: normal; outline: none; transition: all 0.15s ease; }
+
+/* ① 过滤框改到地址表头的下方样式 */
+.th-search-input { 
+    width: 100%; 
+    max-width: 160px; 
+    height: 30px; 
+    padding: 4px 8px; 
+    font-size: 11px; 
+    color: #94a3b8; 
+    border: 1px solid #475569; 
+    border-radius: 4px; 
+    background: #0f172a; 
+    margin-top: 6px; 
+    font-weight: normal; 
+    outline: none; 
+    transition: all 0.15s ease; 
+}
 .th-search-input:focus { border-color: #38bdf8; color: #fff; box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.15); }
 .th-search-input::placeholder { color: #475569; }
 
@@ -166,6 +194,16 @@ td.balance-cell { font-family: monospace; font-weight: bold; color: #fff; text-a
 .footer-counter { display: inline-block; margin-top: 8px; background: rgba(56, 189, 248, 0.05); border: 1px solid rgba(56, 189, 248, 0.15); padding: 4px 14px; border-radius: 20px; color: #94a3b8; }
 .counter-num { color: #38bdf8; font-weight: bold; font-family: monospace; }
 
+/* ② 一键拉取链上余额：适屏与流式控制，确保在各宽度下都靠右，且在小屏时自动沉淀到区块右下角 */
+.action-btn-container {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 12px 20px;
+    background: #1e293b;
+    border-top: 1px solid #334155;
+}
+
 /* ==================== 5. 极致媒体查询 ==================== */
 @media (max-width: 992px) {
     .main-layout { grid-template-columns: 1fr; gap: 15px; }
@@ -177,6 +215,15 @@ td.balance-cell { font-family: monospace; font-weight: bold; color: #fff; text-a
     .header-meta-text p { font-size: 12px; padding: 0 10px; }
     th, td { padding: 10px 8px; font-size: 12px; }
     table { min-width: 650px; }
+    
+    /* 移动端下将一键拉取按钮在最底部/右下角表现更为显著 */
+    .action-btn-container {
+        padding: 15px;
+        background: #151f32;
+    }
+    .action-btn-container button {
+        width: 100%; /* 小屏下按钮撑满或居右，这里采用通栏大按钮方便手机按，或者保留 flex-end */
+    }
 }
 </style>
 </head>
@@ -240,13 +287,9 @@ td.balance-cell { font-family: monospace; font-weight: bold; color: #fff; text-a
                     </div>
                 </div>
 
-                <div class="card-box" style="padding: 0; overflow: hidden;">
-                    <div style="padding: 15px 20px 12px 20px; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap;">
-                        <div style="display: flex; align-items: center; gap: 5px;">
-                            <div class="card-title" data-i18n="card_wallet_list" style="margin: 0; border:none; padding:0; width: auto;">钱包明细清单</div>
-                        </div>
-                        <input type="text" id="headerSearchInput" class="th-search-input" oninput="handleFilterUIChange()" placeholder="🔍 过滤..." style="margin-top:0; width:120px;">
-                        <button onclick="updateAllBalances()" id="refreshBtn" data-i18n="btn_fetch">🔄 一键拉取实时链上余额</button>
+                <div class="card-box" style="padding: 0; overflow: hidden; display: flex; flex-direction: column;">
+                    <div class="card-list-header">
+                        <div class="card-title" data-i18n="card_wallet_list" style="margin: 0; border:none; padding:0; width: auto;">钱包明细清单</div>
                     </div>
 
                     <div class="table-scroll-container">
@@ -256,7 +299,12 @@ td.balance-cell { font-family: monospace; font-weight: bold; color: #fff; text-a
                                     <th data-i18n="th_idx">序号</th>
                                     <th data-i18n="th_net">网络</th>
                                     <th data-i18n="th_rem">备注名称</th>
-                                    <th data-i18n="th_addr">监控钱包地址</th>
+                                    <th>
+                                        <div class="th-title-area">
+                                            <span data-i18n="th_addr">监控钱包地址</span>
+                                            <input type="text" id="headerSearchInput" class="th-search-input" oninput="handleFilterUIChange()" placeholder="🔍 过滤地址备注...">
+                                        </div>
+                                    </th>
                                     <th>
                                         <div class="th-title-area">
                                             <span id="dynamicTableHeader">Token 余额</span>
@@ -269,6 +317,10 @@ td.balance-cell { font-family: monospace; font-weight: bold; color: #fff; text-a
                             <tbody id="walletTableBody">
                                 </tbody>
                         </table>
+                    </div>
+
+                    <div class="action-btn-container">
+                        <button onclick="updateAllBalances()" id="refreshBtn" data-i18n="btn_fetch">🔄 一键拉取实时链上余额</button>
                     </div>
                 </div>
             </section>
@@ -371,7 +423,7 @@ const I18N_DICTS = {
         alert_empty_wallet: "地址栏不可为空！", alert_exist_wallet: "当前网络的该钱包地址已存在于监控清单中！",
         alert_del_wallet: "确认从列表中永久移出此监控钱包吗？", badge_del: "删除", expand: "展开 ▼", collapse: "收起 ▲",
         sort_def: "📊 排序: 默认", sort_desc: "📉 排序: 从高到低", sort_asc: "📈 排序: 从低到高",
-        copied: "已复制!", copy_btn: "复制", search_holder: "🔍 过滤...",
+        copied: "已复制!", copy_btn: "复制", search_holder: "🔍 过滤地址备注...",
         prompt_edit_rem: "请输入新的备注名称:", token_bal: "余额"
     },
     tw: {
@@ -390,7 +442,7 @@ const I18N_DICTS = {
         alert_empty_wallet: "地址欄不可為空！", alert_exist_wallet: "當前網絡的該錢包地址已存在於監控清單中！",
         alert_del_wallet: "確認從列表中永久移出此監控錢包嗎？", badge_del: "刪除", expand: "展開 ▼", collapse: "收起 ▲",
         sort_def: "📊 排序: 默認", sort_desc: "📉 排序: 從高到低", sort_asc: "📈 排序: 從低到高",
-        copied: "已複製!", copy_btn: "複製", search_holder: "🔍 過濾...",
+        copied: "已複製!", copy_btn: "複製", search_holder: "🔍 過濾地址備註...",
         prompt_edit_rem: "請輸入新的備註名稱:", token_bal: "餘額"
     },
     ja: {
@@ -767,7 +819,11 @@ function renderUI() {
     const keyword = document.getElementById("headerSearchInput").value.trim().toLowerCase();
 
     if (keyword !== "") {
-        processedWallets = processedWallets.filter(w => w.remark.toLowerCase().includes(keyword));
+        // 允许根据备注或地址搜索
+        processedWallets = processedWallets.filter(w => 
+            w.remark.toLowerCase().includes(keyword) || 
+            w.address.toLowerCase().includes(keyword)
+        );
     }
 
     if (balanceSortState !== "DEFAULT") {
@@ -837,7 +893,7 @@ function renderUI() {
         tdAddr.appendChild(wrapDiv);
         tr.appendChild(tdAddr);
 
-        // 5. 余额 (① 余额前对齐：对齐表格第4列)
+        // 5. 余额 (对齐表格第5列)
         const tdBal = document.createElement("td"); 
         tdBal.className = "balance-cell"; 
         tdBal.innerHTML = isUpdating ? '<span class="loading-pulse">...</span>' : bal.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: maxFraction});
