@@ -72,15 +72,15 @@ html, body {
 .main-layout { display: grid; grid-template-columns: 2.3fr 1fr; gap: 24px; width: 100%; }
 .card-box { background: #1e293b; padding: 20px; border-radius: 12px; border: 1px solid #334155; margin-bottom: 20px; width: 100%; }
 
-/* 资产明细卡片头部布局重构 */
+/* 资产明细卡片头部布局（支持标题与缩小版按钮同行放置） */
 .card-list-header {
-    padding: 15px 20px 12px 20px; 
+    padding: 15px 20px; 
     display: flex; 
     justify-content: space-between; 
-    align-items: center; 
+    align-items: flex-end; /* 与底部对齐，形成在行内右下角的视觉感 */
     gap: 15px; 
-    flex-wrap: wrap; 
-    position: relative;
+    border-bottom: 1px solid #334155;
+    background: #1e293b;
 }
 
 .card-header-toggle { display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; }
@@ -101,6 +101,20 @@ button.btn-success:hover { background: #059669; }
 button.btn-danger { background: #ef4444; height: 32px; padding: 0 10px; font-size: 12px; }
 button.btn-danger:hover { background: #dc2626; }
 
+/* ② 钱包明细清单行右下角的微型一键拉取按钮样式 */
+button.btn-mini-fetch {
+    height: 30px;
+    padding: 0 12px;
+    font-size: 11px; /* 缩小字号 */
+    font-weight: 600;
+    background: #2563eb;
+    border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+button.btn-mini-fetch:hover {
+    background: #3b82f6;
+}
+
 /* ==================== 4. 经典表格布局与平滑自适应 ==================== */
 .table-scroll-container { 
     width: 100%; 
@@ -120,9 +134,9 @@ table {
 /* 严格分配各列占比 */
 th:nth-child(1), td:nth-child(1) { width: 55px; text-align: center; } 
 th:nth-child(2), td:nth-child(2) { width: 85px; text-align: center; } 
-th:nth-child(3), td:nth-child(3) { width: 150px; text-align: left; } 
+th:nth-child(3), td:nth-child(3) { width: 160px; text-align: left; } /* 备注列适当加宽以兼容过滤输入框 */
 th:nth-child(4), td:nth-child(4) { width: auto; text-align: left; }  /* 地址列自适应 */
-th:nth-child(5), td:nth-child(5) { width: 160px; text-align: left; }  /* 余额前对齐（左对齐） */
+th:nth-child(5), td:nth-child(5) { width: 160px; text-align: left; }  /* 余额左对齐 */
 th:nth-child(6), td:nth-child(6) { width: 80px; text-align: center; } 
 
 th, td { padding: 14px 12px; font-size: 13px; border-bottom: 1px solid #334155; vertical-align: middle; overflow: hidden; }
@@ -136,7 +150,7 @@ td.balance-cell { font-family: monospace; font-weight: bold; color: #fff; text-a
 
 /* 备注容器控制 */
 .remark-inline-container { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; min-width: 0; }
-.remark-text-span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100px; }
+.remark-text-span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 110px; }
 
 /* 铅笔微型修饰 */
 .edit-remark-icon { 
@@ -149,10 +163,10 @@ td.balance-cell { font-family: monospace; font-weight: bold; color: #fff; text-a
 /* 表头内元素排版 */
 .th-title-area { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; width: 100%; gap: 6px; }
 
-/* ① 过滤框改到地址表头的下方样式 */
+/* ① 过滤输入框样式：改到“备注”表头的正下方 */
 .th-search-input { 
     width: 100%; 
-    max-width: 160px; 
+    max-width: 140px; 
     height: 30px; 
     padding: 4px 8px; 
     font-size: 11px; 
@@ -194,16 +208,6 @@ td.balance-cell { font-family: monospace; font-weight: bold; color: #fff; text-a
 .footer-counter { display: inline-block; margin-top: 8px; background: rgba(56, 189, 248, 0.05); border: 1px solid rgba(56, 189, 248, 0.15); padding: 4px 14px; border-radius: 20px; color: #94a3b8; }
 .counter-num { color: #38bdf8; font-weight: bold; font-family: monospace; }
 
-/* ② 一键拉取链上余额：适屏与流式控制，确保在各宽度下都靠右，且在小屏时自动沉淀到区块右下角 */
-.action-btn-container {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    padding: 12px 20px;
-    background: #1e293b;
-    border-top: 1px solid #334155;
-}
-
 /* ==================== 5. 极致媒体查询 ==================== */
 @media (max-width: 992px) {
     .main-layout { grid-template-columns: 1fr; gap: 15px; }
@@ -215,15 +219,6 @@ td.balance-cell { font-family: monospace; font-weight: bold; color: #fff; text-a
     .header-meta-text p { font-size: 12px; padding: 0 10px; }
     th, td { padding: 10px 8px; font-size: 12px; }
     table { min-width: 650px; }
-    
-    /* 移动端下将一键拉取按钮在最底部/右下角表现更为显著 */
-    .action-btn-container {
-        padding: 15px;
-        background: #151f32;
-    }
-    .action-btn-container button {
-        width: 100%; /* 小屏下按钮撑满或居右，这里采用通栏大按钮方便手机按，或者保留 flex-end */
-    }
 }
 </style>
 </head>
@@ -290,6 +285,8 @@ td.balance-cell { font-family: monospace; font-weight: bold; color: #fff; text-a
                 <div class="card-box" style="padding: 0; overflow: hidden; display: flex; flex-direction: column;">
                     <div class="card-list-header">
                         <div class="card-title" data-i18n="card_wallet_list" style="margin: 0; border:none; padding:0; width: auto;">钱包明细清单</div>
+                        
+                        <button onclick="updateAllBalances()" id="refreshBtn" class="btn-mini-fetch" data-i18n="btn_fetch">🔄 一键拉取实时链上余额</button>
                     </div>
 
                     <div class="table-scroll-container">
@@ -298,13 +295,13 @@ td.balance-cell { font-family: monospace; font-weight: bold; color: #fff; text-a
                                 <tr>
                                     <th data-i18n="th_idx">序号</th>
                                     <th data-i18n="th_net">网络</th>
-                                    <th data-i18n="th_rem">备注名称</th>
                                     <th>
                                         <div class="th-title-area">
-                                            <span data-i18n="th_addr">监控钱包地址</span>
-                                            <input type="text" id="headerSearchInput" class="th-search-input" oninput="handleFilterUIChange()" placeholder="🔍 过滤地址备注...">
+                                            <span data-i18n="th_rem">备注名称</span>
+                                            <input type="text" id="headerSearchInput" class="th-search-input" oninput="handleFilterUIChange()" placeholder="🔍 过滤备注或地址...">
                                         </div>
                                     </th>
+                                    <th data-i18n="th_addr">监控钱包地址</th>
                                     <th>
                                         <div class="th-title-area">
                                             <span id="dynamicTableHeader">Token 余额</span>
@@ -317,10 +314,6 @@ td.balance-cell { font-family: monospace; font-weight: bold; color: #fff; text-a
                             <tbody id="walletTableBody">
                                 </tbody>
                         </table>
-                    </div>
-
-                    <div class="action-btn-container">
-                        <button onclick="updateAllBalances()" id="refreshBtn" data-i18n="btn_fetch">🔄 一键拉取实时链上余额</button>
                     </div>
                 </div>
             </section>
@@ -386,7 +379,7 @@ td.balance-cell { font-family: monospace; font-weight: bold; color: #fff; text-a
 </div>
 
 <script>
-// ==================== 极简多语言驱动设计 ====================
+// ==================== 多语言字典 ====================
 const I18N_DICTS = {
     en: {
         main_title: "Multi-Chain Multi-Wallet Intelligent Asset Dashboard",
@@ -423,17 +416,17 @@ const I18N_DICTS = {
         alert_empty_wallet: "地址栏不可为空！", alert_exist_wallet: "当前网络的该钱包地址已存在于监控清单中！",
         alert_del_wallet: "确认从列表中永久移出此监控钱包吗？", badge_del: "删除", expand: "展开 ▼", collapse: "收起 ▲",
         sort_def: "📊 排序: 默认", sort_desc: "📉 排序: 从高到低", sort_asc: "📈 排序: 从低到高",
-        copied: "已复制!", copy_btn: "复制", search_holder: "🔍 过滤地址备注...",
+        copied: "已复制!", copy_btn: "复制", search_holder: "🔍 过滤备注或地址...",
         prompt_edit_rem: "请输入新的备注名称:", token_bal: "余额"
     },
     tw: {
-        main_title: "多鏈多錢包智能資產看板",
+        main_title: "多鏈多錢包智慧資產看板",
         main_desc: "動態添加代幣 | 多錢包合併計算 | 跨域容錯高兼容鏈上通信架構",
         monitoring: "正在監控", wallets: "個錢包",
         card_add_wallet: "➕ 監控錢包添加", btn_add_wallet: "確認添加此錢包到觀察隊列",
         card_wallet_list: "錢包明細清單", btn_fetch: "🔄 一鍵拉取實時鏈上餘額", btn_fetching: "⏳ 同步中...",
         th_idx: "序號", th_net: "網絡", th_rem: "備註名稱", th_addr: "監控錢包地址", th_act: "操作",
-        card_add_token: "🔧 自定義備備查代幣添加", label_symbol: "代幣簡稱 (Symbol)", label_chain: "所屬公鏈 (Chain)",
+        card_add_token: "🔧 自定義備查代幣添加", label_symbol: "代幣簡稱 (Symbol)", label_chain: "所屬公鏈 (Chain)",
         label_contract: "代幣智慧合約/Mint地址", label_decimals: "代幣精度位 (Decimals)", btn_save_token: "💾 錄入並備查此代幣",
         card_token_list: "📋 現已備查的代幣資產", copyright: "版權和解釋權屬於藤蔓協議雲南商學院",
         sys_visits: "📊 系統累計使用人數：", sys_times: "人次", dropdown_prefix: "🔍 觀察查看 ",
@@ -442,7 +435,7 @@ const I18N_DICTS = {
         alert_empty_wallet: "地址欄不可為空！", alert_exist_wallet: "當前網絡的該錢包地址已存在於監控清單中！",
         alert_del_wallet: "確認從列表中永久移出此監控錢包嗎？", badge_del: "刪除", expand: "展開 ▼", collapse: "收起 ▲",
         sort_def: "📊 排序: 默認", sort_desc: "📉 排序: 從高到低", sort_asc: "📈 排序: 從低到高",
-        copied: "已複製!", copy_btn: "複製", search_holder: "🔍 過濾地址備註...",
+        copied: "已複製!", copy_btn: "複製", search_holder: "🔍 過濾備註或地址...",
         prompt_edit_rem: "請輸入新的備註名稱:", token_bal: "餘額"
     },
     ja: {
@@ -507,7 +500,6 @@ function switchLanguage(langKey) {
     renderUI();
 }
 
-// 自动识别用户首选语言
 function autoDetectGeoLanguage() {
     const saved = localStorage.getItem("app_lang");
     if (saved) {
@@ -551,7 +543,6 @@ let walletList = JSON.parse(localStorage.getItem("cfg_wallets")) || INITIAL_WALL
 let balanceSortState = "DEFAULT"; 
 let isUpdating = false;
 
-// 定时重载
 setTimeout(() => {
     window.location.reload();
 }, 60000);
@@ -819,7 +810,6 @@ function renderUI() {
     const keyword = document.getElementById("headerSearchInput").value.trim().toLowerCase();
 
     if (keyword !== "") {
-        // 允许根据备注或地址搜索
         processedWallets = processedWallets.filter(w => 
             w.remark.toLowerCase().includes(keyword) || 
             w.address.toLowerCase().includes(keyword)
@@ -858,7 +848,7 @@ function renderUI() {
         tdNet.innerHTML = `<span class="chain-badge badge-${w.chain}">${w.chain}</span>`; 
         tr.appendChild(tdNet);
         
-        // 3. 备注
+        // 3. 备注 (上方有过滤输入框)
         const tdRem = document.createElement("td"); 
         tdRem.className = "remark-cell";
         const remWrap = document.createElement("div"); 
