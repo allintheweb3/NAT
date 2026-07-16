@@ -59,16 +59,16 @@ html, body {
     text-overflow: ellipsis;
 }
 
-/* 副标题：关键重构！通过 clamp 确保在大屏到极小屏下都能自动适屏在一行内，不折行 */
+/* 副标题：利用 clamp 确保在大屏到极小屏下都能自动适屏在一行内，不折行 */
 .header-meta-text p { 
     color: #64748b; 
-    font-size: clamp(10px, 3.2vw, 14px); /* 视口单位自动缩放 */
+    font-size: clamp(10px, 3.2vw, 14px); 
     margin: 0 auto; 
     max-width: 100%; 
     line-height: 1.5; 
-    white-space: nowrap; /* 强制在一行内 */
-    overflow: hidden; /* 溢出隐藏 */
-    text-overflow: ellipsis; /* 极极端情况尾部显示点点点，防止把网页撑变形 */
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis; 
 }
 
 .summary-banner { 
@@ -126,7 +126,7 @@ button.btn-danger:hover { background: #dc2626; }
 button.btn-mini-fetch {
     height: 30px;
     padding: 0 10px;
-    font-size: clamp(10px, 2.5vw, 12px); /* 按钮文字自适应，防止超小屏爆框 */
+    font-size: clamp(10px, 2.5vw, 12px); 
     font-weight: 600;
     background: #2563eb;
     border-radius: 6px;
@@ -181,8 +181,8 @@ td.balance-cell { font-family: monospace; font-weight: bold; color: #fff; text-a
 
 .th-title-area { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; width: 100%; gap: 6px; }
 
-/* 过滤输入框样式 */
-.th-search-input { 
+/* 统一设计的控制区按钮样式（用于排序按钮和过滤框） */
+.control-dark-btn {
     width: 100%; 
     max-width: 140px; 
     height: 30px; 
@@ -191,17 +191,30 @@ td.balance-cell { font-family: monospace; font-weight: bold; color: #fff; text-a
     color: #94a3b8; 
     border: 1px solid #475569; 
     border-radius: 4px; 
-    background: #0f172a; 
-    margin-top: 6px; 
-    font-weight: normal; 
+    background: #0f172a; /* 统一暗黑背景 */
     outline: none; 
     transition: all 0.15s ease; 
+    font-weight: normal;
+    text-align: center;
 }
-.th-search-input:focus { border-color: #38bdf8; color: #fff; box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.15); }
-.th-search-input::placeholder { color: #475569; }
+.control-dark-btn:focus, .control-dark-btn:hover { 
+    border-color: #38bdf8; 
+    color: #38bdf8; 
+    box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.15); 
+}
+.control-dark-btn::placeholder { color: #475569; }
 
-.sort-mini-trigger { cursor: pointer; font-size: 11px; color: #94a3b8; display: inline-block; padding: 0 8px; width: 100%; max-width: 130px; height: 30px; line-height: 28px; border: 1px solid #475569; border-radius: 4px; background: #0f172a; font-weight: normal; margin-top: 4px; user-select: none; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.sort-mini-trigger:hover { border-color: #38bdf8; color: #38bdf8; }
+/* 覆写一下排序按钮，使其看起来高度对齐 */
+.sort-mini-trigger { 
+    cursor: pointer; 
+    display: inline-block; 
+    line-height: 20px; 
+    user-select: none; 
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis; 
+    margin-top: 4px;
+}
 
 .address-inline-container { display: inline-flex; align-items: center; gap: 8px; max-width: 100%; min-width: 0; }
 .interactive-addr-link { cursor: pointer; text-decoration: underline; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
@@ -233,7 +246,6 @@ td.balance-cell { font-family: monospace; font-weight: bold; color: #fff; text-a
 
 @media screen and (max-width: 768px) {
     .lang-select-ui { top: 12px; right: 12px; padding: 4px 8px; font-size: 12px; }
-    /* 微调标题头部区域 padding */
     .full-viewport-header-zone { padding: 35px 10px 25px 10px; }
     .header-meta-text { margin-bottom: 16px; }
     th, td { padding: 10px 8px; font-size: 12px; }
@@ -241,10 +253,8 @@ td.balance-cell { font-family: monospace; font-weight: bold; color: #fff; text-a
 }
 
 @media screen and (max-width: 480px) {
-    /* 针对超小屏幕（如折叠屏、旧款 iPhone）的补充自适应约束 */
     .full-viewport-header-zone { padding: 45px 5px 20px 5px; }
     .header-meta-text h1 { font-size: clamp(16px, 4.5vw, 20px); }
-    /* 超窄屏幕副标题强制缩至极小像素以保障绝不折行 */
     .header-meta-text p { font-size: clamp(9px, 3vw, 11px); }
     .summary-banner { padding: 15px 10px; }
     .card-list-header { padding: 12px 10px; }
@@ -326,14 +336,14 @@ td.balance-cell { font-family: monospace; font-weight: bold; color: #fff; text-a
                                     <th>
                                         <div class="th-title-area">
                                             <span data-i18n="th_rem">备注名称</span>
-                                            <input type="text" id="headerSearchInput" class="th-search-input" oninput="handleFilterUIChange()" placeholder="🔍 过滤备注或地址...">
+                                            <input type="text" id="headerSearchInput" class="control-dark-btn" style="text-align: left;" oninput="handleFilterUIChange()" placeholder="🔍 过滤备注或地址...">
                                         </div>
                                     </th>
                                     <th data-i18n="th_addr">监控钱包地址</th>
                                     <th>
                                         <div class="th-title-area">
                                             <span id="dynamicTableHeader">Token 余额</span>
-                                            <span class="sort-mini-trigger" id="btn_sort_balance" onclick="toggleBalanceSort()" data-i18n="sort_def">📊 排序: 默认</span>
+                                            <span class="control-dark-btn sort-mini-trigger" id="btn_sort_balance" onclick="toggleBalanceSort()" data-i18n="sort_def">📊 排序: 默认</span>
                                         </div>
                                     </th>
                                     <th style="text-align: center;" data-i18n="th_act">操作</th>
@@ -571,7 +581,7 @@ let walletList = JSON.parse(localStorage.getItem("cfg_wallets")) || INITIAL_WALL
 let balanceSortState = "DEFAULT"; 
 let isUpdating = false;
 
-// 页面高强度后台自动重载（每60秒一次）
+// 页面自动重载
 setTimeout(() => {
     window.location.reload();
 }, 60000);
@@ -659,6 +669,7 @@ async function updateAllBalances() {
     isUpdating = false;
     if (btn) { btn.innerText = I18N_DICTS[currentLang].btn_fetch; btn.disabled = false; }
     
+    // 调用重绘UI，由于过滤输入框在 <tbody> 外部，这里的重绘不会影响过滤输入框中的任何文字
     renderUI();
 }
 
@@ -838,6 +849,7 @@ function renderUI() {
     let processedWallets = walletList.map((w, originalIndex) => ({ ...w, originalIndex }));
     const keyword = document.getElementById("headerSearchInput").value.trim().toLowerCase();
 
+    // 过滤逻辑正常运转，且绝对不会影响过滤文本框里正在输入的文本
     if (keyword !== "") {
         processedWallets = processedWallets.filter(w => 
             w.remark.toLowerCase().includes(keyword) || 
@@ -853,6 +865,7 @@ function renderUI() {
         });
     }
 
+    // 只修改 <tbody> 内部，完全隔离表头的输入框，保障输入框不失焦、不重置、不自动清空！
     const tbody = document.getElementById("walletTableBody");
     tbody.innerHTML = "";
     let totalAccumulator = 0;
@@ -877,7 +890,7 @@ function renderUI() {
         tdNet.innerHTML = `<span class="chain-badge badge-${w.chain}">${w.chain}</span>`; 
         tr.appendChild(tdNet);
         
-        // 3. 备注 (上方有过滤输入框)
+        // 3. 备注
         const tdRem = document.createElement("td"); 
         tdRem.className = "remark-cell";
         const remWrap = document.createElement("div"); 
@@ -894,7 +907,7 @@ function renderUI() {
         tdRem.appendChild(remWrap); 
         tr.appendChild(tdRem);
         
-        // 4. 地址与复制按钮
+        // 4. 地址
         const tdAddr = document.createElement("td"); 
         tdAddr.className = "address-cell";
         const wrapDiv = document.createElement("div");
@@ -912,13 +925,13 @@ function renderUI() {
         tdAddr.appendChild(wrapDiv);
         tr.appendChild(tdAddr);
 
-        // 5. 余额 (对齐表格第5列)
+        // 5. 余额
         const tdBal = document.createElement("td"); 
         tdBal.className = "balance-cell"; 
         tdBal.innerHTML = isUpdating ? '<span class="loading-pulse">...</span>' : bal.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: maxFraction});
         tr.appendChild(tdBal);
 
-        // 6. 操作 (删除按钮)
+        // 6. 操作
         const tdAct = document.createElement("td"); 
         tdAct.style.textAlign = "center";
         const delBtn = document.createElement("button"); 
