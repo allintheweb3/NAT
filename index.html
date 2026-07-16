@@ -1,9 +1,30 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>Multi-Chain Multi-Wallet Intelligent Asset Dashboard</title>
+
+<title>多链多钱包智能资产看板 - Multi-Chain Wallet Dashboard</title>
+<meta name="description" content="藤蔓协议多链多钱包智能资产监控看板，支持 ETH、BSC、Solana 链上资产实时同步，提供极简的多钱包资产合并计算与自定义代币管理方案。">
+<meta name="keywords" content="藤蔓协议, 多链钱包, 资产看板, 智能合约, Solana, BSC, ETH, 代币资产监控">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "多链多钱包智能资产看板",
+  "alternateName": "Multi-Chain Wallet Dashboard",
+  "description": "基于藤蔓协议的高兼容链上通信架构，支持跨 ETH、BSC 及 Solana 等多链钱包资产余额的实时拉取与动态看板呈现。",
+  "applicationCategory": "FinanceApplication",
+  "operatingSystem": "All",
+  "browserRequirements": "Requires JavaScript. Requires HTML5.",
+  "author": {
+    "@type": "Organization",
+    "name": "藤蔓协议云南商学院"
+  }
+}
+</script>
+
 <style>
 /* ==================== 1. 基础重置与全局变量 ==================== */
 html, body { 
@@ -72,7 +93,7 @@ button.btn-danger:hover { background: #dc2626; }
 .table-scroll-container { 
     width: 100%; 
     background: #1e293b; 
-    overflow-x: auto; /* 关键：当屏幕过窄时允许表格内横向滚动，彻底防止内容叠压 */
+    overflow-x: auto; 
     -webkit-overflow-scrolling: touch;
 }
 
@@ -81,7 +102,7 @@ table {
     border-collapse: collapse; 
     text-align: left; 
     table-layout: fixed; 
-    min-width: 680px; /* 保护性最小宽度，保证哪怕在 320px 的小手机上，表格各列依然对仗工整不重叠 */
+    min-width: 680px; 
 }
 
 /* 严格分配PC端各列占比，实现对仗美感 */
@@ -89,7 +110,7 @@ th:nth-child(1), td:nth-child(1) { width: 55px; text-align: center; }
 th:nth-child(2), td:nth-child(2) { width: 85px; text-align: center; } 
 th:nth-child(3), td:nth-child(3) { width: 150px; text-align: left; } 
 th:nth-child(4), td:nth-child(4) { width: auto; text-align: left; }  
-th:nth-child(5), td:nth-child(5) { width: 160px; text-align: right; } 
+th:nth-child(5), td:nth-child(5) { width: 160px; text-align: left; } /* ① 余额对齐：前对齐（左对齐） */
 th:nth-child(6), td:nth-child(6) { width: 80px; text-align: center; } 
 
 th, td { padding: 14px 12px; font-size: 13px; border-bottom: 1px solid #334155; vertical-align: middle; overflow: hidden; }
@@ -99,26 +120,17 @@ tr:hover td { background: rgba(51, 65, 85, 0.3); }
 td.index-cell { font-family: monospace; color: #64748b; font-weight: bold; }
 td.address-cell { font-family: monospace; color: #38bdf8; font-size: 13px; }
 td.remark-cell { color: #e2e8f0; font-weight: 500; }
-td.balance-cell { font-family: monospace; font-weight: bold; color: #fff; }
+td.balance-cell { font-family: monospace; font-weight: bold; color: #fff; text-align: left; } /* ① 保证余额单元格左对齐 */
 
-/* 备注容器控制：超出时使用省略号 */
+/* 备注容器控制 */
 .remark-inline-container { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; min-width: 0; }
 .remark-text-span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100px; }
 
 /* 铅笔微型修饰 */
 .edit-remark-icon { 
-    cursor: pointer; 
-    color: #64748b; 
-    font-size: 10px; 
-    display: inline-flex; 
-    align-items: center; 
-    justify-content: center; 
-    width: 16px; 
-    height: 16px; 
-    border-radius: 4px; 
-    border: 1px solid transparent; 
-    transition: all 0.2s; 
-    flex-shrink: 0;
+    cursor: pointer; color: #64748b; font-size: 10px; display: inline-flex; 
+    align-items: center; justify-content: center; width: 16px; height: 16px; 
+    border-radius: 4px; border: 1px solid transparent; transition: all 0.2s; flex-shrink: 0;
 }
 .edit-remark-icon:hover { color: #38bdf8; background: rgba(56, 189, 248, 0.1); border-color: rgba(56, 189, 248, 0.2); }
 
@@ -131,7 +143,7 @@ td.balance-cell { font-family: monospace; font-weight: bold; color: #fff; }
 .sort-mini-trigger { cursor: pointer; font-size: 11px; color: #94a3b8; display: inline-block; padding: 0 8px; width: 100%; max-width: 130px; height: 30px; line-height: 28px; border: 1px solid #475569; border-radius: 4px; background: #0f172a; font-weight: normal; margin-top: 4px; user-select: none; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .sort-mini-trigger:hover { border-color: #38bdf8; color: #38bdf8; }
 
-/* 地址与复制按钮 */
+/* 地址与复制 */
 .address-inline-container { display: inline-flex; align-items: center; gap: 8px; max-width: 100%; min-width: 0; }
 .interactive-addr-link { cursor: pointer; text-decoration: underline; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
 .interactive-addr-link:hover { color: #60a5fa; }
@@ -154,37 +166,26 @@ td.balance-cell { font-family: monospace; font-weight: bold; color: #fff; }
 .footer-counter { display: inline-block; margin-top: 8px; background: rgba(56, 189, 248, 0.05); border: 1px solid rgba(56, 189, 248, 0.15); padding: 4px 14px; border-radius: 20px; color: #94a3b8; }
 .counter-num { color: #38bdf8; font-weight: bold; font-family: monospace; }
 
-/* ==================== 5. 极致媒体查询（纯净微调，不改变表格结构） ==================== */
-
+/* ==================== 5. 极致媒体查询 ==================== */
 @media (max-width: 992px) {
     .main-layout { grid-template-columns: 1fr; gap: 15px; }
     .form-row-inline { grid-template-columns: 1fr; gap: 8px; }
 }
-
 @media screen and (max-width: 768px) {
     .lang-select-ui { top: 12px; right: 12px; padding: 4px 8px; font-size: 12px; }
     .header-meta-text h1 { font-size: 22px; padding-top: 35px; }
     .header-meta-text p { font-size: 12px; padding: 0 10px; }
-
-    /* 针对小屏，对表格文字和内边距进行流式压缩，使其保持绝佳可读性而绝不溢出 */
-    th, td { 
-        padding: 10px 8px; 
-        font-size: 12px; 
-    }
-    
-    /* 锁定单元格最小宽，防止因极窄屏幕导致文字压叠，同时确保左右滑动的自适应效果 */
-    table {
-        min-width: 650px;
-    }
+    th, td { padding: 10px 8px; font-size: 12px; }
+    table { min-width: 650px; }
 }
 </style>
 </head>
 <body>
 
 <div class="page-container">
-    <div class="content-wrap">
+    <header class="content-wrap">
         <div class="full-viewport-header-zone">
-            <select id="langSwitcher" class="lang-select-ui" onchange="handleLangChange(this.value)">
+            <select id="langSwitcher" class="lang-select-ui" onchange="switchLanguage(this.value)">
                 <option value="en">🌐 English</option>
                 <option value="zh" selected>🌐 简体中文</option>
                 <option value="tw">🌐 繁體中文</option>
@@ -193,8 +194,8 @@ td.balance-cell { font-family: monospace; font-weight: bold; color: #fff; }
             </select>
 
             <div class="header-meta-text">
-                <h1 id="text_main_title">Multi-Chain Multi-Wallet Intelligent Asset Dashboard</h1>
-                <p id="text_main_desc">Dynamic token inclusion | Multi-wallet consolidation | Cross-domain fault-tolerant on-chain communication architecture</p>
+                <h1 data-i18n="main_title">多链多钱包智能资产看板</h1>
+                <p data-i18n="main_desc">动态添加代币 | 多钱包合并计算 | 跨域容错高兼容链上通信架构</p>
             </div>
             
             <div class="summary-banner">
@@ -204,132 +205,137 @@ td.balance-cell { font-family: monospace; font-weight: bold; color: #fff; }
                 </div>
                 <div class="summary-right">
                     <select id="selectDisplayToken" class="select-token-ui" onchange="renderUI()">
-                        <!-- 动态载入 -->
-                    </select>
-                    <div class="wallet-count-badge"><span id="text_monitoring">Monitoring</span> <span id="summary_wallet_count" style="color:#38bdf8;font-weight:bold;">0</span> <span id="text_wallets">wallets</span></div>
+                        </select>
+                    <div class="wallet-count-badge">
+                        <span data-i18n="monitoring">正在监控</span> 
+                        <span id="summary_wallet_count" style="color:#38bdf8;font-weight:bold;">0</span> 
+                        <span data-i18n="wallets">个钱包</span>
+                    </div>
                 </div>
             </div>
         </div>
+    </header>
 
-        <div class="container">
-            <div class="main-layout">
-                <div style="min-width: 0;">
-                    <div class="card-box">
-                        <div class="card-header-toggle" onclick="toggleCard('addWalletContent', 'arrowWallet')">
-                            <div class="card-title">
-                                <span id="text_card_add_wallet">➕ Add Wallet to Monitor</span>
-                                <span id="arrowWallet" class="toggle-icon">Expand ▼</span>
-                            </div>
+    <main class="container">
+        <div class="main-layout">
+            <section style="min-width: 0;">
+                <div class="card-box">
+                    <div class="card-header-toggle" onclick="toggleCard('addWalletContent', 'arrowWallet')">
+                        <div class="card-title">
+                            <span data-i18n="card_add_wallet">➕ 监控钱包添加</span>
+                            <span id="arrowWallet" class="toggle-icon">展开 ▼</span>
                         </div>
-                        <div id="addWalletContent" class="toggle-content collapsed">
-                            <div class="form-row-inline">
-                                <input type="text" id="walletAddress" placeholder="Wallet Address (0x... or SOL address)" />
-                                <input type="text" id="walletRemark" placeholder="Remark (e.g. Whale 1)" />
-                                <select id="walletChain">
-                                    <option value="ETH">Ethereum Chain</option>
-                                    <option value="BSC">BNB Smart Chain</option>
-                                    <option value="SOL">Solana Chain</option>
+                    </div>
+                    <div id="addWalletContent" class="toggle-content collapsed">
+                        <div class="form-row-inline">
+                            <input type="text" id="walletAddress" placeholder="Wallet Address (0x... or SOL address)" />
+                            <input type="text" id="walletRemark" placeholder="Remark (e.g. Whale 1)" />
+                            <select id="walletChain">
+                                <option value="ETH">Ethereum Chain</option>
+                                <option value="BSC">BNB Smart Chain</option>
+                                <option value="SOL">Solana Chain</option>
+                            </select>
+                        </div>
+                        <button class="btn-success" style="width:100%;" data-i18n="btn_add_wallet" onclick="addWallet()">确认添加此钱包到观察队列</button>
+                    </div>
+                </div>
+
+                <div class="card-box" style="padding: 0; overflow: hidden;">
+                    <div style="padding: 15px 20px 12px 20px; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap;">
+                        <div style="display: flex; align-items: center; gap: 5px;">
+                            <div class="card-title" data-i18n="card_wallet_list" style="margin: 0; border:none; padding:0; width: auto;">钱包明细清单</div>
+                        </div>
+                        <input type="text" id="headerSearchInput" class="th-search-input" oninput="handleFilterUIChange()" placeholder="🔍 过滤..." style="margin-top:0; width:120px;">
+                        <button onclick="updateAllBalances()" id="refreshBtn" data-i18n="btn_fetch">🔄 一键拉取实时链上余额</button>
+                    </div>
+
+                    <div class="table-scroll-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th data-i18n="th_idx">序号</th>
+                                    <th data-i18n="th_net">网络</th>
+                                    <th data-i18n="th_rem">备注名称</th>
+                                    <th data-i18n="th_addr">监控钱包地址</th>
+                                    <th>
+                                        <div class="th-title-area">
+                                            <span id="dynamicTableHeader">Token 余额</span>
+                                            <span class="sort-mini-trigger" id="btn_sort_balance" onclick="toggleBalanceSort()" data-i18n="sort_def">📊 排序: 默认</span>
+                                        </div>
+                                    </th>
+                                    <th style="text-align: center;" data-i18n="th_act">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="walletTableBody">
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <aside style="min-width: 0;">
+                <div class="card-box">
+                    <div class="card-header-toggle" onclick="toggleCard('addTokenContent', 'arrow1')">
+                        <div class="card-title">
+                            <span data-i18n="card_add_token">🔧 自定义备查代币添加</span>
+                            <span id="arrow1" class="toggle-icon">展开 ▼</span>
+                        </div>
+                    </div>
+                    <div id="addTokenContent" class="toggle-content collapsed">
+                        <div class="form-grid">
+                            <div>
+                                <label style="font-size:12px; color:#94a3b8;" data-i18n="label_symbol">代币简称 (Symbol)</label>
+                                <input type="text" id="newTokenSymbol" placeholder="e.g. USDT, SOL, ETH" style="width:100%; margin-top:4px;" />
+                            </div>
+                            <div>
+                                <label style="font-size:12px; color:#94a3b8;" data-i18n="label_chain">所属公链 (Chain)</label>
+                                <select id="newTokenChain" style="width:100%; margin-top:4px;">
+                                    <option value="ETH">Ethereum (ERC20)</option>
+                                    <option value="BSC">BNB Smart Chain (BEP20)</option>
+                                    <option value="SOL">Solana Network (SPL/Native)</option>
                                 </select>
                             </div>
-                            <button class="btn-success" style="width:100%;" id="text_btn_add_wallet" onclick="addWallet()">Confirm adding this wallet to query queue</button>
-                        </div>
-                    </div>
-
-                    <div class="card-box" style="padding: 0; overflow: hidden;">
-                        <div style="padding: 15px 20px 12px 20px; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap;">
-                            <div style="display: flex; align-items: center; gap: 5px;">
-                                <div class="card-title" id="text_card_wallet_list" style="margin: 0; border:none; padding:0; width: auto;">Wallet Breakdown List</div>
+                            <div>
+                                <label style="font-size:12px; color:#94a3b8;" data-i18n="label_contract">代币智能合约/Mint地址</label>
+                                <input type="text" id="newTokenContract" placeholder="Contract address" style="width:100%; margin-top:4px;" />
                             </div>
-                            <input type="text" id="headerSearchInput" class="th-search-input" oninput="handleFilterUIChange()" placeholder="🔍 Filter..." style="margin-top:0; width:120px;">
-                            <button onclick="updateAllBalances()" id="refreshBtn">🔄 Fetch Live Balances</button>
-                        </div>
-
-                        <!-- 支持水平横向滚动的表格外包容器 -->
-                        <div class="table-scroll-container">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th id="text_th_idx">Index</th>
-                                        <th id="text_th_net">Network</th>
-                                        <th id="text_th_rem">Wallet Remark</th>
-                                        <th id="text_th_addr">Monitored Wallet Address</th>
-                                        <th>
-                                            <div class="th-title-area" style="align-items: flex-end;">
-                                                <span id="dynamicTableHeader">Token Balance</span>
-                                                <span class="sort-mini-trigger" id="btn_sort_balance" onclick="toggleBalanceSort()">📊 Sort: Default</span>
-                                            </div>
-                                        </th>
-                                        <th style="text-align: center;" id="text_th_act">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="walletTableBody">
-                                    <!-- 数据插槽 -->
-                                </tbody>
-                            </table>
+                            <div>
+                                <label style="font-size:12px; color:#94a3b8;" data-i18n="label_decimals">代币精度位 (Decimals)</label>
+                                <input type="number" id="newTokenDecimals" value="18" min="0" max="18" style="width:100%; margin-top:4px;" />
+                            </div>
+                            <button onclick="addCustomToken()" style="width:100%; margin-top:5px;" data-i18n="btn_save_token">💾 录入并备查此代币</button>
                         </div>
                     </div>
                 </div>
 
-                <div style="min-width: 0;">
-                    <div class="card-box">
-                        <div class="card-header-toggle" onclick="toggleCard('addTokenContent', 'arrow1')">
-                            <div class="card-title">
-                                <span id="text_card_add_token">🔧 Custom Tokens Setup</span>
-                                <span id="arrow1" class="toggle-icon">Expand ▼</span>
-                            </div>
-                        </div>
-                        <div id="addTokenContent" class="toggle-content collapsed">
-                            <div class="form-grid">
-                                <div>
-                                    <label style="font-size:12px; color:#94a3b8;" id="text_label_symbol">Token Symbol</label>
-                                    <input type="text" id="newTokenSymbol" placeholder="e.g. USDT, SOL, ETH" style="width:100%; margin-top:4px;" />
-                                </div>
-                                <div>
-                                    <label style="font-size:12px; color:#94a3b8;" id="text_label_chain">Target Blockchain</label>
-                                    <select id="newTokenChain" style="width:100%; margin-top:4px;">
-                                        <option value="ETH">Ethereum (ERC20)</option>
-                                        <option value="BSC">BNB Smart Chain (BEP20)</option>
-                                        <option value="SOL">Solana Network (SPL/Native)</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label style="font-size:12px; color:#94a3b8;" id="text_label_contract">Smart Contract/Mint Address</label>
-                                    <input type="text" id="newTokenContract" placeholder="Contract address" style="width:100%; margin-top:4px;" />
-                                </div>
-                                <div>
-                                    <label style="font-size:12px; color:#94a3b8;" id="text_label_decimals">Token Decimals</label>
-                                    <input type="number" id="newTokenDecimals" value="18" min="0" max="18" style="width:100%; margin-top:4px;" />
-                                </div>
-                                <button onclick="addCustomToken()" style="width:100%; margin-top:5px;" id="text_btn_save_token">💾 Save and Index Token</button>
-                            </div>
+                <div class="card-box">
+                    <div class="card-header-toggle" onclick="toggleCard('listTokenContent', 'arrow2')">
+                        <div class="card-title">
+                            <span data-i18n="card_token_list">📋 现已备查的代币资产</span>
+                            <span id="arrow2" class="toggle-icon">展开 ▼</span>
                         </div>
                     </div>
-
-                    <div class="card-box">
-                        <div class="card-header-toggle" onclick="toggleCard('listTokenContent', 'arrow2')">
-                            <div class="card-title">
-                                <span id="text_card_token_list">📋 Indexed Token Assets</span>
-                                <span id="arrow2" class="toggle-icon">Expand ▼</span>
-                            </div>
-                        </div>
-                        <div id="listTokenContent" class="toggle-content collapsed">
-                            <div id="customTokenListSlot"></div>
-                        </div>
+                    <div id="listTokenContent" class="toggle-content collapsed">
+                        <div id="customTokenListSlot"></div>
                     </div>
                 </div>
-            </div>
+            </aside>
         </div>
-    </div>
+    </main>
 
-    <div class="footer-zone">
-        <div id="text_copyright">Copyright & Intellectual property belongs to Vine Protocol Yunnan Business School</div>
-        <div class="footer-counter"><span id="text_sys_visits">📊 Total system usage:</span> <span class="counter-num" id="user_counter_slot">1</span> <span id="text_sys_times">times</span></div>
-    </div>
+    <footer class="footer-zone">
+        <div data-i18n="copyright">版权和解释权属于藤蔓协议云南商学院</div>
+        <div class="footer-counter">
+            <span data-i18n="sys_visits">📊 系统累计使用人数：</span> 
+            <span class="counter-num" id="user_counter_slot">1</span> 
+            <span data-i18n="sys_times">人次</span>
+        </div>
+    </footer>
 </div>
 
 <script>
-// ==================== 全球化多语言字典 ====================
-const LANG_DICTIONARY = {
+// ==================== 极简多语言驱动设计 ====================
+const I18N_DICTS = {
     en: {
         main_title: "Multi-Chain Multi-Wallet Intelligent Asset Dashboard",
         main_desc: "Dynamic token inclusion | Multi-wallet consolidation | Cross-domain fault-tolerant architecture",
@@ -340,7 +346,7 @@ const LANG_DICTIONARY = {
         card_add_token: "🔧 Custom Tokens Setup", label_symbol: "Token Symbol", label_chain: "Target Blockchain",
         label_contract: "Smart Contract/Mint Address", label_decimals: "Token Decimals", btn_save_token: "💾 Save and Index Token",
         card_token_list: "📋 Indexed Token Assets", copyright: "Copyright & Intellectual property belongs to Vine Protocol Yunnan Business School",
-        sys_visits: "📊 Total system usage:", sys_times: "times", dropdown_prefix: "🔍 View Asset: ",
+        sys_visits: "📊 Total system usage: ", sys_times: " times", dropdown_prefix: "🔍 View Asset: ",
         alert_empty_token: "Token symbol and Contract/Mint address cannot be empty!", alert_invalid_dec: "Please enter a valid decimal number!",
         alert_exist_token: "This asset already exists in the configuration pool!", alert_del_token: "Removing this token will stop its balance monitoring, proceed?",
         alert_empty_wallet: "Address cannot be empty!", alert_exist_wallet: "This wallet address already exists under the chosen network!",
@@ -375,7 +381,7 @@ const LANG_DICTIONARY = {
         card_add_wallet: "➕ 監控錢包添加", btn_add_wallet: "確認添加此錢包到觀察隊列",
         card_wallet_list: "錢包明細清單", btn_fetch: "🔄 一鍵拉取實時鏈上餘額", btn_fetching: "⏳ 同步中...",
         th_idx: "序號", th_net: "網絡", th_rem: "備註名稱", th_addr: "監控錢包地址", th_act: "操作",
-        card_add_token: "🔧 自定義備查代幣添加", label_symbol: "代幣簡稱 (Symbol)", label_chain: "所屬公鏈 (Chain)",
+        card_add_token: "🔧 自定義備備查代幣添加", label_symbol: "代幣簡稱 (Symbol)", label_chain: "所屬公鏈 (Chain)",
         label_contract: "代幣智慧合約/Mint地址", label_decimals: "代幣精度位 (Decimals)", btn_save_token: "💾 錄入並備查此代幣",
         card_token_list: "📋 現已備查的代幣資產", copyright: "版權和解釋權屬於藤蔓協議雲南商學院",
         sys_visits: "📊 系統累計使用人數：", sys_times: "人次", dropdown_prefix: "🔍 觀察查看 ",
@@ -388,44 +394,82 @@ const LANG_DICTIONARY = {
         prompt_edit_rem: "請輸入新的備註名稱:", token_bal: "餘額"
     },
     ja: {
-        main_title: "マルチチェーン マルチウォレット インテリジェント ダッシュボード",
-        main_desc: "トークン動的追加 | 複数ウォレット統合計算 | クロスドメインフォールトトレラントオンチェーンアーキテクチャ",
+        main_title: "マルチチェーンマルチウォレットダッシュボード",
+        main_desc: "トークン動的追加 | 複数ウォレット統合計算 | クロスドメインフォールトトレラントアーキテクチャ",
         monitoring: "監視中", wallets: "個のウォレット",
         card_add_wallet: "➕ 監視ウォレット追加", btn_add_wallet: "このウォレットを監視キューに追加する",
-        card_wallet_list: "ウォレット明细一覧", btn_fetch: "🔄 リアルタイム残高を取得", btn_fetching: "⏳ 同期中...",
+        card_wallet_list: "ウォレット明細一覧", btn_fetch: "🔄 リアルタイム残高を取得", btn_fetching: "⏳ 同期中...",
         th_idx: "インデックス", th_net: "ネットワーク", th_rem: "備考名称", th_addr: "監視ウォレットアドレス", th_act: "操作",
         card_add_token: "🔧 カスタムトークン設定", label_symbol: "トークンシンボル", label_chain: "対象ブロックチェーン",
-        label_contract: "スマートコントラクト/Mintアドレス", label_decimals: "トークン小数点桁数", btn_save_token: "💾 トークンを保存してインデックス化",
-        card_token_list: "📋 インデックス付きトークン資産", copyright: "Copyright & 知的財産権は Vine Protocol 云南ビジネススクールに帰属します",
+        label_contract: "スマートコントラクト/Mintアドレス", label_decimals: "トークン小数点桁数", btn_save_token: "💾 保存してインデックス化",
+        card_token_list: "📋 登録済みトークン資産", copyright: "Copyright & 知的財産権は Vine Protocol 云南ビジネススクールに帰属します",
         sys_visits: "📊 システム累計利用数：", sys_times: "回", dropdown_prefix: "🔍 資産を表示: ",
-        alert_empty_token: "トークンシンボルとコントラクト/Mintアドレスは空にできません！", alert_invalid_dec: "有効な小数点桁数を入力してください！",
-        alert_exist_token: "このトークンは既に構成プールに存在します！", alert_del_token: "このトークンを削除すると残高監視が停止します。続行しますか？",
-        alert_empty_wallet: "アドレスを入力してください！", alert_exist_wallet: "このウォレットアドレスは選択されたネットワーク内に既に存在します！",
-        alert_del_wallet: "このウォレットを監視リストから完全に削除しますか？", badge_del: "削除", expand: "展開 ▼", collapse: "折りたたみ ▲",
-        sort_def: "📊 並び替え: デフォルト", sort_desc: "📉 並び替え: 高 ➔ 低", sort_asc: "📈 並び替え: 低 ➔ 高",
+        alert_empty_token: "空にできません！", alert_invalid_dec: "有効な値を入力してください！",
+        alert_exist_token: "既に存在します！", alert_del_token: "残高監視が停止します。続行しますか？",
+        alert_empty_wallet: "アドレスを入力してください！", alert_exist_wallet: "既に存在します！",
+        alert_del_wallet: "完全に削除しますか？", badge_del: "削除", expand: "展開 ▼", collapse: "折りたたみ ▲",
+        sort_def: "📊 排序: デフォルト", sort_desc: "📉 排序: 高 ➔ 低", sort_asc: "📈 排序: 低 ➔ 高",
         copied: "コピーしました!", copy_btn: "コピー", search_holder: "🔍 フィルター...",
         prompt_edit_rem: "新しい備考名称を入力してください:", token_bal: "残高"
     },
     ko: {
         main_title: "멀티체인 멀티지갑 인텔리전트 자산 대시보드",
-        main_desc: "동적 토큰 추가 | 다중 지갑 통합 계산 | 크로스 도메인 내결함성 온체인 통신 아키텍처",
+        main_desc: "동적 토큰 추가 | 다중 지갑 통합 계산 | 크로스 도메인 내결함성 온체인 아키처",
         monitoring: "모니터링 중", wallets: "개 지갑",
         card_add_wallet: "➕ 모니터링 지갑 추가", btn_add_wallet: "이 지갑을 조회 대기열에 추가",
         card_wallet_list: "지갑 내역 목록", btn_fetch: "🔄 실시간 잔액 가져오기", btn_fetching: "⏳ 동기화 중...",
         th_idx: "순번", th_net: "네트워크", th_rem: "메모 이름", th_addr: "모니터링 지갑 주소", th_act: "작업",
         card_add_token: "🔧 사용자 정의 토큰 설정", label_symbol: "토큰 심볼", label_chain: "대상 블록체인",
-        label_contract: "스마트 계약/Mint 주소", label_decimals: "토큰 소수점 자리수", btn_save_token: "💾 토큰 저장 및 인덱싱",
+        label_contract: "스마트 계약/Mint 주소", label_decimals: "토큰 소수점 자리수", btn_save_token: "💾 저장 및 인덱싱",
         card_token_list: "📋 인덱싱된 토큰 자산", copyright: "Copyright & 지식재산권은 Vine Protocol 운남 비즈니스 스쿨에 귀속됩니다",
-        sys_visits: "📊 시스템 총 사용 횟수:", sys_times: "회", dropdown_prefix: "🔍 자산 보기: ",
-        alert_empty_token: "토큰 심볼과 계약/Mint 주소는 비워둘 수 없습니다!", alert_invalid_dec: "올바른 소수점 자리수를 입력하세요!",
-        alert_exist_token: "이 자산은 이미 구성 풀에 존재합니다!", alert_del_token: "이 토큰을 제거하면 잔액 모니터링이 중단됩니다. 진행하시겠습니까?",
-        alert_empty_wallet: "주소를 입력해야 합니다!", alert_exist_wallet: "이 지갑 주소는 선택한 네트워크에 이미 존재합니다!",
-        alert_del_wallet: "모니터링 목록에서 이 지갑을 영구히 삭제하시겠습니까?", badge_del: "삭제", expand: "펼치기 ▼", collapse: "접기 ▲",
+        sys_visits: "📊 시스템 총 사용 횟수: ", sys_times: "회", dropdown_prefix: "🔍 자산 보기: ",
+        alert_empty_token: "비워둘 수 없습니다!", alert_invalid_dec: "올바른 소수점 자리수를 입력하세요!",
+        alert_exist_token: "이미 존재합니다!", alert_del_token: "모니터링이 중단됩니다. 진행하시겠습니까?",
+        alert_empty_wallet: "주소를 입력해야 합니다!", alert_exist_wallet: "이미 존재합니다!",
+        alert_del_wallet: "지갑을 영구히 삭제하시겠습니까?", badge_del: "삭제", expand: "펼치기 ▼", collapse: "접기 ▲",
         sort_def: "📊 정렬: 기본", sort_desc: "📉 정렬: 높은 순", sort_asc: "📈 정렬: 낮은 순",
         copied: "복사됨!", copy_btn: "복사", search_holder: "🔍 필터...",
         prompt_edit_rem: "새로운 메모 이름을 입력하세요:", token_bal: "잔액"
     }
 };
+
+let currentLang = "zh";
+
+// 声明式多语言解析机制
+function switchLanguage(langKey) {
+    currentLang = langKey;
+    localStorage.setItem("app_lang", langKey);
+    document.getElementById("langSwitcher").value = langKey;
+    
+    document.querySelectorAll("[data-i18n]").forEach(element => {
+        const key = element.getAttribute("data-i18n");
+        if (I18N_DICTS[langKey] && I18N_DICTS[langKey][key]) {
+            element.textContent = I18N_DICTS[langKey][key];
+        }
+    });
+
+    const placeholderInput = document.getElementById("headerSearchInput");
+    if (placeholderInput) placeholderInput.placeholder = I18N_DICTS[langKey].search_holder;
+    
+    rebuildTokenDropdown();
+    renderUI();
+}
+
+// 自动识别用户首选语言
+function autoDetectGeoLanguage() {
+    const saved = localStorage.getItem("app_lang");
+    if (saved) {
+        currentLang = saved;
+    } else {
+        const browserLang = navigator.language.toLowerCase();
+        if (browserLang.startsWith("zh-tw") || browserLang.startsWith("zh-hk")) currentLang = "tw";
+        else if (browserLang.startsWith("zh")) currentLang = "zh";
+        else if (browserLang.startsWith("ja")) currentLang = "ja";
+        else if (browserLang.startsWith("ko")) currentLang = "ko";
+        else currentLang = "en";
+    }
+    switchLanguage(currentLang);
+}
 
 // ==================== 核心网络与存储区 ====================
 const RPC_ETH = "https://rpc.mevblocker.io"; 
@@ -454,9 +498,8 @@ let walletList = JSON.parse(localStorage.getItem("cfg_wallets")) || INITIAL_WALL
 
 let balanceSortState = "DEFAULT"; 
 let isUpdating = false;
-let currentLang = localStorage.getItem("app_lang") || "zh";
 
-// 启动通用网页整页完全重载刷新机制（默认60秒）
+// 定时重载
 setTimeout(() => {
     window.location.reload();
 }, 60000);
@@ -516,7 +559,7 @@ async function updateAllBalances() {
     if (isUpdating) return;
     isUpdating = true;
     const btn = document.getElementById("refreshBtn");
-    if (btn) { btn.innerText = LANG_DICTIONARY[currentLang].btn_fetching; btn.disabled = true; }
+    if (btn) { btn.innerText = I18N_DICTS[currentLang].btn_fetching; btn.disabled = true; }
 
     document.querySelectorAll(".balance-cell").forEach(el => {
         el.innerHTML = `<span class="loading-pulse">...</span>`;
@@ -542,7 +585,7 @@ async function updateAllBalances() {
     await Promise.all(poolTasks);
     localStorage.setItem("cfg_wallets", JSON.stringify(walletList));
     isUpdating = false;
-    if (btn) { btn.innerText = LANG_DICTIONARY[currentLang].btn_fetch; btn.disabled = false; }
+    if (btn) { btn.innerText = I18N_DICTS[currentLang].btn_fetch; btn.disabled = false; }
     
     renderUI();
 }
@@ -553,7 +596,7 @@ function handleFilterUIChange() {
 
 function toggleBalanceSort() {
     const btn = document.getElementById("btn_sort_balance");
-    const trans = LANG_DICTIONARY[currentLang];
+    const trans = I18N_DICTS[currentLang];
     if (balanceSortState === "DEFAULT") {
         balanceSortState = "DESC";
         btn.textContent = trans.sort_desc;
@@ -573,7 +616,7 @@ function abbreviateAddress(addr) {
 }
 
 function executeCopy(text, btnElement) {
-    const trans = LANG_DICTIONARY[currentLang];
+    const trans = I18N_DICTS[currentLang];
     navigator.clipboard.writeText(text).then(() => {
         const oldText = btnElement.textContent;
         btnElement.textContent = trans.copied;
@@ -597,7 +640,7 @@ function openBlockExplorer(address, chain) {
 }
 
 function triggerEditRemark(originalIndex) {
-    const trans = LANG_DICTIONARY[currentLang];
+    const trans = I18N_DICTS[currentLang];
     const oldRemark = walletList[originalIndex].remark;
     const newRemark = prompt(trans.prompt_edit_rem, oldRemark);
     if (newRemark !== null) {
@@ -620,56 +663,11 @@ function toggleCard(contentId, arrowId) {
     const content = document.getElementById(contentId);
     const arrow = document.getElementById(arrowId);
     const isCollapsed = content.classList.toggle('collapsed');
-    arrow.textContent = isCollapsed ? LANG_DICTIONARY[currentLang].expand : LANG_DICTIONARY[currentLang].collapse;
-}
-
-function handleLangChange(langKey) {
-    currentLang = langKey;
-    localStorage.setItem("app_lang", langKey); 
-    applyLanguagePack();
-    rebuildTokenDropdown();
-    renderUI();
-}
-
-function applyLanguagePack() {
-    const trans = LANG_DICTIONARY[currentLang];
-    document.getElementById("text_main_title").textContent = trans.main_title;
-    document.getElementById("text_main_desc").textContent = trans.main_desc;
-    document.getElementById("text_monitoring").textContent = trans.monitoring;
-    document.getElementById("text_wallets").textContent = trans.wallets;
-    document.getElementById("text_card_add_wallet").textContent = trans.card_add_wallet;
-    document.getElementById("text_btn_add_wallet").textContent = trans.btn_add_wallet;
-    document.getElementById("text_card_wallet_list").textContent = trans.card_wallet_list;
-    
-    const refreshBtn = document.getElementById("refreshBtn");
-    if (refreshBtn && !isUpdating) refreshBtn.textContent = trans.btn_fetch;
-    
-    document.getElementById("text_th_idx").textContent = trans.th_idx;
-    document.getElementById("text_th_net").textContent = trans.th_net;
-    document.getElementById("text_th_rem").textContent = trans.th_rem;
-    document.getElementById("text_th_addr").textContent = trans.th_addr;
-    document.getElementById("text_th_act").textContent = trans.th_act;
-    document.getElementById("headerSearchInput").placeholder = trans.search_holder;
-
-    document.getElementById("text_card_add_token").textContent = trans.card_add_token;
-    document.getElementById("text_label_symbol").textContent = trans.label_symbol;
-    document.getElementById("text_label_chain").textContent = trans.label_chain;
-    document.getElementById("text_label_contract").textContent = trans.label_contract;
-    document.getElementById("text_label_decimals").textContent = trans.label_decimals;
-    document.getElementById("text_btn_save_token").textContent = trans.btn_save_token;
-    document.getElementById("text_card_token_list").textContent = trans.card_token_list;
-    document.getElementById("text_copyright").textContent = trans.copyright;
-    document.getElementById("text_sys_visits").textContent = trans.sys_visits;
-    document.getElementById("text_sys_times").textContent = trans.sys_times;
-
-    const btnSort = document.getElementById("btn_sort_balance");
-    if (balanceSortState === "DEFAULT") btnSort.textContent = trans.sort_def;
-    else if (balanceSortState === "DESC") btnSort.textContent = trans.sort_desc;
-    else btnSort.textContent = trans.sort_asc;
+    arrow.textContent = isCollapsed ? I18N_DICTS[currentLang].expand : I18N_DICTS[currentLang].collapse;
 }
 
 function addCustomToken() {
-    const trans = LANG_DICTIONARY[currentLang];
+    const trans = I18N_DICTS[currentLang];
     const symbol = document.getElementById("newTokenSymbol").value.trim().toUpperCase();
     const chain = document.getElementById("newTokenChain").value;
     let contract = document.getElementById("newTokenContract").value.trim();
@@ -687,7 +685,7 @@ function addCustomToken() {
 }
 
 function deleteCustomToken(idx) {
-    if (confirm(LANG_DICTIONARY[currentLang].alert_del_token)) {
+    if (confirm(I18N_DICTS[currentLang].alert_del_token)) {
         tokenConfigList.splice(idx, 1);
         localStorage.setItem("cfg_tokens", JSON.stringify(tokenConfigList));
         rebuildTokenDropdown();
@@ -696,7 +694,7 @@ function deleteCustomToken(idx) {
 }
 
 function addWallet() {
-    const trans = LANG_DICTIONARY[currentLang];
+    const trans = I18N_DICTS[currentLang];
     const address = document.getElementById("walletAddress").value.trim();
     const remark = document.getElementById("walletRemark").value.trim() || "Wallet";
     const chain = document.getElementById("walletChain").value;
@@ -711,7 +709,7 @@ function addWallet() {
 }
 
 function deleteWallet(idx) {
-    if (confirm(LANG_DICTIONARY[currentLang].alert_del_wallet)) {
+    if (confirm(I18N_DICTS[currentLang].alert_del_wallet)) {
         walletList.splice(idx, 1);
         localStorage.setItem("cfg_wallets", JSON.stringify(walletList));
         renderUI();
@@ -734,7 +732,7 @@ function rebuildTokenDropdown() {
     select.innerHTML = "";
     uniqueSymbols.forEach(sym => {
         const op = document.createElement("option"); op.value = sym;
-        op.textContent = `${LANG_DICTIONARY[currentLang].dropdown_prefix}${sym}`;
+        op.textContent = `${I18N_DICTS[currentLang].dropdown_prefix}${sym}`;
         select.appendChild(op);
     });
     if (uniqueSymbols.includes(previous)) {
@@ -747,7 +745,7 @@ function rebuildTokenDropdown() {
 function renderUI() {
     const selectEl = document.getElementById("selectDisplayToken");
     const currentToken = selectEl.value || "USDT";
-    const trans = LANG_DICTIONARY[currentLang];
+    const trans = I18N_DICTS[currentLang];
     
     document.getElementById("dynamicTableHeader").textContent = `${currentToken} ${trans.token_bal}`;
 
@@ -839,10 +837,9 @@ function renderUI() {
         tdAddr.appendChild(wrapDiv);
         tr.appendChild(tdAddr);
 
-        // 5. 余额 (保持靠右对齐，与PC布局完全一致)
+        // 5. 余额 (① 余额前对齐：对齐表格第4列)
         const tdBal = document.createElement("td"); 
         tdBal.className = "balance-cell"; 
-        tdBal.style.textAlign = "right";
         tdBal.innerHTML = isUpdating ? '<span class="loading-pulse">...</span>' : bal.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: maxFraction});
         tr.appendChild(tdBal);
 
@@ -877,10 +874,7 @@ function initUserCounter() {
 }
 
 // ==================== 挂载初始化 ====================
-applyLanguagePack();
-rebuildTokenDropdown();
-renderUI();
-updateAllBalances();
+autoDetectGeoLanguage();
 initUserCounter();
 </script>
 </body>
