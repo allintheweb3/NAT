@@ -68,17 +68,29 @@ button.btn-success:hover { background: #059669; }
 button.btn-danger { background: #ef4444; height: 32px; padding: 0 10px; font-size: 12px; }
 button.btn-danger:hover { background: #dc2626; }
 
-/* ==================== 4. 表格布局美化与响应式重构 ==================== */
-.table-scroll-container { width: 100%; background: #1e293b; }
-table { width: 100%; border-collapse: collapse; text-align: left; table-layout: fixed; }
+/* ==================== 4. 经典表格布局与平滑自适应 ==================== */
+.table-scroll-container { 
+    width: 100%; 
+    background: #1e293b; 
+    overflow-x: auto; /* 关键：当屏幕过窄时允许表格内横向滚动，彻底防止内容叠压 */
+    -webkit-overflow-scrolling: touch;
+}
 
-/* 定义PC端每列占比，确保对仗工整 */
-th:nth-child(1), td:nth-child(1) { width: 60px; text-align: center; } 
-th:nth-child(2), td:nth-child(2) { width: 90px; text-align: center; } 
-th:nth-child(3), td:nth-child(3) { width: 180px; text-align: left; } 
+table { 
+    width: 100%; 
+    border-collapse: collapse; 
+    text-align: left; 
+    table-layout: fixed; 
+    min-width: 680px; /* 保护性最小宽度，保证哪怕在 320px 的小手机上，表格各列依然对仗工整不重叠 */
+}
+
+/* 严格分配PC端各列占比，实现对仗美感 */
+th:nth-child(1), td:nth-child(1) { width: 55px; text-align: center; } 
+th:nth-child(2), td:nth-child(2) { width: 85px; text-align: center; } 
+th:nth-child(3), td:nth-child(3) { width: 150px; text-align: left; } 
 th:nth-child(4), td:nth-child(4) { width: auto; text-align: left; }  
-th:nth-child(5), td:nth-child(5) { width: 180px; text-align: right; } 
-th:nth-child(6), td:nth-child(6) { width: 85px; text-align: center; } 
+th:nth-child(5), td:nth-child(5) { width: 160px; text-align: right; } 
+th:nth-child(6), td:nth-child(6) { width: 80px; text-align: center; } 
 
 th, td { padding: 14px 12px; font-size: 13px; border-bottom: 1px solid #334155; vertical-align: middle; overflow: hidden; }
 th { background: #334155; color: #38bdf8; font-weight: 600; }
@@ -89,11 +101,11 @@ td.address-cell { font-family: monospace; color: #38bdf8; font-size: 13px; }
 td.remark-cell { color: #e2e8f0; font-weight: 500; }
 td.balance-cell { font-family: monospace; font-weight: bold; color: #fff; }
 
-/* 备注容器：防止英文/长备注撑破容器，自动弹性收缩 */
+/* 备注容器控制：超出时使用省略号 */
 .remark-inline-container { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; min-width: 0; }
-.remark-text-span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px; }
+.remark-text-span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100px; }
 
-/* 优化后的微型铅笔 */
+/* 铅笔微型修饰 */
 .edit-remark-icon { 
     cursor: pointer; 
     color: #64748b; 
@@ -110,7 +122,7 @@ td.balance-cell { font-family: monospace; font-weight: bold; color: #fff; }
 }
 .edit-remark-icon:hover { color: #38bdf8; background: rgba(56, 189, 248, 0.1); border-color: rgba(56, 189, 248, 0.2); }
 
-/* 表头搜索与排序区样式整合 */
+/* 表头搜索与排序 */
 .th-title-area { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; width: 100%; gap: 6px; }
 .th-search-input { width: 100%; max-width: 130px; height: 30px; padding: 4px 8px; font-size: 11px; color: #94a3b8; border: 1px solid #475569; border-radius: 4px; background: #0f172a; margin-top: 4px; font-weight: normal; outline: none; transition: all 0.15s ease; }
 .th-search-input:focus { border-color: #38bdf8; color: #fff; box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.15); }
@@ -119,7 +131,7 @@ td.balance-cell { font-family: monospace; font-weight: bold; color: #fff; }
 .sort-mini-trigger { cursor: pointer; font-size: 11px; color: #94a3b8; display: inline-block; padding: 0 8px; width: 100%; max-width: 130px; height: 30px; line-height: 28px; border: 1px solid #475569; border-radius: 4px; background: #0f172a; font-weight: normal; margin-top: 4px; user-select: none; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .sort-mini-trigger:hover { border-color: #38bdf8; color: #38bdf8; }
 
-/* 地址与复制按钮容器：flex-nowrap 限制单行，min-width 允许收缩，防止挤压余额 */
+/* 地址与复制按钮 */
 .address-inline-container { display: inline-flex; align-items: center; gap: 8px; max-width: 100%; min-width: 0; }
 .interactive-addr-link { cursor: pointer; text-decoration: underline; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
 .interactive-addr-link:hover { color: #60a5fa; }
@@ -142,80 +154,28 @@ td.balance-cell { font-family: monospace; font-weight: bold; color: #fff; }
 .footer-counter { display: inline-block; margin-top: 8px; background: rgba(56, 189, 248, 0.05); border: 1px solid rgba(56, 189, 248, 0.15); padding: 4px 14px; border-radius: 20px; color: #94a3b8; }
 .counter-num { color: #38bdf8; font-weight: bold; font-family: monospace; }
 
-/* ==================== 5. 极致媒体查询（完美适屏的核心） ==================== */
+/* ==================== 5. 极致媒体查询（纯净微调，不改变表格结构） ==================== */
 
 @media (max-width: 992px) {
     .main-layout { grid-template-columns: 1fr; gap: 15px; }
     .form-row-inline { grid-template-columns: 1fr; gap: 8px; }
 }
 
-/* 屏幕宽度 <= 768px 时：全面卡片化，彻底阻断内容折叠与交叉重叠 */
 @media screen and (max-width: 768px) {
     .lang-select-ui { top: 12px; right: 12px; padding: 4px 8px; font-size: 12px; }
     .header-meta-text h1 { font-size: 22px; padding-top: 35px; }
     .header-meta-text p { font-size: 12px; padding: 0 10px; }
 
-    /* 隐藏原生表格头 */
-    table thead { display: none; }
+    /* 针对小屏，对表格文字和内边距进行流式压缩，使其保持绝佳可读性而绝不溢出 */
+    th, td { 
+        padding: 10px 8px; 
+        font-size: 12px; 
+    }
     
-    /* 表格体转换为卡片流动容器 */
-    table, tbody, tr, td { display: block; width: 100% !important; }
-    
-    tr {
-        background: #1e293b;
-        border: 1px solid #334155;
-        border-radius: 8px;
-        margin-bottom: 12px;
-        padding: 12px;
-        position: relative;
+    /* 锁定单元格最小宽，防止因极窄屏幕导致文字压叠，同时确保左右滑动的自适应效果 */
+    table {
+        min-width: 650px;
     }
-    tr:hover td { background: none; }
-
-    td {
-        border: none;
-        padding: 6px 0;
-        text-align: left !important;
-        display: flex;
-        align-items: center;
-        justify-content: space-between; /* 键值对两侧对称分布 */
-        gap: 10px;
-    }
-
-    /* 每一个单元格在卡片中伪装成 "Label: Value" 的格式，对仗工整 */
-    td::before {
-        content: attr(data-label);
-        font-weight: bold;
-        color: #64748b;
-        font-size: 12px;
-        flex-shrink: 0;
-        text-align: left;
-    }
-
-    /* 单元格内容的自适应宽度定义 */
-    td.index-cell, td.address-cell, td.remark-cell, td.balance-cell {
-        font-size: 13px;
-    }
-
-    /* 备注、地址、余额容器在移动端等比例弹性放大 */
-    .remark-inline-container { width: auto; justify-content: flex-end; }
-    .remark-text-span { max-width: 150px; }
-    .address-inline-container { width: auto; justify-content: flex-end; }
-    .interactive-addr-link { max-width: 140px; }
-
-    /* 让动作删除按钮在卡片底端通宽显示，或者居右对齐 */
-    td:last-child {
-        border-top: 1px dashed #334155;
-        margin-top: 8px;
-        padding-top: 10px;
-        justify-content: flex-end;
-    }
-}
-
-/* 极限小屏（如 iPhone 5/SE, 320px 级屏幕）的极致压缩容错 */
-@media screen and (max-width: 360px) {
-    .interactive-addr-link { max-width: 100px; }
-    .remark-text-span { max-width: 100px; }
-    .btn-mini-copy { padding: 0 4px; font-size: 10px; }
 }
 </style>
 </head>
@@ -244,7 +204,8 @@ td.balance-cell { font-family: monospace; font-weight: bold; color: #fff; }
                 </div>
                 <div class="summary-right">
                     <select id="selectDisplayToken" class="select-token-ui" onchange="renderUI()">
-                        </select>
+                        <!-- 动态载入 -->
+                    </select>
                     <div class="wallet-count-badge"><span id="text_monitoring">Monitoring</span> <span id="summary_wallet_count" style="color:#38bdf8;font-weight:bold;">0</span> <span id="text_wallets">wallets</span></div>
                 </div>
             </div>
@@ -283,6 +244,7 @@ td.balance-cell { font-family: monospace; font-weight: bold; color: #fff; }
                             <button onclick="updateAllBalances()" id="refreshBtn">🔄 Fetch Live Balances</button>
                         </div>
 
+                        <!-- 支持水平横向滚动的表格外包容器 -->
                         <div class="table-scroll-container">
                             <table>
                                 <thead>
@@ -301,7 +263,8 @@ td.balance-cell { font-family: monospace; font-weight: bold; color: #fff; }
                                     </tr>
                                 </thead>
                                 <tbody id="walletTableBody">
-                                    </tbody>
+                                    <!-- 数据插槽 -->
+                                </tbody>
                             </table>
                         </div>
                     </div>
@@ -830,44 +793,65 @@ function renderUI() {
 
         const tr = document.createElement("tr");
         
-        // 绑定 data-label，以便在移动端卡片视图下显示统一格式的标签，从而达到工整对仗
-        const tdIdx = document.createElement("td"); tdIdx.className = "index-cell"; tdIdx.setAttribute("data-label", trans.th_idx); tdIdx.textContent = viewIdx + 1; tr.appendChild(tdIdx);
-        const tdNet = document.createElement("td"); tdNet.setAttribute("data-label", trans.th_net); tdNet.innerHTML = `<span class="chain-badge badge-${w.chain}">${w.chain}</span>`; tr.appendChild(tdNet);
+        // 1. 序号
+        const tdIdx = document.createElement("td"); 
+        tdIdx.className = "index-cell"; 
+        tdIdx.textContent = viewIdx + 1; 
+        tr.appendChild(tdIdx);
         
-        const tdRem = document.createElement("td"); tdRem.className = "remark-cell"; tdRem.setAttribute("data-label", trans.th_rem);
-        const remWrap = document.createElement("div"); remWrap.className = "remark-inline-container";
-        const remText = document.createElement("span"); remText.className = "remark-text-span"; remText.textContent = w.remark;
+        // 2. 网络
+        const tdNet = document.createElement("td"); 
+        tdNet.innerHTML = `<span class="chain-badge badge-${w.chain}">${w.chain}</span>`; 
+        tr.appendChild(tdNet);
         
-        const editIcon = document.createElement("span"); editIcon.className = "edit-remark-icon"; editIcon.innerHTML = "📝";
+        // 3. 备注
+        const tdRem = document.createElement("td"); 
+        tdRem.className = "remark-cell";
+        const remWrap = document.createElement("div"); 
+        remWrap.className = "remark-inline-container";
+        const remText = document.createElement("span"); 
+        remText.className = "remark-text-span"; 
+        remText.textContent = w.remark;
+        const editIcon = document.createElement("span"); 
+        editIcon.className = "edit-remark-icon"; 
+        editIcon.innerHTML = "📝";
         editIcon.onclick = () => triggerEditRemark(w.originalIndex);
-        remWrap.appendChild(remText); remWrap.appendChild(editIcon);
-        tdRem.appendChild(remWrap); tr.appendChild(tdRem);
+        remWrap.appendChild(remText); 
+        remWrap.appendChild(editIcon);
+        tdRem.appendChild(remWrap); 
+        tr.appendChild(tdRem);
         
-        const tdAddr = document.createElement("td"); tdAddr.className = "address-cell"; tdAddr.setAttribute("data-label", trans.th_addr);
+        // 4. 地址与复制按钮
+        const tdAddr = document.createElement("td"); 
+        tdAddr.className = "address-cell";
         const wrapDiv = document.createElement("div");
         wrapDiv.className = "address-inline-container";
-        
         const linkSpan = document.createElement("span");
         linkSpan.className = "interactive-addr-link";
         linkSpan.textContent = abbreviateAddress(w.address);
         linkSpan.onclick = () => openBlockExplorer(w.address, w.chain);
-        
         const copyBtn = document.createElement("button");
         copyBtn.className = "btn-mini-copy";
         copyBtn.textContent = trans.copy_btn;
         copyBtn.onclick = (e) => { e.stopPropagation(); executeCopy(w.address, copyBtn); };
-        
         wrapDiv.appendChild(linkSpan);
         wrapDiv.appendChild(copyBtn);
         tdAddr.appendChild(wrapDiv);
         tr.appendChild(tdAddr);
 
-        const tdBal = document.createElement("td"); tdBal.className = "balance-cell"; tdBal.setAttribute("data-label", `${currentToken} ${trans.token_bal}`);
+        // 5. 余额 (保持靠右对齐，与PC布局完全一致)
+        const tdBal = document.createElement("td"); 
+        tdBal.className = "balance-cell"; 
+        tdBal.style.textAlign = "right";
         tdBal.innerHTML = isUpdating ? '<span class="loading-pulse">...</span>' : bal.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: maxFraction});
         tr.appendChild(tdBal);
 
-        const tdAct = document.createElement("td"); tdAct.setAttribute("data-label", trans.th_act);
-        const delBtn = document.createElement("button"); delBtn.className = "btn-danger"; delBtn.textContent = trans.badge_del;
+        // 6. 操作 (删除按钮)
+        const tdAct = document.createElement("td"); 
+        tdAct.style.textAlign = "center";
+        const delBtn = document.createElement("button"); 
+        delBtn.className = "btn-danger"; 
+        delBtn.textContent = trans.badge_del;
         delBtn.onclick = () => deleteWallet(w.originalIndex); 
         tdAct.appendChild(delBtn);
         tr.appendChild(tdAct);
