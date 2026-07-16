@@ -72,13 +72,12 @@ button.btn-danger:hover { background: #dc2626; }
 .table-scroll-container { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; background: #1e293b; }
 table { width: 100%; border-collapse: collapse; text-align: left; min-width: 800px; table-layout: fixed; }
 
-/* 精准微调各列间距，形成视觉呼吸感 */
-th:nth-child(1), td:nth-child(1) { width: 65px; text-align: left; padding-left: 20px; } /* 序号 */
-th:nth-child(2), td:nth-child(2) { width: 95px; text-align: left; } /* 网络 */
-th:nth-child(3), td:nth-child(3) { width: 195px; text-align: left; } /* 备注名称 (略微拓宽以兼容编辑图标) */
-th:nth-child(4), td:nth-child(4) { width: auto; text-align: left; }  /* 监控钱包地址 */
-th:nth-child(5), td:nth-child(5) { width: 185px; text-align: left; } /* 余额 */
-th:nth-child(6), td:nth-child(6) { width: 85px; text-align: center; padding-right: 20px; } /* 操作 */
+th:nth-child(1), td:nth-child(1) { width: 65px; text-align: left; padding-left: 20px; } 
+th:nth-child(2), td:nth-child(2) { width: 95px; text-align: left; } 
+th:nth-child(3), td:nth-child(3) { width: 195px; text-align: left; } 
+th:nth-child(4), td:nth-child(4) { width: auto; text-align: left; }  
+th:nth-child(5), td:nth-child(5) { width: 185px; text-align: left; } 
+th:nth-child(6), td:nth-child(6) { width: 85px; text-align: center; padding-right: 20px; } 
 
 th, td { padding: 14px 12px; font-size: 13px; border-bottom: 1px solid #334155; vertical-align: middle; overflow: visible; }
 th { background: #334155; color: #38bdf8; font-weight: 600; }
@@ -89,63 +88,16 @@ td.address-cell { font-family: monospace; color: #38bdf8; font-size: 13px; }
 td.remark-cell { color: #e2e8f0; font-weight: 500; word-break: break-all; }
 td.balance-cell { font-family: monospace; font-weight: bold; color: #fff; }
 
-/* 备注编辑包装器与小铅笔图标 */
 .remark-inline-container { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; }
 .edit-remark-icon { cursor: pointer; color: #64748b; font-size: 12px; display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 4px; border: 1px solid transparent; transition: all 0.2s; }
 .edit-remark-icon:hover { color: #38bdf8; background: rgba(56, 189, 248, 0.1); border-color: rgba(56, 189, 248, 0.2); }
 
-/* 表头容器 */
-.th-title-area { 
-    display: flex; 
-    flex-direction: column; 
-    align-items: flex-start; 
-    justify-content: center;
-    width: 100%; 
-    gap: 6px; 
-}
-
-/* 过滤框 */
-.th-search-input { 
-    width: 110px; 
-    height: 30px; 
-    padding: 4px 8px; 
-    font-size: 11px; 
-    color: #94a3b8; 
-    border: 1px solid #475569; 
-    border-radius: 4px; 
-    background: #0f172a; 
-    margin-top: 4px; 
-    font-weight: normal;
-    outline: none;
-    text-align: left;
-    transition: border-color 0.15s ease, color 0.15s ease;
-}
-.th-search-input:focus { 
-    border-color: #38bdf8; 
-    color: #fff;
-    box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.15); 
-}
+.th-title-area { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; width: 100%; gap: 6px; }
+.th-search-input { width: 110px; height: 30px; padding: 4px 8px; font-size: 11px; color: #94a3b8; border: 1px solid #475569; border-radius: 4px; background: #0f172a; margin-top: 4px; font-weight: normal; outline: none; text-align: left; transition: border-color 0.15s ease, color 0.15s ease; }
+.th-search-input:focus { border-color: #38bdf8; color: #fff; box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.15); }
 .th-search-input::placeholder { color: #475569; }
 
-/* 排序按钮 */
-.sort-mini-trigger { 
-    cursor: pointer; 
-    font-size: 11px; 
-    color: #94a3b8; 
-    display: inline-block; 
-    padding: 0 8px; 
-    width: 110px; 
-    height: 30px;
-    line-height: 28px;
-    border: 1px solid #475569; 
-    border-radius: 4px; 
-    background: #0f172a; 
-    font-weight: normal; 
-    margin-top: 4px; 
-    user-select: none;
-    text-align: left;
-    white-space: nowrap;
-}
+.sort-mini-trigger { cursor: pointer; font-size: 11px; color: #94a3b8; display: inline-block; padding: 0 8px; width: 110px; height: 30px; line-height: 28px; border: 1px solid #475569; border-radius: 4px; background: #0f172a; font-weight: normal; margin-top: 4px; user-select: none; text-align: left; white-space: nowrap; }
 .sort-mini-trigger:hover { border-color: #38bdf8; color: #38bdf8; }
 
 .address-inline-container { display: inline-flex; align-items: center; gap: 8px; max-width: 100%; }
@@ -166,10 +118,6 @@ td.balance-cell { font-family: monospace; font-weight: bold; color: #fff; }
 .token-item-info h4 { font-size: 14px; color: #fff; margin: 0; }
 .token-item-info p { font-size: 11px; color: #64748b; font-family: monospace; margin: 4px 0 0 0; }
 
-/* 头部操控栏刷新状态附加信息 */
-.refresh-status-tip { font-size: 11px; color: #64748b; display: inline-block; margin-left: 8px; font-family: monospace; }
-
-/* ==================== 5. 底部与流式屏幕自适应 ==================== */
 .footer-zone { width: 100%; padding: 24px 15px; border-top: 1px solid #1e293b; background: #090d16; text-align: center; color: #475669; font-size: 13px; }
 .footer-counter { display: inline-block; margin-top: 8px; background: rgba(56, 189, 248, 0.05); border: 1px solid rgba(56, 189, 248, 0.15); padding: 4px 14px; border-radius: 20px; color: #94a3b8; }
 .counter-num { color: #38bdf8; font-weight: bold; font-family: monospace; }
@@ -194,6 +142,8 @@ td.balance-cell { font-family: monospace; font-weight: bold; color: #fff; }
                 <option value="en">🌐 English</option>
                 <option value="zh" selected>🌐 简体中文</option>
                 <option value="tw">🌐 繁體中文</option>
+                <option value="ja">🌐 日本語</option>
+                <option value="ko">🌐 한국어</option>
             </select>
 
             <div class="header-meta-text">
@@ -208,7 +158,8 @@ td.balance-cell { font-family: monospace; font-weight: bold; color: #fff; }
                 </div>
                 <div class="summary-right">
                     <select id="selectDisplayToken" class="select-token-ui" onchange="renderUI()">
-                        </select>
+                        <!-- 动态载入 -->
+                    </select>
                     <div class="wallet-count-badge"><span id="text_monitoring">Monitoring</span> <span id="summary_wallet_count" style="color:#38bdf8;font-weight:bold;">0</span> <span id="text_wallets">wallets</span></div>
                 </div>
             </div>
@@ -242,7 +193,6 @@ td.balance-cell { font-family: monospace; font-weight: bold; color: #fff; }
                         <div style="padding: 15px 20px 12px 20px; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap;">
                             <div style="display: flex; align-items: center; gap: 5px;">
                                 <div class="card-title" id="text_card_wallet_list" style="margin: 0; border:none; padding:0; width: auto;">Wallet Breakdown List</div>
-                                <span id="autoRefreshCountdown" class="refresh-status-tip"></span>
                             </div>
                             <button onclick="updateAllBalances()" id="refreshBtn">🔄 Fetch Live Balances</button>
                         </div>
@@ -270,7 +220,8 @@ td.balance-cell { font-family: monospace; font-weight: bold; color: #fff; }
                                     </tr>
                                 </thead>
                                 <tbody id="walletTableBody">
-                                    </tbody>
+                                    <!-- 数据插槽 -->
+                                </tbody>
                             </table>
                         </div>
                     </div>
@@ -334,7 +285,7 @@ td.balance-cell { font-family: monospace; font-weight: bold; color: #fff; }
 </div>
 
 <script>
-// ==================== 字典语言映射 ====================
+// ==================== 全球化多语言字典 ====================
 const LANG_DICTIONARY = {
     en: {
         main_title: "Multi-Chain Multi-Wallet Intelligent Asset Dashboard",
@@ -353,7 +304,7 @@ const LANG_DICTIONARY = {
         alert_del_wallet: "Permanently remove this wallet from monitoring?", badge_del: "Delete", expand: "Expand ▼", collapse: "Collapse ▲",
         sort_def: "📊 Sort: Default", sort_desc: "📉 Sort: High ➔ Low", sort_asc: "📈 Sort: Low ➔ High",
         copied: "Copied!", copy_btn: "Copy", search_holder: "🔍 Filter...",
-        prompt_edit_rem: "Enter new remark name:", next_refresh: "Auto-refresh in "
+        prompt_edit_rem: "Enter new remark name:", token_bal: "Balance"
     },
     zh: {
         main_title: "多链多钱包智能资产看板",
@@ -372,26 +323,64 @@ const LANG_DICTIONARY = {
         alert_del_wallet: "确认从列表中永久移出此监控钱包吗？", badge_del: "删除", expand: "展开 ▼", collapse: "收起 ▲",
         sort_def: "📊 排序: 默认", sort_desc: "📉 排序: 从高到低", sort_asc: "📈 排序: 从低到高",
         copied: "已复制!", copy_btn: "复制", search_holder: "🔍 过滤...",
-        prompt_edit_rem: "请输入新的备注名称:", next_refresh: "秒后自动刷新"
+        prompt_edit_rem: "请输入新的备注名称:", token_bal: "余额"
     },
     tw: {
         main_title: "多鏈多錢包智能資產看板",
-        main_desc: "動態添加代幣 | 多錢包合併計算 | 跨域容錯高兼容鏈上通信架訊",
+        main_desc: "動態添加代幣 | 多錢包合併計算 | 跨域容錯高兼容鏈上通信架構",
         monitoring: "正在監控", wallets: "個錢包",
         card_add_wallet: "➕ 監控錢包添加", btn_add_wallet: "確認添加此錢包到觀察隊列",
         card_wallet_list: "錢包明細清單", btn_fetch: "🔄 一鍵拉取實時鏈上餘額", btn_fetching: "⏳ 同步中...",
         th_idx: "序號", th_net: "網絡", th_rem: "備註名稱", th_addr: "監控錢包地址", th_act: "操作",
-        card_add_token: "🔧 自定義備備查代幣添加", label_symbol: "代幣簡稱 (Symbol)", label_chain: "所屬公鏈 (Chain)",
+        card_add_token: "🔧 自定義備查代幣添加", label_symbol: "代幣簡稱 (Symbol)", label_chain: "所屬公鏈 (Chain)",
         label_contract: "代幣智慧合約/Mint地址", label_decimals: "代幣精度位 (Decimals)", btn_save_token: "💾 錄入並備查此代幣",
         card_token_list: "📋 現已備查的代幣資產", copyright: "版權和解釋權屬於藤蔓協議雲南商學院",
         sys_visits: "📊 系統累計使用人數：", sys_times: "人次", dropdown_prefix: "🔍 觀察查看 ",
         alert_empty_token: "代幣簡稱與合約/Mint地址不可為空！", alert_invalid_dec: "請輸入有效的代幣精度數值！",
         alert_exist_token: "該代幣資產已存在備查管理池中！", alert_del_token: "移除該備查代幣會導致對應監控停止，確認刪除嗎？",
-        alert_empty_wallet: "地址欄不可為空！", alert_exist_wallet: "當前網絡的該錢包地址已存在於遷控清單中！",
+        alert_empty_wallet: "地址欄不可為空！", alert_exist_wallet: "當前網絡的該錢包地址已存在於監控清單中！",
         alert_del_wallet: "確認從列表中永久移出此監控錢包嗎？", badge_del: "刪除", expand: "展開 ▼", collapse: "收起 ▲",
-        sort_def: "📊 排序: 默認", sort_desc: "遞排: 從高到低", sort_asc: "📈 排序: 從低到高",
+        sort_def: "📊 排序: 默認", sort_desc: "📉 排序: 從高到低", sort_asc: "📈 排序: 從低到高",
         copied: "已複製!", copy_btn: "複製", search_holder: "🔍 過濾...",
-        prompt_edit_rem: "請輸入新的備註名稱:", next_refresh: "秒後自動刷新"
+        prompt_edit_rem: "請輸入新的備註名稱:", token_bal: "餘額"
+    },
+    ja: {
+        main_title: "マルチチェーン マルチウォレット インテリジェント ダッシュボード",
+        main_desc: "トークン動的追加 | 複数ウォレット統合計算 | クロスドメインフォールトトレラントオンチェーンアーキテクチャ",
+        monitoring: "監視中", wallets: "個のウォレット",
+        card_add_wallet: "➕ 監視ウォレット追加", btn_add_wallet: "このウォレットを監視キューに追加する",
+        card_wallet_list: "ウォレット明細一覧", btn_fetch: "🔄 リアルタイム残高を取得", btn_fetching: "⏳ 同期中...",
+        th_idx: "インデックス", th_net: "ネットワーク", th_rem: "備考名称", th_addr: "監視ウォレットアドレス", th_act: "操作",
+        card_add_token: "🔧 カスタムトークン設定", label_symbol: "トークンシンボル", label_chain: "対象ブロックチェーン",
+        label_contract: "スマートコントラクト/Mintアドレス", label_decimals: "トークン小数点桁数", btn_save_token: "💾 トークンを保存してインデックス化",
+        card_token_list: "📋 インデックス付きトークン資産", copyright: "Copyright & 知的財産権は Vine Protocol 云南ビジネススクールに帰属します",
+        sys_visits: "📊 システム累計利用数：", sys_times: "回", dropdown_prefix: "🔍 資産を表示: ",
+        alert_empty_token: "トークンシンボルとコントラクト/Mintアドレスは空にできません！", alert_invalid_dec: "有効な小数点桁数を入力してください！",
+        alert_exist_token: "このトークンは既に構成プールに存在します！", alert_del_token: "このトークンを削除すると残高監視が停止します。続行しますか？",
+        alert_empty_wallet: "アドレスを入力してください！", alert_exist_wallet: "このウォレットアドレスは選択されたネットワーク内に既に存在します！",
+        alert_del_wallet: "このウォレットを監視リストから完全に削除しますか？", badge_del: "削除", expand: "展開 ▼", collapse: "折りたたみ ▲",
+        sort_def: "📊 並び替え: デフォルト", sort_desc: "📉 並び替え: 高 ➔ 低", sort_asc: "📈 並び替え: 低 ➔ 高",
+        copied: "コピーしました!", copy_btn: "コピー", search_holder: "🔍 フィルター...",
+        prompt_edit_rem: "新しい備考名称を入力してください:", token_bal: "残高"
+    },
+    ko: {
+        main_title: "멀티체인 멀티지갑 인텔리전트 자산 대시보드",
+        main_desc: "동적 토큰 추가 | 다중 지갑 통합 계산 | 크로스 도메인 내결함성 온체인 통신 아키텍처",
+        monitoring: "모니터링 중", wallets: "개 지갑",
+        card_add_wallet: "➕ 모니터링 지갑 추가", btn_add_wallet: "이 지갑을 조회 대기열에 추가",
+        card_wallet_list: "지갑 내역 목록", btn_fetch: "🔄 실시간 잔액 가져오기", btn_fetching: "⏳ 동기화 중...",
+        th_idx: "순번", th_net: "네트워크", th_rem: "메모 이름", th_addr: "모니터링 지갑 주소", th_act: "작업",
+        card_add_token: "🔧 사용자 정의 토큰 설정", label_symbol: "토큰 심볼", label_chain: "대상 블록체인",
+        label_contract: "스마트 계약/Mint 주소", label_decimals: "토큰 소수점 자리수", btn_save_token: "💾 토큰 저장 및 인덱싱",
+        card_token_list: "📋 인덱싱된 토큰 자산", copyright: "Copyright & 지식재산권은 Vine Protocol 운남 비즈니스 스쿨에 귀속됩니다",
+        sys_visits: "📊 시스템 총 사용 횟수:", sys_times: "회", dropdown_prefix: "🔍 자산 보기: ",
+        alert_empty_token: "토큰 심볼과 계약/Mint 주소는 비워둘 수 없습니다!", alert_invalid_dec: "올바른 소수점 자리수를 입력하세요!",
+        alert_exist_token: "이 자산은 이미 구성 풀에 존재합니다!", alert_del_token: "이 토큰을 제거하면 잔액 모니터링이 중단됩니다. 진행하시겠습니까?",
+        alert_empty_wallet: "주소를 입력해야 합니다!", alert_exist_wallet: "이 지갑 주소는 선택한 네트워크에 이미 존재합니다!",
+        alert_del_wallet: "모니터링 목록에서 이 지갑을 영구히 삭제하시겠습니까?", badge_del: "삭제", expand: "펼치기 ▼", collapse: "접기 ▲",
+        sort_def: "📊 정렬: 기본", sort_desc: "📉 정렬: 높은 순", sort_asc: "📈 정렬: 낮은 순",
+        copied: "복사됨!", copy_btn: "복사", search_holder: "🔍 필터...",
+        prompt_edit_rem: "새로운 메모 이름을 입력하세요:", token_bal: "잔액"
     }
 };
 
@@ -424,15 +413,10 @@ let balanceSortState = "DEFAULT";
 let isUpdating = false;
 let currentLang = localStorage.getItem("app_lang") || "zh";
 
-// 自动轮询控制变量（通用网页做法：60秒轮询）
-const REFRESH_INTERVAL_SECONDS = 60;
-let refreshCountdown = REFRESH_INTERVAL_SECONDS;
-let globalTimerInstance = null;
-
-document.addEventListener("DOMContentLoaded", () => {
-    document.getElementById("headerSearchInput").addEventListener("input", handleFilterUIChange);
-    startAutoRefreshTicker();
-});
+// 启动通用网页整页完全重载刷新机制（默认60秒）
+setTimeout(() => {
+    window.location.reload();
+}, 60000);
 
 // ==================== 链上智能通信器 ====================
 async function callEvmRpc(rpcUrl, method, params) {
@@ -517,26 +501,7 @@ async function updateAllBalances() {
     isUpdating = false;
     if (btn) { btn.innerText = LANG_DICTIONARY[currentLang].btn_fetch; btn.disabled = false; }
     
-    // 重置自动刷新倒计时
-    refreshCountdown = REFRESH_INTERVAL_SECONDS;
     renderUI();
-}
-
-// 自动刷新定时器
-function startAutoRefreshTicker() {
-    if (globalTimerInstance) clearInterval(globalTimerInstance);
-    globalTimerInstance = setInterval(() => {
-        refreshCountdown--;
-        const tipEl = document.getElementById("autoRefreshCountdown");
-        if (tipEl) {
-            const trans = LANG_DICTIONARY[currentLang];
-            tipEl.textContent = `(${trans.next_refresh}${refreshCountdown}s)`;
-        }
-        if (refreshCountdown <= 0) {
-            refreshCountdown = REFRESH_INTERVAL_SECONDS;
-            updateAllBalances();
-        }
-    }, 1000);
 }
 
 function handleFilterUIChange() {
@@ -582,17 +547,12 @@ function executeCopy(text, btnElement) {
 
 function openBlockExplorer(address, chain) {
     let url = "";
-    if (chain === "ETH") {
-        url = `https://etherscan.io/address/${address}`;
-    } else if (chain === "BSC") {
-        url = `https://bscscan.com/address/${address}`;
-    } else if (chain === "SOL") {
-        url = `https://solscan.io/account/${address}`;
-    }
+    if (chain === "ETH") url = `https://etherscan.io/address/${address}`;
+    else if (chain === "BSC") url = `https://bscscan.com/address/${address}`;
+    else if (chain === "SOL") url = `https://solscan.io/account/${address}`;
     if (url) window.open(url, '_blank');
 }
 
-// 原地修改备注名称功能
 function triggerEditRemark(originalIndex) {
     const trans = LANG_DICTIONARY[currentLang];
     const oldRemark = walletList[originalIndex].remark;
@@ -746,7 +706,7 @@ function renderUI() {
     const currentToken = selectEl.value || "USDT";
     const trans = LANG_DICTIONARY[currentLang];
     
-    document.getElementById("dynamicTableHeader").textContent = `${currentToken} ${currentLang==='zh'||currentLang==='tw'?'余额':'Balance'}`;
+    document.getElementById("dynamicTableHeader").textContent = `${currentToken} ${trans.token_bal}`;
 
     const tokenSlot = document.getElementById("customTokenListSlot");
     tokenSlot.innerHTML = "";
@@ -793,7 +753,6 @@ function renderUI() {
         const tdIdx = document.createElement("td"); tdIdx.className = "index-cell"; tdIdx.textContent = viewIdx + 1; tr.appendChild(tdIdx);
         const tdNet = document.createElement("td"); tdNet.innerHTML = `<span class="chain-badge badge-${w.chain}">${w.chain}</span>`; tr.appendChild(tdNet);
         
-        // 备注名称栏：注入小铅笔图标且完美左对齐
         const tdRem = document.createElement("td"); tdRem.className = "remark-cell";
         const remWrap = document.createElement("div"); remWrap.className = "remark-inline-container";
         const remText = document.createElement("span"); remText.textContent = w.remark;
