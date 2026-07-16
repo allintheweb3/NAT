@@ -75,7 +75,7 @@ table { width: 100%; border-collapse: collapse; text-align: left; min-width: 800
 /* 精准微调各列间距，形成视觉呼吸感 */
 th:nth-child(1), td:nth-child(1) { width: 65px; text-align: left; padding-left: 20px; } /* 序号 */
 th:nth-child(2), td:nth-child(2) { width: 95px; text-align: left; } /* 网络 */
-th:nth-child(3), td:nth-child(3) { width: 165px; text-align: left; } /* 备注名称 */
+th:nth-child(3), td:nth-child(3) { width: 195px; text-align: left; } /* 备注名称 (略微拓宽以兼容编辑图标) */
 th:nth-child(4), td:nth-child(4) { width: auto; text-align: left; }  /* 监控钱包地址 */
 th:nth-child(5), td:nth-child(5) { width: 185px; text-align: left; } /* 余额 */
 th:nth-child(6), td:nth-child(6) { width: 85px; text-align: center; padding-right: 20px; } /* 操作 */
@@ -89,7 +89,12 @@ td.address-cell { font-family: monospace; color: #38bdf8; font-size: 13px; }
 td.remark-cell { color: #e2e8f0; font-weight: 500; word-break: break-all; }
 td.balance-cell { font-family: monospace; font-weight: bold; color: #fff; }
 
-/* 表头容器：统改为向左靠齐 */
+/* 备注编辑包装器与小铅笔图标 */
+.remark-inline-container { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; }
+.edit-remark-icon { cursor: pointer; color: #64748b; font-size: 12px; display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 4px; border: 1px solid transparent; transition: all 0.2s; }
+.edit-remark-icon:hover { color: #38bdf8; background: rgba(56, 189, 248, 0.1); border-color: rgba(56, 189, 248, 0.2); }
+
+/* 表头容器 */
 .th-title-area { 
     display: flex; 
     flex-direction: column; 
@@ -99,7 +104,7 @@ td.balance-cell { font-family: monospace; font-weight: bold; color: #fff; }
     gap: 6px; 
 }
 
-/* 过滤框：宽高统一，完美向左靠齐 */
+/* 过滤框 */
 .th-search-input { 
     width: 110px; 
     height: 30px; 
@@ -122,7 +127,7 @@ td.balance-cell { font-family: monospace; font-weight: bold; color: #fff; }
 }
 .th-search-input::placeholder { color: #475569; }
 
-/* 排序按钮：宽高与过滤框完全一致，且向左靠齐 */
+/* 排序按钮 */
 .sort-mini-trigger { 
     cursor: pointer; 
     font-size: 11px; 
@@ -160,6 +165,9 @@ td.balance-cell { font-family: monospace; font-weight: bold; color: #fff; }
 .token-item { display: flex; justify-content: space-between; align-items: center; background: #0f172a; padding: 10px; border-radius: 8px; margin-bottom: 8px; border: 1px solid #334155; }
 .token-item-info h4 { font-size: 14px; color: #fff; margin: 0; }
 .token-item-info p { font-size: 11px; color: #64748b; font-family: monospace; margin: 4px 0 0 0; }
+
+/* 头部操控栏刷新状态附加信息 */
+.refresh-status-tip { font-size: 11px; color: #64748b; display: inline-block; margin-left: 8px; font-family: monospace; }
 
 /* ==================== 5. 底部与流式屏幕自适应 ==================== */
 .footer-zone { width: 100%; padding: 24px 15px; border-top: 1px solid #1e293b; background: #090d16; text-align: center; color: #475669; font-size: 13px; }
@@ -232,7 +240,10 @@ td.balance-cell { font-family: monospace; font-weight: bold; color: #fff; }
 
                     <div class="card-box" style="padding: 0; overflow: hidden;">
                         <div style="padding: 15px 20px 12px 20px; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap;">
-                            <div class="card-title" id="text_card_wallet_list" style="margin: 0; border:none; padding:0; width: auto;">Wallet Breakdown List</div>
+                            <div style="display: flex; align-items: center; gap: 5px;">
+                                <div class="card-title" id="text_card_wallet_list" style="margin: 0; border:none; padding:0; width: auto;">Wallet Breakdown List</div>
+                                <span id="autoRefreshCountdown" class="refresh-status-tip"></span>
+                            </div>
                             <button onclick="updateAllBalances()" id="refreshBtn">🔄 Fetch Live Balances</button>
                         </div>
 
@@ -341,7 +352,8 @@ const LANG_DICTIONARY = {
         alert_empty_wallet: "Address cannot be empty!", alert_exist_wallet: "This wallet address already exists under the chosen network!",
         alert_del_wallet: "Permanently remove this wallet from monitoring?", badge_del: "Delete", expand: "Expand ▼", collapse: "Collapse ▲",
         sort_def: "📊 Sort: Default", sort_desc: "📉 Sort: High ➔ Low", sort_asc: "📈 Sort: Low ➔ High",
-        copied: "Copied!", copy_btn: "Copy", search_holder: "🔍 Filter..."
+        copied: "Copied!", copy_btn: "Copy", search_holder: "🔍 Filter...",
+        prompt_edit_rem: "Enter new remark name:", next_refresh: "Auto-refresh in "
     },
     zh: {
         main_title: "多链多钱包智能资产看板",
@@ -359,7 +371,8 @@ const LANG_DICTIONARY = {
         alert_empty_wallet: "地址栏不可为空！", alert_exist_wallet: "当前网络的该钱包地址已存在于监控清单中！",
         alert_del_wallet: "确认从列表中永久移出此监控钱包吗？", badge_del: "删除", expand: "展开 ▼", collapse: "收起 ▲",
         sort_def: "📊 排序: 默认", sort_desc: "📉 排序: 从高到低", sort_asc: "📈 排序: 从低到高",
-        copied: "已复制!", copy_btn: "复制", search_holder: "🔍 过滤..."
+        copied: "已复制!", copy_btn: "复制", search_holder: "🔍 过滤...",
+        prompt_edit_rem: "请输入新的备注名称:", next_refresh: "秒后自动刷新"
     },
     tw: {
         main_title: "多鏈多錢包智能資產看板",
@@ -377,7 +390,8 @@ const LANG_DICTIONARY = {
         alert_empty_wallet: "地址欄不可為空！", alert_exist_wallet: "當前網絡的該錢包地址已存在於遷控清單中！",
         alert_del_wallet: "確認從列表中永久移出此監控錢包嗎？", badge_del: "刪除", expand: "展開 ▼", collapse: "收起 ▲",
         sort_def: "📊 排序: 默認", sort_desc: "遞排: 從高到低", sort_asc: "📈 排序: 從低到高",
-        copied: "已複製!", copy_btn: "複製", search_holder: "🔍 過濾..."
+        copied: "已複製!", copy_btn: "複製", search_holder: "🔍 過濾...",
+        prompt_edit_rem: "請輸入新的備註名稱:", next_refresh: "秒後自動刷新"
     }
 };
 
@@ -410,9 +424,14 @@ let balanceSortState = "DEFAULT";
 let isUpdating = false;
 let currentLang = localStorage.getItem("app_lang") || "zh";
 
-// 绑定搜索输入事件监听
+// 自动轮询控制变量（通用网页做法：60秒轮询）
+const REFRESH_INTERVAL_SECONDS = 60;
+let refreshCountdown = REFRESH_INTERVAL_SECONDS;
+let globalTimerInstance = null;
+
 document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("headerSearchInput").addEventListener("input", handleFilterUIChange);
+    startAutoRefreshTicker();
 });
 
 // ==================== 链上智能通信器 ====================
@@ -497,7 +516,27 @@ async function updateAllBalances() {
     localStorage.setItem("cfg_wallets", JSON.stringify(walletList));
     isUpdating = false;
     if (btn) { btn.innerText = LANG_DICTIONARY[currentLang].btn_fetch; btn.disabled = false; }
+    
+    // 重置自动刷新倒计时
+    refreshCountdown = REFRESH_INTERVAL_SECONDS;
     renderUI();
+}
+
+// 自动刷新定时器
+function startAutoRefreshTicker() {
+    if (globalTimerInstance) clearInterval(globalTimerInstance);
+    globalTimerInstance = setInterval(() => {
+        refreshCountdown--;
+        const tipEl = document.getElementById("autoRefreshCountdown");
+        if (tipEl) {
+            const trans = LANG_DICTIONARY[currentLang];
+            tipEl.textContent = `(${trans.next_refresh}${refreshCountdown}s)`;
+        }
+        if (refreshCountdown <= 0) {
+            refreshCountdown = REFRESH_INTERVAL_SECONDS;
+            updateAllBalances();
+        }
+    }, 1000);
 }
 
 function handleFilterUIChange() {
@@ -541,7 +580,6 @@ function executeCopy(text, btnElement) {
     });
 }
 
-// 优化后的核心跳转逻辑：直达本区块链真实交易历史
 function openBlockExplorer(address, chain) {
     let url = "";
     if (chain === "ETH") {
@@ -551,8 +589,21 @@ function openBlockExplorer(address, chain) {
     } else if (chain === "SOL") {
         url = `https://solscan.io/account/${address}`;
     }
-    if (url) {
-        window.open(url, '_blank');
+    if (url) window.open(url, '_blank');
+}
+
+// 原地修改备注名称功能
+function triggerEditRemark(originalIndex) {
+    const trans = LANG_DICTIONARY[currentLang];
+    const oldRemark = walletList[originalIndex].remark;
+    const newRemark = prompt(trans.prompt_edit_rem, oldRemark);
+    if (newRemark !== null) {
+        const cleanRemark = newRemark.trim();
+        if (cleanRemark) {
+            walletList[originalIndex].remark = cleanRemark;
+            localStorage.setItem("cfg_wallets", JSON.stringify(walletList));
+            renderUI();
+        }
     }
 }
 
@@ -673,7 +724,6 @@ function formatShortVolume(val) {
     return "";
 }
 
-// 修复：优化下拉菜单重建防丢机制
 function rebuildTokenDropdown() {
     const select = document.getElementById("selectDisplayToken");
     const uniqueSymbols = [...new Set(tokenConfigList.map(t => t.symbol))];
@@ -742,7 +792,15 @@ function renderUI() {
         
         const tdIdx = document.createElement("td"); tdIdx.className = "index-cell"; tdIdx.textContent = viewIdx + 1; tr.appendChild(tdIdx);
         const tdNet = document.createElement("td"); tdNet.innerHTML = `<span class="chain-badge badge-${w.chain}">${w.chain}</span>`; tr.appendChild(tdNet);
-        const tdRem = document.createElement("td"); tdRem.className = "remark-cell"; tdRem.textContent = w.remark; tr.appendChild(tdRem);
+        
+        // 备注名称栏：注入小铅笔图标且完美左对齐
+        const tdRem = document.createElement("td"); tdRem.className = "remark-cell";
+        const remWrap = document.createElement("div"); remWrap.className = "remark-inline-container";
+        const remText = document.createElement("span"); remText.textContent = w.remark;
+        const editIcon = document.createElement("span"); editIcon.className = "edit-remark-icon"; editIcon.innerHTML = "✏️";
+        editIcon.onclick = () => triggerEditRemark(w.originalIndex);
+        remWrap.appendChild(remText); remWrap.appendChild(editIcon);
+        tdRem.appendChild(remWrap); tr.appendChild(tdRem);
         
         const tdAddr = document.createElement("td"); tdAddr.className = "address-cell";
         const wrapDiv = document.createElement("div");
@@ -751,7 +809,6 @@ function renderUI() {
         const linkSpan = document.createElement("span");
         linkSpan.className = "interactive-addr-link";
         linkSpan.textContent = abbreviateAddress(w.address);
-        // 点击调用修复后的浏览器跳转逻辑
         linkSpan.onclick = () => openBlockExplorer(w.address, w.chain);
         
         const copyBtn = document.createElement("button");
@@ -786,14 +843,9 @@ function renderUI() {
     document.getElementById("summary_wallet_count").textContent = walletList.length;
 }
 
-// 修复：底部使用统计数的健壮性逻辑
 function initUserCounter() {
     let count = parseInt(localStorage.getItem("sys_user_count"));
-    // 如果本地没有基数，初始化一个高大上的基数
-    if (!count || isNaN(count)) {
-        count = 1588; 
-    } 
-    // 每次刷新/载入都稳健自增 1，确保统计行为绝对被执行
+    if (!count || isNaN(count)) count = 1588; 
     count += 1;
     localStorage.setItem("sys_user_count", count);
     document.getElementById("user_counter_slot").textContent = count.toLocaleString('en-US');
