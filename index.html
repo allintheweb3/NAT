@@ -27,7 +27,6 @@ html, body { margin: 0; padding: 0; background: #0f172a; color: #f1f5f9; width: 
 /* 阿拉伯语 RTL 方向控制 */
 [dir="rtl"] { direction: rtl; text-align: right; }
 [dir="rtl"] .card-title { border-left: none; border-right: 4px solid #38bdf8; padding-left: 0; padding-right: 10px; }
-[dir="rtl"] .lang-select-ui { right: auto; left: 16px; }
 
 /* 顶部视觉区 */
 .full-viewport-header-zone {
@@ -36,42 +35,49 @@ html, body { margin: 0; padding: 0; background: #0f172a; color: #f1f5f9; width: 
     position: relative; display: flex; flex-direction: column; align-items: center;
 }
 
-/* PC/移动端 强行统一语言按钮样式 (强制显示 Emoji 国旗) */
-.lang-select-ui {
+/* 自定义多语言下拉组件 (彻底解决 PC/Windows 国旗显示问题) */
+.custom-lang-component {
     position: absolute; top: 16px; right: 16px; 
-    padding: 6px 16px 6px 12px; 
-    font-size: 14px; font-weight: 600;
-    color: #f8fafc; border: 1px solid #475569; background: #1e293b;
-    border-radius: 8px; cursor: pointer; outline: none; z-index: 100;
-    max-width: 220px;
-    
-    /* 核心修复：重置 PC 浏览器对下拉框的默认渲染，防止将 Emoji 强行转为文字代码 */
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-    background-repeat: no-repeat;
-    background-position: right 8px center;
-    background-size: 14px;
-    padding-right: 28px;
-}
-.lang-select-ui option {
-    background: #0f172a;
-    color: #f8fafc;
-    padding: 8px;
-    font-size: 14px;
+    z-index: 1000; user-select: none;
 }
 
+.custom-lang-btn {
+    display: flex; align-items: center; gap: 8px;
+    padding: 6px 12px; font-size: 13px; font-weight: 600;
+    color: #f8fafc; border: 1px solid #475569; background: #1e293b;
+    border-radius: 8px; cursor: pointer; transition: all 0.2s;
+}
+.custom-lang-btn:hover { border-color: #38bdf8; background: #0f172a; }
+
+.flag-icon { width: 18px; height: 13px; border-radius: 2px; object-fit: cover; flex-shrink: 0; box-shadow: 0 0 2px rgba(0,0,0,0.5); }
+.arrow-icon { font-size: 10px; color: #94a3b8; margin-left: 4px; transition: transform 0.2s; }
+.custom-lang-component.open .arrow-icon { transform: rotate(180deg); }
+
+.custom-lang-dropdown {
+    display: none; position: absolute; top: calc(100% + 6px); right: 0;
+    background: #1e293b; border: 1px solid #475569; border-radius: 8px;
+    padding: 6px 0; width: 150px; box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    z-index: 1001;
+}
+.custom-lang-component.open .custom-lang-dropdown { display: block; }
+
+.lang-option {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 12px; font-size: 13px; color: #cbd5e1;
+    cursor: pointer; transition: background 0.15s, color 0.15s;
+}
+.lang-option:hover, .lang-option.selected { background: #334155; color: #38bdf8; font-weight: bold; }
+
+/* 标头文本适应 */
 .header-meta-text { text-align: center; margin-bottom: 24px; width: 100%; max-width: 1100px; padding: 0 10px; overflow: hidden; }
 
-/* 核心修复：强制单行适屏、不换行、自动缩小字号适配 */
 .header-meta-text h1 { 
     color: #38bdf8; 
     font-size: clamp(13px, 2.8vw, 28px); 
     margin: 0 0 10px; 
     font-weight: 700; 
     line-height: 1.2;
-    white-space: nowrap; /* 强行禁止换行 */
+    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     width: 100%;
@@ -81,7 +87,7 @@ html, body { margin: 0; padding: 0; background: #0f172a; color: #f1f5f9; width: 
     font-size: clamp(10px, 1.8vw, 14px); 
     margin: 0 auto; 
     line-height: 1.4; 
-    white-space: nowrap; /* 强行禁止换行 */
+    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     width: 100%;
@@ -134,15 +140,11 @@ button.btn-mini-fetch { height: auto; min-height: 32px; padding: 6px 12px; font-
 
 /* 表格滑动容器强化 */
 .table-scroll-container { 
-    width: 100%; 
-    background: #1e293b; 
-    overflow-x: auto; 
-    -webkit-overflow-scrolling: touch; 
-    scroll-behavior: smooth;
+    width: 100%; background: #1e293b; overflow-x: auto; 
+    -webkit-overflow-scrolling: touch; scroll-behavior: smooth;
 }
 table { width: 100%; border-collapse: collapse; text-align: left; }
 
-/* 桌面端默认样式 */
 th, td { padding: 12px 10px; font-size: 13px; border-bottom: 1px solid #334155; vertical-align: middle; white-space: nowrap; }
 th { background: #334155; color: #38bdf8; font-weight: 600; }
 tr:hover td { background: rgba(51, 65, 85, 0.3); }
@@ -152,7 +154,6 @@ td.address-cell { font-family: monospace; color: #38bdf8; font-size: 13px; }
 td.remark-cell { color: #e2e8f0; font-weight: 500; }
 td.balance-cell { font-family: monospace; font-weight: bold; color: #fff; } 
 
-/* 备注栏 - 自适应撑开 */
 .remark-inline-container { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
 .remark-text-span { white-space: nowrap; display: inline-block; }
 .edit-remark-icon { cursor: pointer; color: #64748b; font-size: 12px; display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border-radius: 4px; transition: all 0.2s; flex-shrink: 0; }
@@ -202,51 +203,19 @@ input.control-dark-btn { width: 100%; min-width: 90px; text-align: left; }
 
 @media (max-width: 992px) { .main-layout { grid-template-columns: 1fr; gap: 15px; } .form-row-inline { grid-template-columns: 1fr; gap: 8px; } }
 
-/* 移动端优化 */
 @media (max-width: 768px) { 
-    .lang-select-ui { top: 12px; right: 12px; padding: 4px 22px 4px 8px; font-size: 12px; max-width: 130px; background-position: right 6px center; } 
     .full-viewport-header-zone { padding: 45px 12px 20px; } 
     .header-meta-text { margin-bottom: 16px; padding: 0 4px; } 
 
-    table {
-        width: max-content !important;
-        min-width: 100% !important;
-        table-layout: auto !important;
-    }
+    table { width: max-content !important; min-width: 100% !important; table-layout: auto !important; }
+    th, td { padding: 10px 8px !important; font-size: 12px; } 
 
-    th, td { 
-        padding: 10px 8px !important; 
-        font-size: 12px; 
-    } 
-
-    .remark-text-span {
-        max-width: none !important;
-        overflow: visible !important;
-        text-overflow: clip !important;
-        white-space: nowrap !important;
-    }
-
+    .remark-text-span { max-width: none !important; overflow: visible !important; text-overflow: clip !important; white-space: nowrap !important; }
     .interactive-addr-link { font-size: 12px; }
+    .btn-mini-copy { padding: 0 4px; font-size: 10px; height: 20px; line-height: 20px; }
 
-    .btn-mini-copy {
-        padding: 0 4px;
-        font-size: 10px;
-        height: 20px;
-        line-height: 20px;
-    }
-
-    .card-list-header {
-        flex-direction: row !important;
-        justify-content: space-between !important;
-        align-items: flex-end !important;
-        gap: 10px;
-        padding: 12px 15px;
-    }
-
-    .btn-mini-fetch {
-        width: auto !important;
-        margin-left: auto;
-    }
+    .card-list-header { flex-direction: row !important; justify-content: space-between !important; align-items: flex-end !important; gap: 10px; padding: 12px 15px; }
+    .btn-mini-fetch { width: auto !important; margin-left: auto; }
 }
 @media (max-width: 480px) { 
     .full-viewport-header-zone { padding: 45px 8px 16px; } 
@@ -260,15 +229,34 @@ input.control-dark-btn { width: 100%; min-width: 90px; text-align: left; }
 <div class="page-container">
     <header class="content-wrap">
         <div class="full-viewport-header-zone">
-            <!-- 语言切换选择框：仅显示国旗 + 语言名称 -->
-            <select id="langSwitcher" class="lang-select-ui" onchange="switchLanguage(this.value)">
-                <option value="en">🇺🇸 English</option>
-                <option value="zh" selected>🇨🇳 简体中文</option>
-                <option value="tw">🇹🇼 繁體中文</option>
-                <option value="ja">🇯🇵 日本語</option>
-                <option value="ko">🇰🇷 한국어</option>
-                <option value="ar">🇦🇪 العربية</option>
-            </select>
+            <!-- 升级：完全自定义矢量国旗下拉菜单 -->
+            <div class="custom-lang-component" id="langPicker">
+                <div class="custom-lang-btn" onclick="toggleLangDropdown()">
+                    <img id="currentFlag" class="flag-icon" src="" alt="Flag">
+                    <span id="currentLangName">简体中文</span>
+                    <span class="arrow-icon">▼</span>
+                </div>
+                <div class="custom-lang-dropdown">
+                    <div class="lang-option" onclick="selectLanguage('en')">
+                        <img class="flag-icon" src="https://flagcdn.com/w40/us.png" alt="US"> English
+                    </div>
+                    <div class="lang-option" onclick="selectLanguage('zh')">
+                        <img class="flag-icon" src="https://flagcdn.com/w40/cn.png" alt="CN"> 简体中文
+                    </div>
+                    <div class="lang-option" onclick="selectLanguage('tw')">
+                        <img class="flag-icon" src="https://flagcdn.com/w40/tw.png" alt="TW"> 繁體中文
+                    </div>
+                    <div class="lang-option" onclick="selectLanguage('ja')">
+                        <img class="flag-icon" src="https://flagcdn.com/w40/jp.png" alt="JP"> 日本語
+                    </div>
+                    <div class="lang-option" onclick="selectLanguage('ko')">
+                        <img class="flag-icon" src="https://flagcdn.com/w40/kr.png" alt="KR"> 한국어
+                    </div>
+                    <div class="lang-option" onclick="selectLanguage('ar')">
+                        <img class="flag-icon" src="https://flagcdn.com/w40/ae.png" alt="AE"> العربية
+                    </div>
+                </div>
+            </div>
 
             <div class="header-meta-text">
                 <h1 data-i18n="main_title">多链多钱包智能资产看板</h1>
@@ -411,7 +399,17 @@ input.control-dark-btn { width: 100%; min-width: 90px; text-align: left; }
 </div>
 
 <script>
-// 多语言字典（包含新增的阿拉伯语 ar）
+// 语言国旗图标 & 名称配置
+const LANG_CONFIG = {
+    en: { name: "English", flag: "https://flagcdn.com/w40/us.png" },
+    zh: { name: "简体中文", flag: "https://flagcdn.com/w40/cn.png" },
+    tw: { name: "繁體中文", flag: "https://flagcdn.com/w40/tw.png" },
+    ja: { name: "日本語", flag: "https://flagcdn.com/w40/jp.png" },
+    ko: { name: "한국어", flag: "https://flagcdn.com/w40/kr.png" },
+    ar: { name: "العربية", flag: "https://flagcdn.com/w40/ae.png" }
+};
+
+// 多语言字典
 const I18N_DICTS = {
     en: {
         main_title: "Multi-Chain Multi-Wallet Intelligent Asset Dashboard", main_desc: "Dynamic Token Inclusion | Multi-Wallet Calculation | Fault-Tolerant Architecture",
@@ -513,42 +511,36 @@ const I18N_DICTS = {
 
 let currentLang = "zh";
 
-// RPC 与初始化参数
-const RPC_ETH = "https://rpc.mevblocker.io", RPC_BSC = "https://bsc-dataseed1.binance.org", RPC_SOL = "https://api.mainnet-beta.solana.com"; 
+// 下拉菜单组件交互逻辑
+function toggleLangDropdown() {
+    document.getElementById("langPicker").classList.toggle("open");
+}
 
-const INITIAL_TOKENS = [
-    { symbol: "USDT", chain: "ETH", contract: "0xdac17f958d2ee523a2206206994597c13d831ec7", decimals: 6 },
-    { symbol: "USDT", chain: "BSC", contract: "0x55d398326f99059ff775485246999027b3197955", decimals: 18 },
-    { symbol: "USDT", chain: "SOL", contract: "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB", decimals: 6 },
-    { symbol: "NAT", chain: "ETH", contract: "0x249130f5e2dd4cf278180c0df8273f3592ad1247", decimals: 0 },
-    { symbol: "NAT", chain: "BSC", contract: "0x600e3b55d5368c32a94f9372563318adb6a3f882", decimals: 0 }, 
-    { symbol: "NAT", chain: "SOL", contract: "FbKRaqBzupLry3V7QujpNghwrHgxutB4MY11M8aeyVa1", decimals: 0 }, 
-    { symbol: "TENDRIL", chain: "BSC", contract: "0xb1afdfd850da168f2cc9f742e11cdda5273973d2", decimals: 18 }
-];
+function selectLanguage(langKey) {
+    document.getElementById("langPicker").classList.remove("open");
+    switchLanguage(langKey);
+}
 
-const INITIAL_WALLETS = [
-    { chain: "ETH", remark: "Vitalik Wallet", address: "0xAb5801a7D398351b8bE11C439e05C5B3259aec9B", balances: {} },
-    { chain: "BSC", remark: "Binance Hot Wallet", address: "0xF977814e90dA44bFA03b6295A0616a897441aceC", balances: {} },
-    { chain: "SOL", remark: "SOL Watcher 1", address: "6ZRCB7v8gscuA2N6773FwYms48D6f4YfV2LnyfC8e96X", balances: {} },
-    { chain: "SOL", remark: "SOL Watcher 2", address: "9xQeWvG816bUx9EPjHmaT23yvVM2ZWbrrpZb9PusVFin", balances: {} }
-];
-
-let tokenConfigList = JSON.parse(localStorage.getItem("cfg_tokens")) || INITIAL_TOKENS;
-let walletList = JSON.parse(localStorage.getItem("cfg_wallets")) || INITIAL_WALLETS;
-let balanceSortState = "DEFAULT", isUpdating = false;
-
-// 60 秒轮询
-setInterval(updateAllBalances, 60000);
-
-window.addEventListener('resize', () => {
-    renderUI();
+// 点击页面外部区域关闭下拉框
+document.addEventListener("click", function(e) {
+    const picker = document.getElementById("langPicker");
+    if (picker && !picker.contains(e.target)) {
+        picker.classList.remove("open");
+    }
 });
 
-// 语言切换与阿拉伯语从右到左 (RTL) 支持
 function switchLanguage(langKey) {
     currentLang = langKey;
     localStorage.setItem("app_lang", langKey);
-    document.getElementById("langSwitcher").value = langKey;
+    
+    // 更新自定义组件的 UI（图标 + 名称）
+    if (LANG_CONFIG[langKey]) {
+        document.getElementById("currentFlag").src = LANG_CONFIG[langKey].flag;
+        document.getElementById("currentLangName").textContent = LANG_CONFIG[langKey].name;
+    }
+
+    // 更新选中的样式高亮
+    document.querySelectorAll(".lang-option").forEach(opt => opt.classList.remove("selected"));
     
     // 阿拉伯语 RTL 排版切换
     const htmlRoot = document.getElementById("htmlRoot");
@@ -585,6 +577,36 @@ function autoDetectGeoLanguage() {
     }
     switchLanguage(currentLang);
 }
+
+// RPC 与初始化参数
+const RPC_ETH = "https://rpc.mevblocker.io", RPC_BSC = "https://bsc-dataseed1.binance.org", RPC_SOL = "https://api.mainnet-beta.solana.com"; 
+
+const INITIAL_TOKENS = [
+    { symbol: "USDT", chain: "ETH", contract: "0xdac17f958d2ee523a2206206994597c13d831ec7", decimals: 6 },
+    { symbol: "USDT", chain: "BSC", contract: "0x55d398326f99059ff775485246999027b3197955", decimals: 18 },
+    { symbol: "USDT", chain: "SOL", contract: "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB", decimals: 6 },
+    { symbol: "NAT", chain: "ETH", contract: "0x249130f5e2dd4cf278180c0df8273f3592ad1247", decimals: 0 },
+    { symbol: "NAT", chain: "BSC", contract: "0x600e3b55d5368c32a94f9372563318adb6a3f882", decimals: 0 }, 
+    { symbol: "NAT", chain: "SOL", contract: "FbKRaqBzupLry3V7QujpNghwrHgxutB4MY11M8aeyVa1", decimals: 0 }, 
+    { symbol: "TENDRIL", chain: "BSC", contract: "0xb1afdfd850da168f2cc9f742e11cdda5273973d2", decimals: 18 }
+];
+
+const INITIAL_WALLETS = [
+    { chain: "ETH", remark: "Vitalik Wallet", address: "0xAb5801a7D398351b8bE11C439e05C5B3259aec9B", balances: {} },
+    { chain: "BSC", remark: "Binance Hot Wallet", address: "0xF977814e90dA44bFA03b6295A0616a897441aceC", balances: {} },
+    { chain: "SOL", remark: "SOL Watcher 1", address: "6ZRCB7v8gscuA2N6773FwYms48D6f4YfV2LnyfC8e96X", balances: {} },
+    { chain: "SOL", remark: "SOL Watcher 2", address: "9xQeWvG816bUx9EPjHmaT23yvVM2ZWbrrpZb9PusVFin", balances: {} }
+];
+
+let tokenConfigList = JSON.parse(localStorage.getItem("cfg_tokens")) || INITIAL_TOKENS;
+let walletList = JSON.parse(localStorage.getItem("cfg_wallets")) || INITIAL_WALLETS;
+let balanceSortState = "DEFAULT", isUpdating = false;
+
+setInterval(updateAllBalances, 60000);
+
+window.addEventListener('resize', () => {
+    renderUI();
+});
 
 // 链上通信核心逻辑
 async function callEvmRpc(rpcUrl, method, params) {
@@ -675,7 +697,6 @@ function toggleBalanceSort() {
     renderUI();
 }
 
-// 地址截断逻辑：移动端(<=768px)前4后4，PC端前8后8
 function abbreviateAddress(addr) {
     if (!addr) return '';
     const isMobile = window.innerWidth <= 768;
