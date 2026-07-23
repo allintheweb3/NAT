@@ -44,7 +44,7 @@ html, body { margin: 0; padding: 0; background: #0f172a; color: #f1f5f9; width: 
     position: absolute; top: 16px; right: 16px; padding: 6px 12px; font-size: 13px; font-weight: 600;
     color: #94a3b8; border: 1px solid #334155; background: rgba(30, 41, 59, 0.8);
     backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border-radius: 6px; cursor: pointer; outline: none; z-index: 100;
-    max-width: 140px;
+    max-width: 220px;
 }
 .header-meta-text { text-align: center; margin-bottom: 24px; width: 100%; max-width: 900px; padding: 0 10px; }
 .header-meta-text h1 { 
@@ -188,9 +188,9 @@ input.control-dark-btn { width: 100%; min-width: 90px; text-align: left; }
 
 @media (max-width: 992px) { .main-layout { grid-template-columns: 1fr; gap: 15px; } .form-row-inline { grid-template-columns: 1fr; gap: 8px; } }
 
-/* 移动端全方位文本适屏与无裁切行内滑动优化 */
+/* 移动端全方位文本适屏与按键右下角对齐优化 */
 @media (max-width: 768px) { 
-    .lang-select-ui { top: 12px; right: 12px; padding: 4px 8px; font-size: 11px; } 
+    .lang-select-ui { top: 12px; right: 12px; padding: 4px 8px; font-size: 11px; max-width: 160px; } 
     .full-viewport-header-zone { padding: 45px 12px 20px; } 
     .header-meta-text { margin-bottom: 16px; padding: 0 4px; } 
 
@@ -225,13 +225,18 @@ input.control-dark-btn { width: 100%; min-width: 90px; text-align: left; }
         line-height: 20px;
     }
 
+    /* 移动端卡片头部：横向对齐，按钮放右下角 */
     .card-list-header {
-        flex-direction: column;
-        align-items: flex-start;
+        flex-direction: row !important;
+        justify-content: space-between !important;
+        align-items: flex-end !important;
         gap: 10px;
+        padding: 12px 15px;
     }
+
     .btn-mini-fetch {
-        width: 100%;
+        width: auto !important;
+        margin-left: auto;
     }
 }
 @media (max-width: 480px) { 
@@ -246,13 +251,13 @@ input.control-dark-btn { width: 100%; min-width: 90px; text-align: left; }
 <div class="page-container">
     <header class="content-wrap">
         <div class="full-viewport-header-zone">
-            <!-- 切换语言下拉框 -->
+            <!-- 切换语言下拉框：带有国旗与国别/语言代码 -->
             <select id="langSwitcher" class="lang-select-ui" onchange="switchLanguage(this.value)">
-                <option value="en">🇺🇸 English</option>
-                <option value="zh" selected>🇨🇳 简体中文</option>
-                <option value="tw">🇹🇼 繁體中文</option>
-                <option value="ja">🇯🇵 日本語</option>
-                <option value="ko">🇰🇷 한국어</option>
+                <option value="en">🇺🇸 English (en-US)</option>
+                <option value="zh" selected>🇨🇳 简体中文 (zh-CN)</option>
+                <option value="tw">🇹🇼 繁體中文 (zh-TW)</option>
+                <option value="ja">🇯🇵 日本語 (ja-JP)</option>
+                <option value="ko">🇰🇷 한국어 (ko-KR)</option>
             </select>
 
             <div class="header-meta-text">
