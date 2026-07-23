@@ -119,7 +119,7 @@ input.control-dark-btn { width: 100%; max-width: 110px; text-align: left; }
 }
 .control-dark-btn::placeholder { color: #475569; }
 
-.address-inline-container { display: inline-flex; align-items: center; gap: 8px; max-width: 100%; }
+.address-inline-container { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; }
 .interactive-addr-link { cursor: pointer; text-decoration: underline; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .interactive-addr-link:hover { color: #60a5fa; }
 .btn-mini-copy { background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.2); color: #38bdf8; font-size: 11px; height: 22px; padding: 0 6px; border-radius: 4px; flex-shrink: 0; }
@@ -142,7 +142,24 @@ input.control-dark-btn { width: 100%; max-width: 110px; text-align: left; }
 .counter-num { color: #38bdf8; font-weight: bold; font-family: monospace; }
 
 @media (max-width: 992px) { .main-layout { grid-template-columns: 1fr; gap: 15px; } .form-row-inline { grid-template-columns: 1fr; gap: 8px; } }
-@media (max-width: 768px) { .lang-select-ui { top: 12px; right: 12px; padding: 4px 8px; font-size: 12px; } .full-viewport-header-zone { padding: 35px 10px 25px; } .header-meta-text { margin-bottom: 16px; } th, td { padding: 10px 8px; font-size: 12px; } }
+@media (max-width: 768px) { 
+    .lang-select-ui { top: 12px; right: 12px; padding: 4px 8px; font-size: 12px; } 
+    .full-viewport-header-zone { padding: 35px 10px 25px; } 
+    .header-meta-text { margin-bottom: 16px; } 
+    th, td { padding: 10px 6px; font-size: 12px; } 
+    
+    /* 移动端地址栏专属优化：限制最大宽度精准呈现 前4后4 */
+    .interactive-addr-link {
+        max-width: 8.5ch;
+        display: inline-block;
+        vertical-align: middle;
+    }
+    .btn-mini-copy {
+        padding: 0 4px;
+        font-size: 10px;
+        height: 20px;
+    }
+}
 @media (max-width: 480px) { .full-viewport-header-zone { padding: 45px 5px 20px; } .summary-banner { padding: 15px 10px; } .card-list-header { padding: 12px 10px; } }
 </style>
 </head>
@@ -151,7 +168,7 @@ input.control-dark-btn { width: 100%; max-width: 110px; text-align: left; }
 <div class="page-container">
     <header class="content-wrap">
         <div class="full-viewport-header-zone">
-            <!-- 切换语言下拉框（前置各国母语国旗图标） -->
+            <!-- 切换语言下拉框 -->
             <select id="langSwitcher" class="lang-select-ui" onchange="switchLanguage(this.value)">
                 <option value="en">🇺🇸 English</option>
                 <option value="zh" selected>🇨🇳 简体中文</option>
@@ -536,7 +553,8 @@ function toggleBalanceSort() {
     renderUI();
 }
 
-const abbreviateAddress = addr => (!addr || addr.length <= 14) ? addr : `${addr.slice(0, 8)}...${addr.slice(-8)}`;
+// PC端默认截断显示（前8后8），移动端由 CSS 智能截断为（前4后4）
+const abbreviateAddress = addr => (!addr || addr.length <= 16) ? addr : `${addr.slice(0, 8)}...${addr.slice(-8)}`;
 
 function executeCopy(text, btnElement) {
     const trans = I18N_DICTS[currentLang];
@@ -703,7 +721,7 @@ function renderUI() {
             </td>
             <td class="address-cell">
                 <div class="address-inline-container">
-                    <span class="interactive-addr-link" onclick="openBlockExplorer('${w.address}', '${w.chain}')">${abbreviateAddress(w.address)}</span>
+                    <span class="interactive-addr-link" title="${w.address}" onclick="openBlockExplorer('${w.address}', '${w.chain}')">${abbreviateAddress(w.address)}</span>
                     <button class="btn-mini-copy" onclick="event.stopPropagation(); executeCopy('${w.address}', this)">${trans.copy_btn}</button>
                 </div>
             </td>
