@@ -40,7 +40,7 @@ html, body { margin: 0; padding: 0; background: #0f172a; color: #f1f5f9; width: 
     align-items: center;
 }
 
-/* 🌟【解决重叠】顶部栏弹性布局容器 🌟 */
+/* 🌟【顶部隔离栏】确保语言下拉按钮与标题完全分离，防止重叠 🌟 */
 .top-bar-row {
     width: 100%;
     max-width: 1000px;
@@ -86,13 +86,13 @@ html, body { margin: 0; padding: 0; background: #0f172a; color: #f1f5f9; width: 
 }
 .lang-option:hover, .lang-option.selected { background: #334155; color: #38bdf8; font-weight: bold; }
 
-/* 🌟【彻底解决】标头文本完美自适应算法容器 🌟 */
+/* 🌟【原版主副标题自适应容器】恢复原版精准的字号自适应计算算法 🌟 */
 .header-meta-text { 
     text-align: center; 
     margin-bottom: 24px; 
     width: 100%; 
     max-width: 1000px; 
-    padding: 0 16px; /* 安全间距 */
+    padding: 0 16px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -107,7 +107,6 @@ html, body { margin: 0; padding: 0; background: #0f172a; color: #f1f5f9; width: 
     white-space: nowrap;
     display: inline-block;
     max-width: 100%;
-    transition: font-size 0.1s ease-out;
 }
 
 .header-meta-text p { 
@@ -117,7 +116,6 @@ html, body { margin: 0; padding: 0; background: #0f172a; color: #f1f5f9; width: 
     white-space: nowrap;
     display: inline-block;
     max-width: 100%;
-    transition: font-size 0.1s ease-out;
 }
 
 /* 资产看板 */
@@ -254,7 +252,7 @@ input.control-dark-btn { width: 100%; min-width: 90px; text-align: left; }
     .full-viewport-header-zone { padding: 12px 6px 16px; } 
     .summary-banner { padding: 15px 10px; } 
     .card-list-header { padding: 12px 10px; } 
-    .top-bar-row { justify-content: center; } /* 超小屏居中对齐 */
+    .top-bar-row { justify-content: center; } 
 }
 </style>
 </head>
@@ -263,7 +261,7 @@ input.control-dark-btn { width: 100%; min-width: 90px; text-align: left; }
 <div class="page-container">
     <header class="content-wrap">
         <div class="full-viewport-header-zone">
-            <!-- 🌟 顶部工具栏（语言按钮脱离布局依赖，彻底防止遮挡标题） 🌟 -->
+            <!-- 顶部隔离栏：防止语言切换菜单遮挡标题 -->
             <div class="top-bar-row">
                 <div class="custom-lang-component" id="langPicker">
                     <div class="custom-lang-btn" onclick="toggleLangDropdown()">
@@ -294,7 +292,7 @@ input.control-dark-btn { width: 100%; min-width: 90px; text-align: left; }
                 </div>
             </div>
 
-            <!-- 🌟 JS 动态精密算字号：无限自适应且永远留有边距 🌟 -->
+            <!-- 主副标题区：使用原版 JS 智能缩放算法 -->
             <div class="header-meta-text" id="headerMetaBox">
                 <h1 id="mainTitleEl" data-i18n="main_title">多链多钱包智能资产看板</h1>
                 <p id="mainDescEl" data-i18n="main_desc">动态添加代币 | 多钱包合并计算 | 跨域容错高兼容链上通信架构</p>
@@ -548,7 +546,7 @@ const I18N_DICTS = {
 
 let currentLang = "zh";
 
-// 下拉菜单组件交互逻辑
+// 下拉菜单交互
 function toggleLangDropdown() {
     document.getElementById("langPicker").classList.toggle("open");
 }
@@ -558,7 +556,6 @@ function selectLanguage(langKey) {
     switchLanguage(langKey);
 }
 
-// 点击页面外部区域关闭下拉框
 document.addEventListener("click", function(e) {
     const picker = document.getElementById("langPicker");
     if (picker && !picker.contains(e.target)) {
@@ -566,13 +563,12 @@ document.addEventListener("click", function(e) {
     }
 });
 
-// 🌟【核心算法】自动测量单行文本并精算最合适字号 🌟
+/* 🌟【原版主副标题自适应算法】动态测量宽度并缩小字号，确保单行显示不折行 🌟 */
 function autoFitSingleLineText(el, maxFontSize, minFontSize) {
     if (!el) return;
     const parentBox = el.parentElement;
     if (!parentBox) return;
 
-    // 获取父容器的可容纳真实可用宽度（减去左右各 16px 安全 padding）
     const style = window.getComputedStyle(parentBox);
     const paddingLeft = parseFloat(style.paddingLeft) || 0;
     const paddingRight = parseFloat(style.paddingRight) || 0;
@@ -580,24 +576,19 @@ function autoFitSingleLineText(el, maxFontSize, minFontSize) {
 
     if (availableWidth <= 0) return;
 
-    // 先设为最大字号测算宽度
     let fontSize = maxFontSize;
     el.style.fontSize = fontSize + 'px';
 
-    // 如果文本超出容器宽度，用比例快速逼近最精准字号
     if (el.scrollWidth > availableWidth) {
         fontSize = Math.floor((availableWidth / el.scrollWidth) * maxFontSize);
     }
 
-    // 限制在预设安全范围内
     fontSize = Math.max(minFontSize, Math.min(fontSize, maxFontSize));
     el.style.fontSize = fontSize + 'px';
 }
 
 function adjustAllHeaderFontSizes() {
-    // 主标题：最大 28px，最小 11px
     autoFitSingleLineText(document.getElementById('mainTitleEl'), 28, 11);
-    // 副标题：最大 14px，最小 9px
     autoFitSingleLineText(document.getElementById('mainDescEl'), 14, 9);
 }
 
@@ -605,16 +596,13 @@ function switchLanguage(langKey) {
     currentLang = langKey;
     localStorage.setItem("app_lang", langKey);
     
-    // 更新自定义组件的 UI（图标 + 名称）
     if (LANG_CONFIG[langKey]) {
         document.getElementById("currentFlag").src = LANG_CONFIG[langKey].flag;
         document.getElementById("currentLangName").textContent = LANG_CONFIG[langKey].name;
     }
 
-    // 更新选中的样式高亮
     document.querySelectorAll(".lang-option").forEach(opt => opt.classList.remove("selected"));
     
-    // 阿拉伯语 RTL 排版切换
     const htmlRoot = document.getElementById("htmlRoot");
     if (langKey === "ar") {
         htmlRoot.setAttribute("dir", "rtl");
@@ -633,7 +621,6 @@ function switchLanguage(langKey) {
     rebuildTokenDropdown();
     renderUI();
 
-    // 语言切换后立即重新测算字号适配
     setTimeout(adjustAllHeaderFontSizes, 10);
 }
 
@@ -653,7 +640,7 @@ function autoDetectGeoLanguage() {
     switchLanguage(currentLang);
 }
 
-// RPC 与初始化参数
+// RPC 参数与区块链交互
 const RPC_ETH = "https://rpc.mevblocker.io", RPC_BSC = "https://bsc-dataseed1.binance.org", RPC_SOL = "https://api.mainnet-beta.solana.com"; 
 
 const INITIAL_TOKENS = [
@@ -679,7 +666,6 @@ let balanceSortState = "DEFAULT", isUpdating = false;
 
 setInterval(updateAllBalances, 60000);
 
-// 使用 ResizeObserver 监听标头容器大小变化，毫秒级响应文字缩放
 const resizeObserver = new ResizeObserver(() => {
     adjustAllHeaderFontSizes();
 });
@@ -691,7 +677,6 @@ window.addEventListener('resize', () => {
     renderUI();
 });
 
-// 链上通信逻辑
 async function callEvmRpc(rpcUrl, method, params) {
     const res = await fetch(rpcUrl, {
         method: "POST", headers: { "Content-Type": "application/json" },
@@ -818,7 +803,6 @@ function triggerEditRemark(originalIndex) {
     }
 }
 
-// 界面 UI 绘制
 const escapeHtml = str => str ? str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;") : "";
 
 function toggleCard(contentId, arrowId) {
@@ -978,7 +962,7 @@ function initUserCounter() {
     document.getElementById("user_counter_slot").textContent = count.toLocaleString('en-US');
 }
 
-// 挂载执行
+// 挂载运行
 autoDetectGeoLanguage();
 initUserCounter();
 setTimeout(adjustAllHeaderFontSizes, 50);
