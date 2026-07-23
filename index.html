@@ -77,18 +77,19 @@ button.btn-danger { background: #ef4444; height: 32px; padding: 0 10px; font-siz
 button.btn-danger:hover { background: #dc2626; }
 button.btn-mini-fetch { height: 30px; padding: 0 10px; font-size: clamp(10px, 2.5vw, 12px); font-weight: 600; background: #2563eb; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
 
-/* 表格样式 */
+/* 表格基础样式 */
 .table-scroll-container { width: 100%; background: #1e293b; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-table { width: 100%; border-collapse: collapse; text-align: left; table-layout: fixed; min-width: 650px; }
+table { width: 100%; border-collapse: collapse; text-align: left; table-layout: fixed; }
 
-th:nth-child(1), td:nth-child(1) { width: 55px; text-align: center; } 
-th:nth-child(2), td:nth-child(2) { width: 85px; text-align: center; } 
-th:nth-child(3), td:nth-child(3) { width: 160px; } 
+/* 桌面端列宽比例分配 */
+th:nth-child(1), td:nth-child(1) { width: 50px; text-align: center; } 
+th:nth-child(2), td:nth-child(2) { width: 70px; text-align: center; } 
+th:nth-child(3), td:nth-child(3) { width: 110px; } 
 th:nth-child(4), td:nth-child(4) { width: auto; }  
-th:nth-child(5), td:nth-child(5) { width: 170px; }  
-th:nth-child(6), td:nth-child(6) { width: 80px; text-align: center; } 
+th:nth-child(5), td:nth-child(5) { width: 150px; }  
+th:nth-child(6), td:nth-child(6) { width: 60px; text-align: center; } 
 
-th, td { padding: 14px 12px; font-size: 13px; border-bottom: 1px solid #334155; vertical-align: middle; overflow: hidden; }
+th, td { padding: 12px 10px; font-size: 13px; border-bottom: 1px solid #334155; vertical-align: middle; overflow: hidden; }
 th { background: #334155; color: #38bdf8; font-weight: 600; }
 tr:hover td { background: rgba(51, 65, 85, 0.3); }
 
@@ -97,8 +98,8 @@ td.address-cell { font-family: monospace; color: #38bdf8; font-size: 13px; }
 td.remark-cell { color: #e2e8f0; font-weight: 500; }
 td.balance-cell { font-family: monospace; font-weight: bold; color: #fff; } 
 
-.remark-inline-container { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; }
-.remark-text-span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 110px; }
+.remark-inline-container { display: inline-flex; align-items: center; gap: 4px; max-width: 100%; }
+.remark-text-span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 80px; }
 .edit-remark-icon { cursor: pointer; color: #64748b; font-size: 10px; display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; border-radius: 4px; transition: all 0.2s; flex-shrink: 0; }
 .edit-remark-icon:hover { color: #38bdf8; background: rgba(56, 189, 248, 0.1); }
 
@@ -119,8 +120,8 @@ input.control-dark-btn { width: 100%; max-width: 110px; text-align: left; }
 }
 .control-dark-btn::placeholder { color: #475569; }
 
-.address-inline-container { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; }
-.interactive-addr-link { cursor: pointer; text-decoration: underline; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.address-inline-container { display: inline-flex; align-items: center; gap: 4px; max-width: 100%; }
+.interactive-addr-link { cursor: pointer; text-decoration: underline; font-weight: 500; white-space: nowrap; }
 .interactive-addr-link:hover { color: #60a5fa; }
 .btn-mini-copy { background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.2); color: #38bdf8; font-size: 11px; height: 22px; padding: 0 6px; border-radius: 4px; flex-shrink: 0; }
 .btn-mini-copy:hover { background: #38bdf8; color: #fff; }
@@ -142,21 +143,55 @@ input.control-dark-btn { width: 100%; max-width: 110px; text-align: left; }
 .counter-num { color: #38bdf8; font-weight: bold; font-family: monospace; }
 
 @media (max-width: 992px) { .main-layout { grid-template-columns: 1fr; gap: 15px; } .form-row-inline { grid-template-columns: 1fr; gap: 8px; } }
+
+/* 移动端表格无挤压适配专区 */
 @media (max-width: 768px) { 
     .lang-select-ui { top: 12px; right: 12px; padding: 4px 8px; font-size: 12px; } 
     .full-viewport-header-zone { padding: 35px 10px 25px; } 
     .header-meta-text { margin-bottom: 16px; } 
-    th, td { padding: 10px 6px; font-size: 12px; } 
-    
-    .interactive-addr-link {
-        max-width: none;
-        display: inline-block;
-        vertical-align: middle;
+
+    /* 解锁硬性宽度限制，开启自适应适屏 */
+    table {
+        min-width: 100% !important;
+        table-layout: auto !important;
     }
+
+    /* 紧凑单元格边距 */
+    th, td { 
+        padding: 8px 3px !important; 
+        font-size: 12px; 
+    } 
+
+    /* 极简挤压次要列，把空间留给地址与余额 */
+    th:nth-child(1), td:nth-child(1) { width: 28px !important; text-align: center; }
+    th:nth-child(2), td:nth-child(2) { width: 42px !important; }
+
+    .remark-text-span {
+        max-width: 50px !important;
+    }
+    
+    /* 彻底解绑地址文本二次溢出截断 */
+    .address-inline-container {
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        max-width: 100%;
+    }
+
+    .interactive-addr-link {
+        max-width: none !important;
+        display: inline !important;
+        overflow: visible !important;
+        white-space: nowrap;
+        font-size: 12px;
+    }
+
     .btn-mini-copy {
-        padding: 0 4px;
+        padding: 0 3px;
         font-size: 10px;
-        height: 20px;
+        height: 18px;
+        line-height: 18px;
+        flex-shrink: 0;
     }
 }
 @media (max-width: 480px) { .full-viewport-header-zone { padding: 45px 5px 20px; } .summary-banner { padding: 15px 10px; } .card-list-header { padding: 12px 10px; } }
