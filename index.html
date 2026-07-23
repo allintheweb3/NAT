@@ -148,9 +148,8 @@ input.control-dark-btn { width: 100%; max-width: 110px; text-align: left; }
     .header-meta-text { margin-bottom: 16px; } 
     th, td { padding: 10px 6px; font-size: 12px; } 
     
-    /* 移动端地址栏专属优化：限制最大宽度精准呈现 前4后4 */
     .interactive-addr-link {
-        max-width: 8.5ch;
+        max-width: none;
         display: inline-block;
         vertical-align: middle;
     }
@@ -431,6 +430,11 @@ let balanceSortState = "DEFAULT", isUpdating = false;
 // 60 秒轮询（无刷新静默更新）
 setInterval(updateAllBalances, 60000);
 
+// 监听窗口大小改变，移动端与 PC 切换时自动重新渲染截断地址
+window.addEventListener('resize', () => {
+    renderUI();
+});
+
 // 语言切换与自动检测
 function switchLanguage(langKey) {
     currentLang = langKey;
@@ -553,8 +557,15 @@ function toggleBalanceSort() {
     renderUI();
 }
 
-// PC端默认截断显示（前8后8），移动端由 CSS 智能截断为（前4后4）
-const abbreviateAddress = addr => (!addr || addr.length <= 16) ? addr : `${addr.slice(0, 8)}...${addr.slice(-8)}`;
+// 核心地址截断逻辑：移动端(<=768px)严格前4后4，PC端前8后8
+function abbreviateAddress(addr) {
+    if (!addr) return '';
+    const isMobile = window.innerWidth <= 768;
+    if (isMobile) {
+        return addr.length <= 8 ? addr : `${addr.slice(0, 4)}...${addr.slice(-4)}`;
+    }
+    return addr.length <= 16 ? addr : `${addr.slice(0, 8)}...${addr.slice(-8)}`;
+}
 
 function executeCopy(text, btnElement) {
     const trans = I18N_DICTS[currentLang];
