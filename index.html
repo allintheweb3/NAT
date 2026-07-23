@@ -1,407 +1,764 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>项目国库 & 钱包明细管理</title>
-    <style>
-        /* ================= 1. 全局重置与基础变量 ================= */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>多链多钱包智能资产看板 - Multi-Chain Wallet Dashboard</title>
+<meta name="description" content="藤蔓协议多链多钱包智能资产监控看板，支持 ETH、BSC、Solana 链上资产实时同步。">
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            background-color: #f4f6f9;
-            color: #333;
-            line-height: 1.5;
-            padding-bottom: 40px;
-        }
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "多链多钱包智能资产看板",
+  "alternateName": "Multi-Chain Wallet Dashboard",
+  "applicationCategory": "FinanceApplication",
+  "author": { "@type": "Organization", "name": "藤蔓协议云南商学院" }
+}
+</script>
 
-        .main-container {
-            width: 100%;
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 0 16px;
-            position: relative;
-        }
+<style>
+/* 基础重置 & 全局样式 */
+*, *::before, *::after { box-sizing: border-box; font-family: "PingFang SC", "Microsoft YaHei", sans-serif; }
+html, body { margin: 0; padding: 0; background: #0f172a; color: #f1f5f9; width: 100%; min-height: 100vh; overflow-x: hidden; -webkit-text-size-adjust: 100%; }
+.page-container { display: flex; flex-direction: column; min-height: 100vh; width: 100%; }
+.content-wrap { flex: 1; width: 100%; }
 
-        /* ================= 2. 顶栏与 Header 区域 ================= */
-        .full-viewport-header-zone {
-            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-            color: #ffffff;
-            padding: 40px 20px 30px;
-            border-radius: 0 0 16px 16px;
-            margin-bottom: 24px;
-            position: relative;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-        }
+/* 顶部视觉区 */
+.full-viewport-header-zone {
+    width: 100%; background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+    padding: 40px 15px 30px; border-bottom: 1px solid #334155;
+    position: relative; display: flex; flex-direction: column; align-items: center;
+}
+.lang-select-ui {
+    position: absolute; top: 20px; right: 20px; padding: 6px 12px; font-size: 13px; font-weight: 600;
+    color: #94a3b8; border: 1px solid #334155; background: rgba(30, 41, 59, 0.6);
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border-radius: 6px; cursor: pointer; outline: none; z-index: 100;
+}
+.header-meta-text { text-align: center; margin-bottom: 24px; width: 100%; padding: 0 10px; }
+.header-meta-text h1 { color: #38bdf8; font-size: clamp(20px, 5vw, 28px); margin: 0 0 10px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.header-meta-text p { color: #64748b; font-size: clamp(10px, 3.2vw, 14px); margin: 0 auto; line-height: 1.5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        .lang-select-ui {
-            position: absolute;
-            top: 16px;
-            right: 20px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #fff;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 13px;
-            outline: none;
-            cursor: pointer;
-        }
-        .lang-select-ui option {
-            background: #1e293b;
-            color: #fff;
-        }
+.summary-banner { 
+    background: linear-gradient(135deg, #1e1b4b, #2e1065); border: 1px solid #4c1d95; 
+    padding: 24px 20px; border-radius: 12px; width: 100%; max-width: 800px; 
+    display: flex; flex-direction: column; align-items: center; gap: 15px; container-type: inline-size;
+}
+.summary-display-box { width: 100%; text-align: center; overflow: hidden; }
+.summary-display-box .total-val { display: block; font-size: clamp(24px, 7.5cqw, 48px); font-weight: 800; color: #10b981; font-family: monospace; white-space: nowrap; margin: 0; line-height: 1.1; }
+.summary-display-box .total-short-val { display: block; font-size: clamp(13px, 3cqw, 16px); color: #34d399; margin-top: 6px; }
 
-        .header-title {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
+.summary-right { display: flex; flex-direction: column; align-items: center; gap: 12px; width: 100%; }
+.select-token-ui { height: 42px; padding: 0 16px; font-size: 14px; font-weight: bold; color: #38bdf8; border: 2px solid #38bdf8; background: #0f172a; border-radius: 8px; cursor: pointer; width: 100%; max-width: 280px; text-align-last: center; }
+.wallet-count-badge { font-size: 12px; color: #94a3b8; background: rgba(255,255,255,0.05); padding: 4px 12px; border-radius: 20px; border: 1px solid #334155; }
 
-        .header-meta-text {
-            color: #94a3b8;
-            font-size: 14px;
-            margin-bottom: 24px;
-        }
+/* 主体与表单 */
+.container { max-width: 1280px; margin: 20px auto; padding: 0 15px; width: 100%; }
+.main-layout { display: grid; grid-template-columns: 2.3fr 1fr; gap: 24px; width: 100%; }
+.card-box { background: #1e293b; padding: 20px; border-radius: 12px; border: 1px solid #334155; margin-bottom: 20px; width: 100%; }
 
-        /* 核心指标卡片概览 */
-        .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
-        }
+.card-list-header { padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; gap: 10px; border-bottom: 1px solid #334155; background: #1e293b; }
+.card-header-toggle { display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; }
+.card-title { font-size: 15px; color: #38bdf8; font-weight: bold; border-left: 4px solid #38bdf8; padding-left: 10px; display: flex; align-items: center; justify-content: space-between; width: 100%; }
+.toggle-icon { font-size: 12px; color: #64748b; }
+.toggle-content { margin-top: 15px; }
+.toggle-content.collapsed { display: none; }
 
-        .metric-card {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 16px;
-            border-radius: 8px;
-        }
+.form-grid { display: flex; flex-direction: column; gap: 12px; }
+.form-row-inline { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 10px; margin-bottom: 10px; width: 100%; }
+input, select, button { padding: 10px 12px; border-radius: 8px; border: 1px solid #475569; background: #0f172a; color: #fff; font-size: 14px; outline: none; }
+input:focus, select:focus { border-color: #38bdf8; }
 
-        .metric-label {
-            font-size: 12px;
-            color: #94a3b8;
-            margin-bottom: 4px;
-        }
+button { height: 42px; background: #2563eb; cursor: pointer; border: none; font-weight: bold; transition: background 0.2s; white-space: nowrap; display: inline-flex; align-items: center; justify-content: center; }
+button:hover { background: #3b82f6; }
+button.btn-success { background: #10b981; }
+button.btn-success:hover { background: #059669; }
+button.btn-danger { background: #ef4444; height: 32px; padding: 0 10px; font-size: 12px; }
+button.btn-danger:hover { background: #dc2626; }
+button.btn-mini-fetch { height: 30px; padding: 0 10px; font-size: clamp(10px, 2.5vw, 12px); font-weight: 600; background: #2563eb; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
 
-        .metric-value {
-            font-size: 20px;
-            font-weight: 600;
-            color: #38bdf8;
-        }
+/* 表格样式 */
+.table-scroll-container { width: 100%; background: #1e293b; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+table { width: 100%; border-collapse: collapse; text-align: left; table-layout: fixed; min-width: 650px; }
 
-        /* ================= 3. 表格卡片主体 ================= */
-        .card-panel {
-            background: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
-            overflow: hidden;
-            margin-top: 16px;
-        }
+th:nth-child(1), td:nth-child(1) { width: 55px; text-align: center; } 
+th:nth-child(2), td:nth-child(2) { width: 85px; text-align: center; } 
+th:nth-child(3), td:nth-child(3) { width: 160px; } 
+th:nth-child(4), td:nth-child(4) { width: auto; }  
+th:nth-child(5), td:nth-child(5) { width: 170px; }  
+th:nth-child(6), td:nth-child(6) { width: 80px; text-align: center; } 
 
-        .card-header {
-            padding: 16px 20px;
-            border-bottom: 1px solid #f1f5f9;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+th, td { padding: 14px 12px; font-size: 13px; border-bottom: 1px solid #334155; vertical-align: middle; overflow: hidden; }
+th { background: #334155; color: #38bdf8; font-weight: 600; }
+tr:hover td { background: rgba(51, 65, 85, 0.3); }
 
-        .card-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: #1e293b;
-        }
+td.index-cell { font-family: monospace; color: #64748b; font-weight: bold; }
+td.address-cell { font-family: monospace; color: #38bdf8; font-size: 13px; }
+td.remark-cell { color: #e2e8f0; font-weight: 500; }
+td.balance-cell { font-family: monospace; font-weight: bold; color: #fff; } 
 
-        .table-responsive-wrapper {
-            width: 100%;
-            overflow-x: auto;
-        }
+.remark-inline-container { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; }
+.remark-text-span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 110px; }
+.edit-remark-icon { cursor: pointer; color: #64748b; font-size: 10px; display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; border-radius: 4px; transition: all 0.2s; flex-shrink: 0; }
+.edit-remark-icon:hover { color: #38bdf8; background: rgba(56, 189, 248, 0.1); }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-            table-layout: fixed; /* 桌面端按固定比例设定 */
-        }
+.th-title-area { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; width: 100%; gap: 6px; }
 
-        th, td {
-            padding: 14px 12px;
-            border-bottom: 1px solid #f1f5f9;
-            font-size: 14px;
-            color: #334155;
-            vertical-align: middle;
-        }
+.control-dark-btn {
+    height: 32px; padding: 4px 10px; font-size: 11px; color: #94a3b8; 
+    border: 1px solid #475569; border-radius: 6px; background: #0f172a; 
+    outline: none !important; -webkit-tap-highlight-color: transparent !important;
+    transition: border-color 0.15s, color 0.15s; font-weight: normal;
+    display: inline-flex; align-items: center; justify-content: center;
+}
+input.control-dark-btn { width: 100%; max-width: 110px; text-align: left; }
+.sort-mini-trigger { cursor: pointer; user-select: none; white-space: nowrap; margin-top: 4px; }
 
-        th {
-            background-color: #f8fafc;
-            font-weight: 600;
-            color: #64748b;
-        }
+.control-dark-btn:focus, .control-dark-btn:hover, .control-dark-btn:active { 
+    border-color: #38bdf8 !important; color: #38bdf8 !important; background: #0f172a !important; box-shadow: none !important; 
+}
+.control-dark-btn::placeholder { color: #475569; }
 
-        /* 桌面端列宽比例 */
-        th:nth-child(1), td:nth-child(1) { width: 60px; text-align: center; } /* 序号 */
-        th:nth-child(2), td:nth-child(2) { width: 90px; }  /* 网络 */
-        th:nth-child(3), td:nth-child(3) { width: 240px; } /* 钱包地址 */
-        th:nth-child(4), td:nth-child(4) { width: 140px; } /* 备注 */
-        th:nth-child(5), td:nth-child(5) { width: 120px; text-align: right; } /* 余额 */
+.address-inline-container { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; }
+.interactive-addr-link { cursor: pointer; text-decoration: underline; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.interactive-addr-link:hover { color: #60a5fa; }
+.btn-mini-copy { background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.2); color: #38bdf8; font-size: 11px; height: 22px; padding: 0 6px; border-radius: 4px; flex-shrink: 0; }
+.btn-mini-copy:hover { background: #38bdf8; color: #fff; }
 
-        /* ================= 4. 地址与交互组件 ================= */
-        .address-inline-container {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            max-width: 100%;
-        }
+.loading-pulse { animation: pulse 1.5s infinite; color: #64748b; }
+@keyframes pulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
 
-        .interactive-addr-link {
-            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-            color: #0284c7;
-            text-decoration: none;
-            font-weight: 500;
-        }
+.chain-badge { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; text-align: center; white-space: nowrap; }
+.badge-ETH { background: rgba(99, 102, 241, 0.2); color: #818cf8; border: 1px solid #6366f1; }
+.badge-BSC { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid #f59e0b; }
+.badge-SOL { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid #10b981; }
 
-        .interactive-addr-link:hover {
-            text-decoration: underline;
-        }
+.token-item { display: flex; justify-content: space-between; align-items: center; background: #0f172a; padding: 10px; border-radius: 8px; margin-bottom: 8px; border: 1px solid #334155; }
+.token-item-info h4 { font-size: 14px; color: #fff; margin: 0; }
+.token-item-info p { font-size: 11px; color: #64748b; font-family: monospace; margin: 4px 0 0; }
 
-        .btn-mini-copy {
-            background-color: #f1f5f9;
-            border: 1px solid #cbd5e1;
-            color: #475569;
-            border-radius: 4px;
-            padding: 2px 6px;
-            font-size: 11px;
-            cursor: pointer;
-            transition: all 0.2s;
-            flex-shrink: 0;
-        }
+.footer-zone { width: 100%; padding: 24px 15px; border-top: 1px solid #1e293b; background: #090d16; text-align: center; color: #475669; font-size: 13px; }
+.footer-counter { display: inline-block; margin-top: 8px; background: rgba(56, 189, 248, 0.05); border: 1px solid rgba(56, 189, 248, 0.15); padding: 4px 14px; border-radius: 20px; color: #94a3b8; }
+.counter-num { color: #38bdf8; font-weight: bold; font-family: monospace; }
 
-        .btn-mini-copy:hover {
-            background-color: #e2e8f0;
-            color: #0f172a;
-        }
-
-        .remark-text-span {
-            display: inline-block;
-            max-width: 120px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            color: #64748b;
-        }
-
-        .badge-net {
-            display: inline-block;
-            padding: 2px 6px;
-            background: #e0f2fe;
-            color: #0369a1;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: 500;
-        }
-
-        /* ================= 5. 移动端适屏响应式 (关键修正) ================= */
-        @media (max-width: 768px) {
-            .full-viewport-header-zone {
-                padding: 35px 12px 20px;
-            }
-
-            .lang-select-ui {
-                top: 12px;
-                right: 12px;
-                padding: 4px 8px;
-                font-size: 12px;
-            }
-
-            .header-title {
-                font-size: 20px;
-            }
-
-            /* 1. 彻底取消表格硬性宽度和固定列宽，开启完全自适应 */
-            table {
-                min-width: 100% !important;
-                table-layout: auto !important;
-            }
-
-            /* 2. 紧凑化单元格内边距 */
-            th, td {
-                padding: 10px 4px !important;
-                font-size: 12px;
-            }
-
-            /* 3. 极简压缩序号和网络列，挤出宽度给地址 */
-            th:nth-child(1), td:nth-child(1) { width: 28px !important; text-align: center; } 
-            th:nth-child(2), td:nth-child(2) { width: 44px !important; } 
-
-            .badge-net {
-                padding: 1px 4px;
-                font-size: 10px;
-            }
-
-            /* 4. 压缩备注名称宽度 */
-            .remark-text-span {
-                max-width: 50px !important;
-            }
-
-            /* 5. 彻底移除 CSS 的二次溢出截断，仅由 JS 控制“前4后4”全显 */
-            .address-inline-container {
-                gap: 3px;
-            }
-
-            .interactive-addr-link {
-                max-width: none !important;
-                display: inline !important;
-                overflow: visible !important;
-                white-space: nowrap;
-                font-size: 12px;
-            }
-
-            .btn-mini-copy {
-                padding: 0 4px;
-                font-size: 10px;
-                height: 18px;
-                line-height: 16px;
-            }
-        }
-    </style>
+@media (max-width: 992px) { .main-layout { grid-template-columns: 1fr; gap: 15px; } .form-row-inline { grid-template-columns: 1fr; gap: 8px; } }
+@media (max-width: 768px) { 
+    .lang-select-ui { top: 12px; right: 12px; padding: 4px 8px; font-size: 12px; } 
+    .full-viewport-header-zone { padding: 35px 10px 25px; } 
+    .header-meta-text { margin-bottom: 16px; } 
+    th, td { padding: 10px 6px; font-size: 12px; } 
+    
+    .interactive-addr-link {
+        max-width: none;
+        display: inline-block;
+        vertical-align: middle;
+    }
+    .btn-mini-copy {
+        padding: 0 4px;
+        font-size: 10px;
+        height: 20px;
+    }
+}
+@media (max-width: 480px) { .full-viewport-header-zone { padding: 45px 5px 20px; } .summary-banner { padding: 15px 10px; } .card-list-header { padding: 12px 10px; } }
+</style>
 </head>
 <body>
 
-    <!-- 全局头部与概览区 -->
-    <header class="full-viewport-header-zone">
-        <select class="lang-select-ui" id="langSelect">
-            <option value="zh">简体中文</option>
-            <option value="en">English</option>
-        </select>
-        <div class="main-container">
-            <h1 class="header-title">项目国库资产看板</h1>
-            <p class="header-meta-text">多签与质押挖矿钱包实时监控</p>
+<div class="page-container">
+    <header class="content-wrap">
+        <div class="full-viewport-header-zone">
+            <!-- 切换语言下拉框 -->
+            <select id="langSwitcher" class="lang-select-ui" onchange="switchLanguage(this.value)">
+                <option value="en">🇺🇸 English</option>
+                <option value="zh" selected>🇨🇳 简体中文</option>
+                <option value="tw">🇹🇼 繁體中文</option>
+                <option value="ja">🇯🇵 日本語</option>
+                <option value="ko">🇰🇷 한국어</option>
+            </select>
+
+            <div class="header-meta-text">
+                <h1 data-i18n="main_title">多链多钱包智能资产看板</h1>
+                <p data-i18n="main_desc">动态添加代币 | 多钱包合并计算 | 跨域容错高兼容链上通信架构</p>
+            </div>
             
-            <div class="metrics-grid">
-                <div class="metric-card">
-                    <div class="metric-label">国库总资产 (USD)</div>
-                    <div class="metric-value">$ 1,284,910.00</div>
+            <div class="summary-banner">
+                <div class="summary-display-box">
+                    <span class="total-val" id="summary_total_display">0.00</span>
+                    <span class="total-short-val" id="summary_short_display"></span>
                 </div>
-                <div class="metric-card">
-                    <div class="metric-label">质押中的资产</div>
-                    <div class="metric-value">$ 850,000.00</div>
-                </div>
-                <div class="metric-card">
-                    <div class="metric-label">受监控钱包数</div>
-                    <div class="metric-value" id="total-wallet-count">0</div>
+                <div class="summary-right">
+                    <select id="selectDisplayToken" class="select-token-ui" onchange="renderUI()"></select>
+                    <div class="wallet-count-badge">
+                        <span data-i18n="monitoring">正在监控</span> 
+                        <span id="summary_wallet_count" style="color:#38bdf8;font-weight:bold;">0</span> 
+                        <span data-i18n="wallets">个钱包</span>
+                    </div>
                 </div>
             </div>
         </div>
     </header>
 
-    <!-- 主体表格区 -->
-    <main class="main-container">
-        <div class="card-panel">
-            <div class="card-header">
-                <div class="card-title">钱包地址明细</div>
-            </div>
-            
-            <div class="table-responsive-wrapper">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>网络</th>
-                            <th>钱包地址</th>
-                            <th>备注</th>
-                            <th style="text-align: right;">余额</th>
-                        </tr>
-                    </thead>
-                    <tbody id="wallet-tbody">
-                        <!-- JS 动态渲染 -->
-                    </tbody>
-                </table>
-            </div>
+    <main class="container">
+        <div class="main-layout">
+            <section style="min-width: 0;">
+                <div class="card-box">
+                    <div class="card-header-toggle" onclick="toggleCard('addWalletContent', 'arrowWallet')">
+                        <div class="card-title">
+                            <span data-i18n="card_add_wallet">➕ 监控钱包添加</span>
+                            <span id="arrowWallet" class="toggle-icon">展开 ▼</span>
+                        </div>
+                    </div>
+                    <div id="addWalletContent" class="toggle-content collapsed">
+                        <div class="form-row-inline">
+                            <input type="text" id="walletAddress" placeholder="Wallet Address (0x... or SOL address)" />
+                            <input type="text" id="walletRemark" placeholder="Remark (e.g. Whale 1)" />
+                            <select id="walletChain">
+                                <option value="ETH">Ethereum Chain</option>
+                                <option value="BSC">BNB Smart Chain</option>
+                                <option value="SOL">Solana Chain</option>
+                            </select>
+                        </div>
+                        <button class="btn-success" style="width:100%;" data-i18n="btn_add_wallet" onclick="addWallet()">确认添加此钱包到观察队列</button>
+                    </div>
+                </div>
+
+                <div class="card-box" style="padding: 0; overflow: hidden; display: flex; flex-direction: column;">
+                    <div class="card-list-header">
+                        <div class="card-title" data-i18n="card_wallet_list" style="margin: 0; border:none; padding:0; width: auto;">钱包明细清单</div>
+                        <button onclick="updateAllBalances()" id="refreshBtn" class="btn-mini-fetch" data-i18n="btn_fetch">🔄 一键拉取实时链上余额</button>
+                    </div>
+
+                    <div class="table-scroll-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th data-i18n="th_idx">序号</th>
+                                    <th data-i18n="th_net">网络</th>
+                                    <th>
+                                        <div class="th-title-area">
+                                            <span data-i18n="th_rem">备注名称</span>
+                                            <input type="text" id="headerSearchInput" class="control-dark-btn" oninput="renderUI()" placeholder="🔍 过滤...">
+                                        </div>
+                                    </th>
+                                    <th data-i18n="th_addr">监控钱包地址</th>
+                                    <th>
+                                        <div class="th-title-area">
+                                            <span id="dynamicTableHeader">Token 余额</span>
+                                            <button class="control-dark-btn sort-mini-trigger" id="btn_sort_balance" onclick="toggleBalanceSort()" data-i18n="sort_def">📊 排序: 默认</button>
+                                        </div>
+                                    </th>
+                                    <th style="text-align: center;" data-i18n="th_act">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="walletTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <aside style="min-width: 0;">
+                <div class="card-box">
+                    <div class="card-header-toggle" onclick="toggleCard('addTokenContent', 'arrow1')">
+                        <div class="card-title">
+                            <span data-i18n="card_add_token">🔧 自定义备查代币添加</span>
+                            <span id="arrow1" class="toggle-icon">展开 ▼</span>
+                        </div>
+                    </div>
+                    <div id="addTokenContent" class="toggle-content collapsed">
+                        <div class="form-grid">
+                            <div>
+                                <label style="font-size:12px; color:#94a3b8;" data-i18n="label_symbol">代币简称 (Symbol)</label>
+                                <input type="text" id="newTokenSymbol" placeholder="e.g. USDT, SOL, ETH" style="width:100%; margin-top:4px;" />
+                            </div>
+                            <div>
+                                <label style="font-size:12px; color:#94a3b8;" data-i18n="label_chain">所属公链 (Chain)</label>
+                                <select id="newTokenChain" style="width:100%; margin-top:4px;">
+                                    <option value="ETH">Ethereum (ERC20)</option>
+                                    <option value="BSC">BNB Smart Chain (BEP20)</option>
+                                    <option value="SOL">Solana Network (SPL/Native)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label style="font-size:12px; color:#94a3b8;" data-i18n="label_contract">代币智能合约/Mint地址</label>
+                                <input type="text" id="newTokenContract" placeholder="Contract address" style="width:100%; margin-top:4px;" />
+                            </div>
+                            <div>
+                                <label style="font-size:12px; color:#94a3b8;" data-i18n="label_decimals">代币精度位 (Decimals)</label>
+                                <input type="number" id="newTokenDecimals" value="18" min="0" max="18" style="width:100%; margin-top:4px;" />
+                            </div>
+                            <button onclick="addCustomToken()" style="width:100%; margin-top:5px;" data-i18n="btn_save_token">💾 录入并备查此代币</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-box">
+                    <div class="card-header-toggle" onclick="toggleCard('listTokenContent', 'arrow2')">
+                        <div class="card-title">
+                            <span data-i18n="card_token_list">📋 现已备查的代币资产</span>
+                            <span id="arrow2" class="toggle-icon">展开 ▼</span>
+                        </div>
+                    </div>
+                    <div id="listTokenContent" class="toggle-content collapsed">
+                        <div id="customTokenListSlot"></div>
+                    </div>
+                </div>
+            </aside>
         </div>
     </main>
 
-    <script>
-        // 模拟全局钱包列表数据
-        const walletData = [
-            { id: 1, chain: "TRX", address: "TFr2s3G9Xk8NmL1p4vQ7zW5yR0aCdB6eF9", remark: "主国库钱包", balance: "1,245,000.00 USDT" },
-            { id: 2, chain: "ETH", address: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F", remark: "7人多签节点", balance: "142.50 ETH" },
-            { id: 3, chain: "BSC", address: "0x28C6c06298d514Db089934071355E5743bf21d60", remark: "质押收益池", balance: "89,050.00 BUSD" },
-            { id: 4, chain: "SOL", address: "4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R", remark: "流动性备用", balance: "1,200.00 SOL" }
-        ];
+    <footer class="footer-zone">
+        <div data-i18n="copyright">版权和解释权属于藤蔓协议云南商学院</div>
+        <div class="footer-counter">
+            <span data-i18n="sys_visits">📊 系统累计使用人数：</span> 
+            <span class="counter-num" id="user_counter_slot">1</span> 
+            <span data-i18n="sys_times">人次</span>
+        </div>
+    </footer>
+</div>
 
-        /**
-         * 地址格式化：精确截断为前 4 位 + ... + 后 4 位
-         */
-        function formatAddress(addr) {
-            if (!addr || addr.length <= 10) return addr;
-            return `${addr.slice(0, 4)}...${addr.slice(-4)}`;
+<script>
+// 多语言配置字典
+const I18N_DICTS = {
+    en: {
+        main_title: "Multi-Chain Multi-Wallet Intelligent Asset Dashboard", main_desc: "Dynamic token inclusion | Multi-wallet consolidation | Cross-domain fault-tolerant architecture",
+        monitoring: "Monitoring", wallets: "wallets", card_add_wallet: "➕ Add Wallet to Monitor", btn_add_wallet: "Confirm adding this wallet to query queue",
+        card_wallet_list: "Wallet Breakdown List", btn_fetch: "🔄 Fetch Live Balances", btn_fetching: "⏳ Syncing...",
+        th_idx: "Index", th_net: "Network", th_rem: "Wallet Remark", th_addr: "Monitored Wallet Address", th_act: "Action",
+        card_add_token: "🔧 Custom Tokens Setup", label_symbol: "Token Symbol", label_chain: "Target Blockchain",
+        label_contract: "Smart Contract/Mint Address", label_decimals: "Token Decimals", btn_save_token: "💾 Save and Index Token",
+        card_token_list: "📋 Indexed Token Assets", copyright: "Copyright & Intellectual property belongs to Vine Protocol Yunnan Business School",
+        sys_visits: "📊 Total system usage: ", sys_times: " times", dropdown_prefix: "🔍 View Asset: ",
+        alert_empty_token: "Token symbol and Contract/Mint address cannot be empty!", alert_invalid_dec: "Please enter a valid decimal number!",
+        alert_exist_token: "This asset already exists in the configuration pool!", alert_del_token: "Removing this token will stop its balance monitoring, proceed?",
+        alert_empty_wallet: "Address cannot be empty!", alert_exist_wallet: "This wallet address already exists under the chosen network!",
+        alert_del_wallet: "Permanently remove this wallet from monitoring?", badge_del: "Delete", expand: "Expand ▼", collapse: "Collapse ▲",
+        sort_def: "📊 Sort: Default", sort_desc: "📉 Sort: High ➔ Low", sort_asc: "📈 Sort: Low ➔ High",
+        copied: "Copied!", copy_btn: "Copy", search_holder: "🔍 Filter...", prompt_edit_rem: "Enter new remark name:", token_bal: "Balance"
+    },
+    zh: {
+        main_title: "多链多钱包智能资产看板", main_desc: "动态添加代币 | 多钱包合并计算 | 跨域容错高兼容链上通信架构",
+        monitoring: "正在监控", wallets: "个钱包", card_add_wallet: "➕ 监控钱包添加", btn_add_wallet: "确认添加此钱包到观察队列",
+        card_wallet_list: "钱包明细清单", btn_fetch: "🔄 一键拉取实时链上余额", btn_fetching: "⏳ 同步中...",
+        th_idx: "序号", th_net: "网络", th_rem: "备注名称", th_addr: "监控钱包地址", th_act: "操作",
+        card_add_token: "🔧 自定义备查代币添加", label_symbol: "代币简称 (Symbol)", label_chain: "所属公链 (Chain)",
+        label_contract: "代币智能合约/Mint地址", label_decimals: "代币精度位 (Decimals)", btn_save_token: "💾 录入并备查此代币",
+        card_token_list: "📋 现已备查的代币资产", copyright: "版权和解释权属于藤蔓协议云南商学院",
+        sys_visits: "📊 系统累计使用人数：", sys_times: "人次", dropdown_prefix: "🔍 观察查看 ",
+        alert_empty_token: "代币简称与合约/Mint地址不可为空！", alert_invalid_dec: "请输入有效的代币精度数值！",
+        alert_exist_token: "该代币资产已存在备查管理池中！", alert_del_token: "移除该备查代币会导致对应监控停止，确认删除吗？",
+        alert_empty_wallet: "地址栏不可为空！", alert_exist_wallet: "当前网络的该钱包地址已存在于监控清单中！",
+        alert_del_wallet: "确认从列表中永久移出此监控钱包吗？", badge_del: "删除", expand: "展开 ▼", collapse: "收起 ▲",
+        sort_def: "📊 排序: 默认", sort_desc: "📉 排序: 从高到低", sort_asc: "📈 排序: 从低到高",
+        copied: "已复制!", copy_btn: "复制", search_holder: "🔍 过滤...", prompt_edit_rem: "请输入新的备注名称:", token_bal: "余额"
+    },
+    tw: {
+        main_title: "多鏈多錢包智慧資產看板", main_desc: "動態添加代幣 | 多錢包合併計算 | 跨域容錯高兼容鏈上通信架構",
+        monitoring: "正在監控", wallets: "個錢包", card_add_wallet: "➕ 監控錢包添加", btn_add_wallet: "確認添加此錢包到觀察隊列",
+        card_wallet_list: "錢包明細清單", btn_fetch: "🔄 一鍵拉取實時鏈上餘額", btn_fetching: "⏳ 同步中...",
+        th_idx: "序號", th_net: "網絡", th_rem: "備註名稱", th_addr: "監控錢包地址", th_act: "操作",
+        card_add_token: "🔧 自定義備備查代幣添加", label_symbol: "代幣簡稱 (Symbol)", label_chain: "所屬公鏈 (Chain)",
+        label_contract: "代幣智慧合約/Mint地址", label_decimals: "代幣精度位 (Decimals)", btn_save_token: "💾 錄入並備查此代幣",
+        card_token_list: "📋 現已備查的代幣資產", copyright: "版權和解釋權屬於藤蔓協議雲南商學院",
+        sys_visits: "📊 系統累計使用人數：", sys_times: "人次", dropdown_prefix: "🔍 觀察查看 ",
+        alert_empty_token: "代幣簡稱與合約/Mint地址不可為空！", alert_invalid_dec: "請輸入有效的代幣精度數值！",
+        alert_exist_token: "該代幣資產已存在備查管理池中！", alert_del_token: "移除該備查代幣會導致對應監控停止，確認刪除嗎？",
+        alert_empty_wallet: "地址欄不可為空！", alert_exist_wallet: "當前網絡的該錢包地址已存在於監控清單中！",
+        alert_del_wallet: "確認從列表中永久移出此監控錢包嗎？", badge_del: "刪除", expand: "展開 ▼", collapse: "收起 ▲",
+        sort_def: "📊 排序: 默認", sort_desc: "📉 排序: 從高到低", sort_asc: "📈 排序: 從低到高",
+        copied: "已複製!", copy_btn: "複製", search_holder: "🔍 過濾...", prompt_edit_rem: "請輸入新的備註名稱:", token_bal: "餘額"
+    },
+    ja: {
+        main_title: "マルチチェーンマルチウォレットダッシュボード", main_desc: "トークン動的追加 | 複数ウォレット統合計算 | クロスドメインフォールトトレラントアーキテクチャ",
+        monitoring: "監視中", wallets: "個のウォレット", card_add_wallet: "➕ 監視ウォレット追加", btn_add_wallet: "このウォレットを監視キューに追加する",
+        card_wallet_list: "ウォレット明細一覧", btn_fetch: "🔄 リアルタイム残高を取得", btn_fetching: "⏳ 同期中...",
+        th_idx: "インデックス", th_net: "ネットワーク", th_rem: "備考名称", th_addr: "監視ウォレットアドレス", th_act: "操作",
+        card_add_token: "🔧 カスタムトークン設定", label_symbol: "トークンシンボル", label_chain: "対象ブロックチェーン",
+        label_contract: "スマートコントラクト/Mintアドレス", label_decimals: "トークン小数点桁数", btn_save_token: "💾 保存してインデックス化",
+        card_token_list: "📋 登録済みトークン資産", copyright: "Copyright & 知的財産権は Vine Protocol 云南ビジネススクールに帰属します",
+        sys_visits: "📊 システム累計利用数：", sys_times: "回", dropdown_prefix: "🔍 資産を表示: ",
+        alert_empty_token: "空にできません！", alert_invalid_dec: "有効な値を入力してください！",
+        alert_exist_token: "既に存在します！", alert_del_token: "残高監視が停止します。続行しますか？",
+        alert_empty_wallet: "アドレスを入力してください！", alert_exist_wallet: "既に存在します！",
+        alert_del_wallet: "完全に削除しますか？", badge_del: "削除", expand: "展開 ▼", collapse: "折りたたみ ▲",
+        sort_def: "📊 排序: デフォルト", sort_desc: "📉 排序: 高 ➔ 低", sort_asc: "📈 排序: 低 ➔ 高",
+        copied: "コピーしました!", copy_btn: "コピー", search_holder: "🔍 フィルター...", prompt_edit_rem: "新しい備考名称を入力してください:", token_bal: "残高"
+    },
+    ko: {
+        main_title: "멀티체인 멀티지갑 인텔리전트 자산 대시보드", main_desc: "동적 토큰 추가 | 다중 지갑 통합 계산 | 크로스 도메인 내결함성 온체인 아키처",
+        monitoring: "모니터링 중", wallets: "개 지갑", card_add_wallet: "➕ 모니터링 지갑 추가", btn_add_wallet: "이 지갑을 조회 대기열에 추가",
+        card_wallet_list: "지갑 내역 목록", btn_fetch: "🔄 실시간 잔액 가져오기", btn_fetching: "⏳ 동기화 중...",
+        th_idx: "순번", th_net: "네트워크", th_rem: "메모 이름", th_addr: "모니터링 지갑 주소", th_act: "작업",
+        card_add_token: "🔧 사용자 정의 토큰 설정", label_symbol: "토큰 심볼", label_chain: "대상 블록체인",
+        label_contract: "스마트 계약/Mint 주소", label_decimals: "토큰 소수점 자리수", btn_save_token: "💾 저장 및 인덱싱",
+        card_token_list: "📋 인덱싱된 토큰 자산", copyright: "Copyright & 지식재산권은 Vine Protocol 운남 비즈니스 스쿨에 귀속됩니다",
+        sys_visits: "📊 시스템 총 사용 횟수: ", sys_times: "회", dropdown_prefix: "🔍 자산 보기: ",
+        alert_empty_token: "비워둘 수 없습니다!", alert_invalid_dec: "올바른 소수점 자리수를 입력하세요!",
+        alert_exist_token: "이미 존재합니다!", alert_del_token: "모니터링이 중단됩니다. 진행하시겠습니까?",
+        alert_empty_wallet: "주소를 입력해야 합니다!", alert_exist_wallet: "이미 존재합니다!",
+        alert_del_wallet: "지갑을 영구히 삭제하시겠습니까?", badge_del: "삭제", expand: "펼치기 ▼", collapse: "접기 ▲",
+        sort_def: "📊 정렬: 기본", sort_desc: "📉 정렬: 높은 순", sort_asc: "📈 정렬: 낮은 순",
+        copied: "복사됨!", copy_btn: "복사", search_holder: "🔍 필터...", prompt_edit_rem: "새로운 메모 이름을 입력하세요:", token_bal: "잔액"
+    }
+};
+
+let currentLang = "zh";
+
+// RPC 与初始化参数
+const RPC_ETH = "https://rpc.mevblocker.io", RPC_BSC = "https://bsc-dataseed1.binance.org", RPC_SOL = "https://api.mainnet-beta.solana.com"; 
+
+const INITIAL_TOKENS = [
+    { symbol: "USDT", chain: "ETH", contract: "0xdac17f958d2ee523a2206206994597c13d831ec7", decimals: 6 },
+    { symbol: "USDT", chain: "BSC", contract: "0x55d398326f99059ff775485246999027b3197955", decimals: 18 },
+    { symbol: "USDT", chain: "SOL", contract: "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB", decimals: 6 },
+    { symbol: "NAT", chain: "ETH", contract: "0x249130f5e2dd4cf278180c0df8273f3592ad1247", decimals: 0 },
+    { symbol: "NAT", chain: "BSC", contract: "0x600e3b55d5368c32a94f9372563318adb6a3f882", decimals: 0 }, 
+    { symbol: "NAT", chain: "SOL", contract: "FbKRaqBzupLry3V7QujpNghwrHgxutB4MY11M8aeyVa1", decimals: 0 }, 
+    { symbol: "TENDRIL", chain: "BSC", contract: "0xb1afdfd850da168f2cc9f742e11cdda5273973d2", decimals: 18 }
+];
+
+const INITIAL_WALLETS = [
+    { chain: "ETH", remark: "Vitalik Wallet", address: "0xAb5801a7D398351b8bE11C439e05C5B3259aec9B", balances: {} },
+    { chain: "BSC", remark: "Binance Hot Wallet", address: "0xF977814e90dA44bFA03b6295A0616a897441aceC", balances: {} },
+    { chain: "SOL", remark: "SOL Watcher 1", address: "6ZRCB7v8gscuA2N6773FwYms48D6f4YfV2LnyfC8e96X", balances: {} },
+    { chain: "SOL", remark: "SOL Watcher 2", address: "9xQeWvG816bUx9EPjHmaT23yvVM2ZWbrrpZb9PusVFin", balances: {} }
+];
+
+let tokenConfigList = JSON.parse(localStorage.getItem("cfg_tokens")) || INITIAL_TOKENS;
+let walletList = JSON.parse(localStorage.getItem("cfg_wallets")) || INITIAL_WALLETS;
+let balanceSortState = "DEFAULT", isUpdating = false;
+
+// 60 秒轮询（无刷新静默更新）
+setInterval(updateAllBalances, 60000);
+
+// 监听窗口大小改变，移动端与 PC 切换时自动重新渲染截断地址
+window.addEventListener('resize', () => {
+    renderUI();
+});
+
+// 语言切换与自动检测
+function switchLanguage(langKey) {
+    currentLang = langKey;
+    localStorage.setItem("app_lang", langKey);
+    document.getElementById("langSwitcher").value = langKey;
+    
+    document.querySelectorAll("[data-i18n]").forEach(el => {
+        const key = el.getAttribute("data-i18n");
+        if (I18N_DICTS[langKey]?.[key]) el.textContent = I18N_DICTS[langKey][key];
+    });
+
+    const placeholderInput = document.getElementById("headerSearchInput");
+    if (placeholderInput) placeholderInput.placeholder = I18N_DICTS[langKey].search_holder;
+    
+    rebuildTokenDropdown();
+    renderUI();
+}
+
+function autoDetectGeoLanguage() {
+    const saved = localStorage.getItem("app_lang");
+    if (saved) {
+        currentLang = saved;
+    } else {
+        const browserLang = navigator.language.toLowerCase();
+        if (browserLang.startsWith("zh-tw") || browserLang.startsWith("zh-hk")) currentLang = "tw";
+        else if (browserLang.startsWith("zh")) currentLang = "zh";
+        else if (browserLang.startsWith("ja")) currentLang = "ja";
+        else if (browserLang.startsWith("ko")) currentLang = "ko";
+        else currentLang = "en";
+    }
+    switchLanguage(currentLang);
+}
+
+// 链上通信核心逻辑
+async function callEvmRpc(rpcUrl, method, params) {
+    const res = await fetch(rpcUrl, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ jsonrpc: "2.0", id: Math.floor(Math.random() * 10000), method, params })
+    });
+    return await res.json();
+}
+
+async function queryEvmSingleUnit(chain, walletAddr, tokenAddr, decimals) {
+    const rpcUrl = (chain === "ETH") ? RPC_ETH : RPC_BSC;
+    const isNative = /^0x0{40}$/.test(tokenAddr);
+    try {
+        if (isNative) {
+            const json = await callEvmRpc(rpcUrl, "eth_getBalance", [walletAddr, "latest"]);
+            return json.result ? (Number(BigInt(json.result)) / 1e18) : 0;
+        } else {
+            const cleanAddress = walletAddr.toLowerCase().replace("0x", "");
+            const dataParam = "0x70a08231" + cleanAddress.padStart(64, "0");
+            const json = await callEvmRpc(rpcUrl, "eth_call", [{ to: tokenAddr, data: dataParam }, "latest"]);
+            return (json.result && json.result !== "0x") ? (Number(BigInt(json.result)) / Math.pow(10, decimals)) : 0;
         }
+    } catch { return 0; }
+}
 
-        /**
-         * 复制到剪贴板
-         */
-        function copyAddress(text, btn) {
-            navigator.clipboard.writeText(text).then(() => {
-                const oldText = btn.innerText;
-                btn.innerText = "已复制";
-                btn.style.borderColor = "#22c55e";
-                btn.style.color = "#15803d";
-
-                setTimeout(() => {
-                    btn.innerText = oldText;
-                    btn.style.borderColor = "";
-                    btn.style.color = "";
-                }, 1200);
-            }).catch(err => {
-                console.error("复制失败:", err);
-            });
+async function querySolanaSingleUnit(walletAddr, tokenMint, decimals) {
+    const isNative = tokenMint === "11111111111111111111111111111111" || !tokenMint.trim();
+    try {
+        const res = await fetch(RPC_SOL, {
+            method: "POST", headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                jsonrpc: "2.0", id: Math.floor(Math.random() * 10000),
+                method: isNative ? "getBalance" : "getTokenAccountsByOwner",
+                params: isNative ? [walletAddr] : [walletAddr, { mint: tokenMint }, { encoding: "jsonParsed" }]
+            })
+        });
+        const json = await res.json();
+        if (!json?.result) return 0;
+        if (isNative) return json.result.value !== undefined ? (Number(json.result.value) / 1e9) : 0;
+        
+        if (json.result.value?.length > 0) {
+            const info = json.result.value[0].account.data.parsed.info.tokenAmount;
+            if (info.uiAmountString !== undefined) return parseFloat(info.uiAmountString);
+            return info.amount ? (Number(info.amount) / Math.pow(10, parseInt(decimals) || 0)) : 0;
         }
+        return 0;
+    } catch { return 0; }
+}
 
-        /**
-         * 渲染整体表格与指标数据
-         */
-        function initDashboard() {
-            // 更新顶部计数器
-            document.getElementById("total-wallet-count").innerText = walletData.length;
+async function updateAllBalances() {
+    if (isUpdating) return;
+    isUpdating = true;
+    const btn = document.getElementById("refreshBtn");
+    if (btn) { btn.innerText = I18N_DICTS[currentLang].btn_fetching; btn.disabled = true; }
 
-            // 渲染表格
-            const tbody = document.getElementById("wallet-tbody");
-            tbody.innerHTML = "";
+    document.querySelectorAll(".balance-cell").forEach(el => el.innerHTML = `<span class="loading-pulse">...</span>`);
 
-            walletData.forEach(item => {
-                const tr = document.createElement("tr");
+    const poolTasks = [];
+    walletList.forEach((wallet) => {
+        if (!wallet.balances) wallet.balances = {};
+        const matchTokens = tokenConfigList.filter(t => t.chain === wallet.chain);
+        matchTokens.forEach((token) => {
+            let task;
+            if (wallet.chain === "BSC" || wallet.chain === "ETH") {
+                task = queryEvmSingleUnit(wallet.chain, wallet.address, token.contract, token.decimals)
+                    .then(val => { wallet.balances[token.symbol] = val; });
+            } else if (wallet.chain === "SOL") {
+                task = querySolanaSingleUnit(wallet.address, token.contract, token.decimals)
+                    .then(val => { wallet.balances[token.symbol] = val; });
+            }
+            if (task) poolTasks.push(task);
+        });
+    });
 
-                const addressColumnHTML = `
-                    <div class="address-inline-container">
-                        <a href="javascript:void(0);" 
-                           class="interactive-addr-link" 
-                           title="${item.address}">
-                           ${formatAddress(item.address)}
-                        </a>
-                        <button class="btn-mini-copy" onclick="copyAddress('${item.address}', this)">复制</button>
-                    </div>
-                `;
+    await Promise.all(poolTasks);
+    localStorage.setItem("cfg_wallets", JSON.stringify(walletList));
+    isUpdating = false;
+    if (btn) { btn.innerText = I18N_DICTS[currentLang].btn_fetch; btn.disabled = false; }
+    renderUI();
+}
 
-                tr.innerHTML = `
-                    <td style="text-align: center;">${item.id}</td>
-                    <td><span class="badge-net">${item.chain}</span></td>
-                    <td>${addressColumnHTML}</td>
-                    <td><span class="remark-text-span" title="${item.remark}">${item.remark}</span></td>
-                    <td style="text-align: right; font-weight: 600;">${item.balance}</td>
-                `;
+function toggleBalanceSort() {
+    const btn = document.getElementById("btn_sort_balance");
+    const trans = I18N_DICTS[currentLang];
+    balanceSortState = balanceSortState === "DEFAULT" ? "DESC" : balanceSortState === "DESC" ? "ASC" : "DEFAULT";
+    btn.textContent = trans[`sort_${balanceSortState === "DEFAULT" ? "def" : balanceSortState.toLowerCase()}`];
+    renderUI();
+}
 
-                tbody.appendChild(tr);
-            });
-        }
+// 核心地址截断逻辑：移动端(<=768px)严格前4后4，PC端前8后8
+function abbreviateAddress(addr) {
+    if (!addr) return '';
+    const isMobile = window.innerWidth <= 768;
+    if (isMobile) {
+        return addr.length <= 8 ? addr : `${addr.slice(0, 4)}...${addr.slice(-4)}`;
+    }
+    return addr.length <= 16 ? addr : `${addr.slice(0, 8)}...${addr.slice(-8)}`;
+}
 
-        // 页面初始化
-        document.addEventListener("DOMContentLoaded", initDashboard);
-    </script>
+function executeCopy(text, btnElement) {
+    const trans = I18N_DICTS[currentLang];
+    navigator.clipboard.writeText(text).then(() => {
+        const oldText = btnElement.textContent;
+        btnElement.textContent = trans.copied;
+        btnElement.style.color = "#10b981";
+        setTimeout(() => { btnElement.textContent = oldText; btnElement.style.color = ""; }, 1200);
+    }).catch(() => {
+        const t = document.createElement("textarea"); t.value = text; document.body.appendChild(t);
+        t.select(); document.execCommand("copy"); document.body.removeChild(t);
+    });
+}
+
+function openBlockExplorer(address, chain) {
+    const urls = { ETH: "etherscan.io", BSC: "bscscan.com", SOL: "solscan.io" };
+    const path = chain === "SOL" ? "account" : "address";
+    if (urls[chain]) window.open(`https://${urls[chain]}/${path}/${address}`, '_blank');
+}
+
+function triggerEditRemark(originalIndex) {
+    const trans = I18N_DICTS[currentLang];
+    const newRemark = prompt(trans.prompt_edit_rem, walletList[originalIndex].remark);
+    if (newRemark?.trim()) {
+        walletList[originalIndex].remark = newRemark.trim();
+        localStorage.setItem("cfg_wallets", JSON.stringify(walletList));
+        renderUI();
+    }
+}
+
+// 界面 UI 绘制
+const escapeHtml = str => str ? str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;") : "";
+
+function toggleCard(contentId, arrowId) {
+    const isCollapsed = document.getElementById(contentId).classList.toggle('collapsed');
+    document.getElementById(arrowId).textContent = isCollapsed ? I18N_DICTS[currentLang].expand : I18N_DICTS[currentLang].collapse;
+}
+
+function addCustomToken() {
+    const trans = I18N_DICTS[currentLang];
+    const symbol = document.getElementById("newTokenSymbol").value.trim().toUpperCase();
+    const chain = document.getElementById("newTokenChain").value;
+    let contract = document.getElementById("newTokenContract").value.trim();
+    const decimals = parseInt(document.getElementById("newTokenDecimals").value);
+
+    if (!symbol || !contract) return alert(trans.alert_empty_token);
+    if (isNaN(decimals) || decimals < 0) return alert(trans.alert_invalid_dec);
+    if (chain !== "SOL" && !contract.startsWith("0x")) contract = "0x" + contract;
+
+    tokenConfigList.push({ symbol, chain, contract, decimals });
+    localStorage.setItem("cfg_tokens", JSON.stringify(tokenConfigList));
+    rebuildTokenDropdown();
+    renderUI();
+    updateAllBalances();
+}
+
+function deleteCustomToken(idx) {
+    if (confirm(I18N_DICTS[currentLang].alert_del_token)) {
+        tokenConfigList.splice(idx, 1);
+        localStorage.setItem("cfg_tokens", JSON.stringify(tokenConfigList));
+        rebuildTokenDropdown();
+        renderUI();
+    }
+}
+
+function addWallet() {
+    const trans = I18N_DICTS[currentLang];
+    const address = document.getElementById("walletAddress").value.trim();
+    const remark = document.getElementById("walletRemark").value.trim() || "Wallet";
+    const chain = document.getElementById("walletChain").value;
+
+    if (!address) return alert(trans.alert_empty_wallet);
+    walletList.push({ chain, remark, address, balances: {} });
+    localStorage.setItem("cfg_wallets", JSON.stringify(walletList));
+    document.getElementById("walletAddress").value = "";
+    document.getElementById("walletRemark").value = "";
+    renderUI();
+    updateAllBalances();
+}
+
+function deleteWallet(idx) {
+    if (confirm(I18N_DICTS[currentLang].alert_del_wallet)) {
+        walletList.splice(idx, 1);
+        localStorage.setItem("cfg_wallets", JSON.stringify(walletList));
+        renderUI();
+    }
+}
+
+function formatShortVolume(val) {
+    if (val < 10000) return "";
+    const units = [{v:1e12,s:"T"},{v:1e9,s:"B"},{v:1e6,s:"M"},{v:1e3,s:"K"}];
+    const u = units.find(u => val >= u.v);
+    return u ? ` (${(val / u.v).toFixed(2)}${u.s})` : "";
+}
+
+function rebuildTokenDropdown() {
+    const select = document.getElementById("selectDisplayToken");
+    const uniqueSymbols = [...new Set(tokenConfigList.map(t => t.symbol))];
+    const previous = select.value;
+    select.innerHTML = "";
+    uniqueSymbols.forEach(sym => {
+        const op = document.createElement("option"); op.value = sym;
+        op.textContent = `${I18N_DICTS[currentLang].dropdown_prefix}${sym}`;
+        select.appendChild(op);
+    });
+    select.value = uniqueSymbols.includes(previous) ? previous : (uniqueSymbols[0] || "");
+}
+
+function renderUI() {
+    const selectEl = document.getElementById("selectDisplayToken");
+    const currentToken = selectEl.value || "USDT";
+    const trans = I18N_DICTS[currentLang];
+    
+    document.getElementById("dynamicTableHeader").textContent = `${currentToken} ${trans.token_bal}`;
+
+    const tokenSlot = document.getElementById("customTokenListSlot");
+    tokenSlot.innerHTML = "";
+    tokenConfigList.forEach((t, i) => {
+        const row = document.createElement("div"); row.className = "token-item";
+        row.innerHTML = `
+            <div class="token-item-info">
+                <h4>${escapeHtml(t.symbol)} <span class="chain-badge badge-${t.chain}">${t.chain}</span></h4>
+                <p>Contract:${t.contract.slice(0,6)}...${t.contract.slice(-6)}</p>
+            </div>
+            <button class="btn-danger" onclick="deleteCustomToken(${i})">${trans.badge_del}</button>
+        `;
+        tokenSlot.appendChild(row);
+    });
+
+    let processedWallets = walletList.map((w, originalIndex) => ({ ...w, originalIndex }));
+    const keyword = document.getElementById("headerSearchInput").value.trim().toLowerCase();
+
+    if (keyword) {
+        processedWallets = processedWallets.filter(w => w.remark.toLowerCase().includes(keyword) || w.address.toLowerCase().includes(keyword));
+    }
+
+    if (balanceSortState !== "DEFAULT") {
+        processedWallets.sort((a, b) => {
+            const balA = parseFloat(a.balances?.[currentToken] || 0), balB = parseFloat(b.balances?.[currentToken] || 0);
+            return balanceSortState === "DESC" ? (balB - balA) : (balA - balB);
+        });
+    }
+
+    const tbody = document.getElementById("walletTableBody");
+    tbody.innerHTML = "";
+    let totalAccumulator = 0;
+
+    processedWallets.forEach((w, viewIdx) => {
+        const bal = parseFloat(w.balances?.[currentToken] || 0);
+        totalAccumulator += bal;
+
+        const activeTokenObj = tokenConfigList.find(t => t.symbol === currentToken && t.chain === w.chain);
+        const maxFraction = (activeTokenObj && activeTokenObj.decimals === 0) ? 0 : 4;
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+            <td class="index-cell">${viewIdx + 1}</td>
+            <td><span class="chain-badge badge-${w.chain}">${w.chain}</span></td>
+            <td class="remark-cell">
+                <div class="remark-inline-container">
+                    <span class="remark-text-span">${escapeHtml(w.remark)}</span>
+                    <span class="edit-remark-icon" onclick="triggerEditRemark(${w.originalIndex})">📝</span>
+                </div>
+            </td>
+            <td class="address-cell">
+                <div class="address-inline-container">
+                    <span class="interactive-addr-link" title="${w.address}" onclick="openBlockExplorer('${w.address}', '${w.chain}')">${abbreviateAddress(w.address)}</span>
+                    <button class="btn-mini-copy" onclick="event.stopPropagation(); executeCopy('${w.address}', this)">${trans.copy_btn}</button>
+                </div>
+            </td>
+            <td class="balance-cell">${isUpdating ? '<span class="loading-pulse">...</span>' : bal.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: maxFraction})}</td>
+            <td style="text-align: center;"><button class="btn-danger" onclick="deleteWallet(${w.originalIndex})">${trans.badge_del}</button></td>
+        `;
+        tbody.appendChild(tr);
+    });
+
+    const activeGlobalTokens = tokenConfigList.filter(t => t.symbol === currentToken);
+    const globalMaxFraction = (activeGlobalTokens.length > 0 && activeGlobalTokens.every(t => t.decimals === 0)) ? 0 : 4;
+
+    document.getElementById("summary_total_display").textContent = totalAccumulator.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: globalMaxFraction});
+    document.getElementById("summary_short_display").textContent = formatShortVolume(totalAccumulator);
+    document.getElementById("summary_wallet_count").textContent = walletList.length;
+}
+
+function initUserCounter() {
+    let count = (parseInt(localStorage.getItem("sys_user_count")) || 1588) + 1;
+    localStorage.setItem("sys_user_count", count);
+    document.getElementById("user_counter_slot").textContent = count.toLocaleString('en-US');
+}
+
+// 挂载执行
+autoDetectGeoLanguage();
+initUserCounter();
+</script>
 </body>
 </html>
